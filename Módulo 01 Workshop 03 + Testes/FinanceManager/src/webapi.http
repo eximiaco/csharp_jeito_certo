@@ -1,0 +1,98 @@
+@FinanceManager_HostAddress = https://localhost:7008
+@Token = BEARER_TOKEN (Utilize o endpoint abaixo para criar o usuário. Após isso, realize o login).
+
+### Create User 
+
+POST {{FinanceManager_HostAddress}}/api/v1/user-account
+Content-Type: application/json
+
+{
+  "name": "Usuário principal",
+  "email": "user@email.com",
+  "password": "Userpassword@123",
+  "confirmPassword": "Userpassword@123"
+}
+
+### Login
+
+POST {{FinanceManager_HostAddress}}/api/v1/user-account/login
+Content-Type: application/json
+
+{
+  "email": "user@email.com",
+  "password": "Userpassword@123"
+}
+
+### Get bank accounts
+
+GET {{FinanceManager_HostAddress}}/api/v1/bank-accounts
+Authorization:  Bearer {{Token}}
+X-Correlation-Id: "requestDemo"
+Content-Type: application/json
+
+### Create bank account
+
+POST {{FinanceManager_HostAddress}}/api/v1/bank-accounts 
+Content-Type: application/json
+Authorization: Bearer {{Token}}
+
+{
+  "name": "Conta despesas mês"
+}
+
+### Get single bank account
+
+GET {{FinanceManager_HostAddress}}/api/v1/bank-accounts/81de06a5-ffeb-4e90-8215-fad8011268d3
+Authorization:  Bearer {{Token}}
+X-Correlation-Id: "requestDemo"
+Content-Type: application/json
+
+
+### Create transaction 
+
+POST {{FinanceManager_HostAddress}}/api/v1/bank-accounts/81de06a5-ffeb-4e90-8215-fad8011268d3/transactions HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{Token}}
+X-Correlation-Id: "teste123"
+
+{
+  "value": 150,
+  "description": "Compras semana 1",
+  "categoryId": "1b1f206a-7828-42f8-a8bc-64010dd505b1"
+}
+
+### Get transaction categories
+
+GET {{FinanceManager_HostAddress}}/api/v1/transaction-categories
+Authorization:  Bearer {{Token}}
+X-Correlation-Id: "requestDemo"
+Content-Type: application/json
+
+### Create transaction category
+
+POST {{FinanceManager_HostAddress}}/api/v1/transaction-categories HTTP/1.1
+Content-Type: application/json
+Authorization:  Bearer {{Token}}
+
+{
+  "name": "Mercado",
+  "description": "Gastos com mercado",
+  "categoryType": 1
+}
+
+### Get budget alerts
+GET {{FinanceManager_HostAddress}}/api/v1/bank-accounts/81de06a5-ffeb-4e90-8215-fad8011268d3/budget-alerts HTTP/1.1
+Host: localhost
+Authorization: Bearer {{Token}}
+X-Correlation-Id: "requestDemo"
+Content-Type: application/json
+
+### Create budget alert
+POST {{FinanceManager_HostAddress}}/api/v1/bank-accounts/81de06a5-ffeb-4e90-8215-fad8011268d3/budget-alerts
+Content-Type: application/json
+Authorization: Bearer {{Token}}
+
+{
+  "maxAllowedValue": 1000,
+  "categoryId": "1b1f206a-7828-42f8-a8bc-64010dd505b1"
+}

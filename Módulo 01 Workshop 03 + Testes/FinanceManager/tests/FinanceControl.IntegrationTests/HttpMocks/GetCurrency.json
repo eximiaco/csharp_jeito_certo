@@ -1,0 +1,24 @@
+{
+  "request": {
+    "method": "GET",
+    "route": "/json/last/USD"
+  },
+  "response": {
+    "status": "ok",
+    "body": {
+      "USDBRL": {
+        "code": "USD",
+        "codein": "BRL",
+        "name": "Dólar Americano/Real Brasileiro",
+        "high": "5",
+        "low": "5",
+        "varBid": "0.027",
+        "pctChange": "0.54",
+        "bid": "5",
+        "ask": "5",
+        "timestamp": "1708703743",
+        "create_date": "2024-02-23 12:55:43"
+      }
+    }
+  }
+}
