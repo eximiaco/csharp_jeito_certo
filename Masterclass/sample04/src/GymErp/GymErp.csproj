@@ -25,6 +25,8 @@
     <ItemGroup>
       <Folder Include="Domain\Financial\" />
       <Folder Include="Domain\Scheduling\" />
+      <Folder Include="Domain\Subscriptions\AddNewEnrollment\" />
+      <Folder Include="Domain\Subscriptions\Infrastructure\" />
       <Folder Include="Tenant\" />
     </ItemGroup>
 
