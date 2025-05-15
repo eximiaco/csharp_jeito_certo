@@ -11,6 +11,8 @@ namespace Gymerp.Domain.Entities
         public DateTime StartDate { get; private set; }
         public DateTime EndDate { get; private set; }
         public EnrollmentStatus Status { get; private set; }
+        public DateTime CreatedAt { get; private set; }
+        public DateTime UpdatedAt { get; private set; }
         public virtual Student? Student { get; private set; }
         public virtual Plan? Plan { get; private set; }
         public virtual ICollection<Payment> Payments { get; private set; } = new List<Payment>();
@@ -25,16 +27,20 @@ namespace Gymerp.Domain.Entities
             StartDate = startDate;
             EndDate = endDate;
             Status = EnrollmentStatus.Pending;
+            CreatedAt = DateTime.UtcNow;
+            UpdatedAt = DateTime.UtcNow;
         }
 
         public void Confirm()
         {
             Status = EnrollmentStatus.Active;
+            UpdatedAt = DateTime.UtcNow;
         }
 
         public void Cancel()
         {
             Status = EnrollmentStatus.Cancelled;
+            UpdatedAt = DateTime.UtcNow;
         }
 
         public void Complete()

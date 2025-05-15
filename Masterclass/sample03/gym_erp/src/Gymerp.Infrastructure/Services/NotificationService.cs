@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Gymerp.Application.Interfaces;
 using Microsoft.Extensions.Logging;
+using Gymerp.Domain.Entities;
 
 namespace Gymerp.Infrastructure.Services
 {
@@ -14,24 +15,27 @@ namespace Gymerp.Infrastructure.Services
             _logger = logger;
         }
 
-        public async Task SendAsync(string to, string subject, string message)
+        public async Task SendAsync(string to, string subject, string body)
         {
-            try
-            {
-                // TODO: Implementar integração real com serviço de email
-                // Por enquanto, apenas logamos a notificação
-                _logger.LogInformation(
-                    "Notificação enviada para {To}\nAssunto: {Subject}\nMensagem: {Message}",
-                    to, subject, message
-                );
+            // Simula envio de e-mail
+            _logger.LogInformation($"Email enviado para {to} | Assunto: {subject} | Mensagem: {body}");
+            await Task.CompletedTask;
+        }
 
-                await Task.CompletedTask;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Erro ao enviar notificação para {To}", to);
-                throw;
-            }
+        public async Task SendPaymentConfirmationAsync(Payment payment)
+        {
+            var subject = "Pagamento aprovado";
+            var body = $"Seu pagamento de {payment.Amount:C} foi aprovado com sucesso.";
+            var to = payment.Enrollment?.Student?.Email ?? "";
+            await SendAsync(to, subject, body);
+        }
+
+        public async Task SendPaymentRejectionAsync(Payment payment)
+        {
+            var subject = "Pagamento não aprovado";
+            var body = $"Seu pagamento de {payment.Amount:C} não foi aprovado. Por favor, tente novamente.";
+            var to = payment.Enrollment?.Student?.Email ?? "";
+            await SendAsync(to, subject, body);
         }
     }
 } 

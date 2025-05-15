@@ -45,6 +45,8 @@ namespace Gymerp.Infrastructure.Data
                 entity.Property(e => e.Status).IsRequired();
                 entity.Property(e => e.StartDate).IsRequired();
                 entity.Property(e => e.EndDate).IsRequired();
+                entity.Property(e => e.CreatedAt).IsRequired();
+                entity.Property(e => e.UpdatedAt).IsRequired();
 
                 entity.HasOne(e => e.Student)
                     .WithMany(s => s.Enrollments)
@@ -75,6 +77,7 @@ namespace Gymerp.Infrastructure.Data
                 entity.Property(e => e.Amount).IsRequired();
                 entity.Property(e => e.DueDate).IsRequired();
                 entity.Property(e => e.Status).IsRequired();
+                entity.Property(e => e.Attempts).IsRequired();
                 entity.Property(e => e.CreatedAt).IsRequired();
                 entity.Property(e => e.UpdatedAt).IsRequired();
 

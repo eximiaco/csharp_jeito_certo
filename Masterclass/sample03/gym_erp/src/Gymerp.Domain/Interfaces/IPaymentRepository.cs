@@ -7,8 +7,10 @@ namespace Gymerp.Domain.Interfaces
 {
     public interface IPaymentRepository
     {
+        Task<Payment> GetByIdAsync(Guid id);
+        Task<IEnumerable<Payment>> GetByEnrollmentIdAsync(Guid enrollmentId);
+        Task<IEnumerable<Payment>> GetAllAsync();
         Task<Payment> AddAsync(Payment payment);
         Task<Payment> UpdateAsync(Payment payment);
-        Task<IEnumerable<Payment>> GetByEnrollmentIdAsync(Guid enrollmentId);
     }
 } 

@@ -11,6 +11,7 @@ namespace Gymerp.Domain.Entities
         public PaymentStatus Status { get; private set; }
         public DateTime CreatedAt { get; private set; }
         public DateTime UpdatedAt { get; private set; }
+        public int Attempts { get; private set; }
         public virtual Enrollment? Enrollment { get; private set; }
 
         protected Payment() { }
@@ -22,6 +23,7 @@ namespace Gymerp.Domain.Entities
             Amount = amount;
             DueDate = dueDate;
             Status = PaymentStatus.Pending;
+            Attempts = 0;
             CreatedAt = DateTime.UtcNow;
             UpdatedAt = DateTime.UtcNow;
         }
@@ -43,6 +45,12 @@ namespace Gymerp.Domain.Entities
             Status = PaymentStatus.Cancelled;
             UpdatedAt = DateTime.UtcNow;
         }
+
+        public void MarkAsRejected()
+        {
+            Status = PaymentStatus.Rejected;
+            UpdatedAt = DateTime.UtcNow;
+        }
     }
 
     public enum PaymentStatus
@@ -50,6 +58,7 @@ namespace Gymerp.Domain.Entities
         Pending,
         Paid,
         Overdue,
-        Cancelled
+        Cancelled,
+        Rejected
     }
 } 
