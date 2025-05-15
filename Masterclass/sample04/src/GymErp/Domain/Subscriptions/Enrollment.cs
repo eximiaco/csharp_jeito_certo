@@ -3,7 +3,25 @@ using GymErp.Common;
 
 namespace GymErp.Domain.Subscriptions;
 
-public record Client(string Cpf, string Name, string Email, string Phone, string Address);
+public record Client
+{
+    public string Cpf { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Phone { get; set; } = string.Empty;
+    public string Address { get; set; } = string.Empty;
+
+    public Client() { }
+
+    public Client(string cpf, string name, string email, string phone, string address)
+    {
+        Cpf = cpf;
+        Name = name;
+        Email = email;
+        Phone = phone;
+        Address = address;
+    }
+}
 
 public enum EState
 {
@@ -14,6 +32,8 @@ public enum EState
 
 public sealed class Enrollment : IAggregate
 {
+    private Enrollment() { }
+
     private Enrollment(Guid id, Client client, DateTime requestDate, EState state)
     {
         Id = id;
@@ -22,10 +42,10 @@ public sealed class Enrollment : IAggregate
         State = state;
     }
     
-    public Guid Id { get; }
-    public Client Client { get; }
-    public DateTime RequestDate { get; }
-    public EState State { get; }
+    public Guid Id { get; private set; }
+    public Client Client { get; private set; } = null!;
+    public DateTime RequestDate { get; private set; }
+    public EState State { get; private set; }
 
     public static Result<Enrollment> Create(Client client)
     {

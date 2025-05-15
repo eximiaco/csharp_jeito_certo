@@ -184,3 +184,15 @@ D:/Work/Eximia/Eximia/csharp_jeito_certo/Masterclass/sample04/src/GymErp/bin/Deb
 D:/Work/Eximia/Eximia/csharp_jeito_certo/Masterclass/sample04/src/GymErp/bin/Debug/net8.0/Microsoft.Extensions.Caching.Abstractions.dll
 D:/Work/Eximia/Eximia/csharp_jeito_certo/Masterclass/sample04/src/GymErp/bin/Debug/net8.0/Microsoft.Extensions.Caching.Memory.dll
 D:/Work/Eximia/Eximia/csharp_jeito_certo/Masterclass/sample04/src/GymErp/bin/Debug/net8.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll
+/Users/gabrielkohlrausch/Documents/dev/csharp_jeito_certo/Masterclass/sample04/src/GymErp/bin/Debug/net8.0/ConcurrentCollections.dll
+/Users/gabrielkohlrausch/Documents/dev/csharp_jeito_certo/Masterclass/sample04/src/GymErp/bin/Debug/net8.0/CSharpFunctionalExtensions.dll
+/Users/gabrielkohlrausch/Documents/dev/csharp_jeito_certo/Masterclass/sample04/src/GymErp/bin/Debug/net8.0/Microsoft.EntityFrameworkCore.dll
+/Users/gabrielkohlrausch/Documents/dev/csharp_jeito_certo/Masterclass/sample04/src/GymErp/bin/Debug/net8.0/Microsoft.EntityFrameworkCore.Abstractions.dll
+/Users/gabrielkohlrausch/Documents/dev/csharp_jeito_certo/Masterclass/sample04/src/GymErp/bin/Debug/net8.0/Microsoft.EntityFrameworkCore.Relational.dll
+/Users/gabrielkohlrausch/Documents/dev/csharp_jeito_certo/Masterclass/sample04/src/GymErp/bin/Debug/net8.0/Microsoft.Extensions.Caching.Abstractions.dll
+/Users/gabrielkohlrausch/Documents/dev/csharp_jeito_certo/Masterclass/sample04/src/GymErp/bin/Debug/net8.0/Microsoft.Extensions.Caching.Memory.dll
+/Users/gabrielkohlrausch/Documents/dev/csharp_jeito_certo/Masterclass/sample04/src/GymErp/bin/Debug/net8.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll
+/Users/gabrielkohlrausch/Documents/dev/csharp_jeito_certo/Masterclass/sample04/src/GymErp/bin/Debug/net8.0/OpenTelemetry.Api.dll
+/Users/gabrielkohlrausch/Documents/dev/csharp_jeito_certo/Masterclass/sample04/src/GymErp/bin/Debug/net8.0/Polly.dll
+/Users/gabrielkohlrausch/Documents/dev/csharp_jeito_certo/Masterclass/sample04/src/GymErp/bin/Debug/net8.0/Polly.Core.dll
+/Users/gabrielkohlrausch/Documents/dev/csharp_jeito_certo/Masterclass/sample04/src/GymErp/bin/Debug/net8.0/WorkflowCore.dll
