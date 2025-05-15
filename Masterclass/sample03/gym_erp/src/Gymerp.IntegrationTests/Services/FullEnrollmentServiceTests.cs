@@ -48,9 +48,7 @@ namespace Gymerp.IntegrationTests.Services
             _assessmentRepository = new PhysicalAssessmentRepository(_context);
             _personalRepository = new PersonalRepository(_context);
 
-            // Mocks para dependências do PaymentService
-            var paymentRepoMock = new Mock<IPaymentRepository>();
-            var notificationServiceMock = new Mock<INotificationService>();
+            // Mock do PaymentService
             var paymentServiceMock = new Mock<IPaymentService>();
             paymentServiceMock.Setup(x => x.ProcessAsync(It.IsAny<Enrollment>()))
                 .ReturnsAsync(new Gymerp.Application.Models.PaymentResult { Success = true, Message = "Pagamento aprovado" });
@@ -127,7 +125,7 @@ namespace Gymerp.IntegrationTests.Services
             var enrollmentId = await _service.EnrollAsync(dto);
 
             // Assert
-            var enrollment = await _enrollmentRepository.GetByIdAsync(enrollmentId);
+            var enrollment = await _enrollmentRepository.GetByIdAsync(enrollmentId.Id);
             Assert.NotNull(enrollment);
             Assert.Equal(plan.Id, enrollment.PlanId);
             Assert.Equal(dto.StartDate.Date, enrollment.StartDate.Date);
@@ -207,7 +205,7 @@ namespace Gymerp.IntegrationTests.Services
             var enrollmentId = await _service.EnrollAsync(dto);
 
             // Assert
-            var enrollment = await _enrollmentRepository.GetByIdAsync(enrollmentId);
+            var enrollment = await _enrollmentRepository.GetByIdAsync(enrollmentId.Id);
             Assert.NotNull(enrollment);
             Assert.Equal(existingStudent.Id, enrollment.StudentId);
         }

@@ -32,7 +32,7 @@ namespace Gymerp.Application.Services
             _paymentService = paymentService;
         }
 
-        public async Task<Guid> EnrollAsync(FullEnrollmentDto dto)
+        public async Task<Enrollment> EnrollAsync(FullEnrollmentDto dto)
         {
             // 1. Obtém ou cria o aluno
             var student = await GetOrCreateStudentAsync(dto.Student);
@@ -50,7 +50,7 @@ namespace Gymerp.Application.Services
             // 4. Agenda avaliação física apenas se o pagamento for aprovado
             await SchedulePhysicalAssessmentAsync(student, dto.PhysicalAssessment);
 
-            return enrollment.Id;
+            return enrollment;
         }
 
         private async Task<Student> GetOrCreateStudentAsync(StudentDto studentDto)

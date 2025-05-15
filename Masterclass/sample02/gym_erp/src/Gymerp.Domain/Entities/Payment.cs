@@ -26,6 +26,7 @@ namespace Gymerp.Domain.Entities
             Status = PaymentStatus.Pending;
             Attempts = 0;
             CreatedAt = DateTime.UtcNow;
+            UpdatedAt = DateTime.UtcNow;
         }
 
         public void MarkAsPaid()

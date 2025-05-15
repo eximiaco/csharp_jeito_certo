@@ -1,0 +1,29 @@
+﻿{
+  Id: fc2a8468-d562-4d35-9811-225f0a49af00,
+  StudentId: 1d3ea3e4-fe3b-43c7-a0ee-289d30ffb6d6,
+  PlanId: 87a15cb0-3030-4452-80f8-670cce6dd3a3,
+  CreatedAt: 2025-05-15 18:18:25.215019 Utc,
+  UpdatedAt: 2025-05-15 18:18:25.215028 Utc,
+  Student: {
+    Id: 1d3ea3e4-fe3b-43c7-a0ee-289d30ffb6d6,
+    Name: João Silva,
+    Email: joao@email.com,
+    Phone: 11999999999,
+    Document: 12345678900,
+    BirthDate: 2005-05-15 15:18:25.088961 Local,
+    Address: Rua Teste, 123,
+    CreatedAt: 2025-05-15 18:18:25.089174 Utc,
+    UpdatedAt: 2025-05-15 18:18:25.089184 Utc,
+    Enrollments: []
+  },
+  Plan: {
+    Id: 87a15cb0-3030-4452-80f8-670cce6dd3a3,
+    Name: Plano Mensal,
+    Description: Acesso à academia por 30 dias,
+    Price: 100.00,
+    DurationInMonths: 30,
+    CreatedAt: 2025-05-15 18:18:25.1338 Utc,
+    UpdatedAt: 2025-05-15 18:18:25.133811 Utc,
+    HasUnlimitedClasses: false
+  }
+}
