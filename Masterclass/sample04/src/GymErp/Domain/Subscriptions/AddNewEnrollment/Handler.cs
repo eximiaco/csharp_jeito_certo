@@ -1,14 +1,15 @@
+using CSharpFunctionalExtensions;
 using GymErp.Common;
-using GymErp.Domain.Subscriptions;
-using Gymerp.Domain.Subscriptions.Infrastructure;
+using GymErp.Domain.Subscriptions.AddNewEnrollment;
+using GymErp.Domain.Subscriptions.Infrastructure;
 
-namespace Gymerp.Domain.Subscriptions.AddNewEnrollment;
+namespace GymErp.Domain.Subscriptions.AddNewEnrollment;
 
-public class Handler(EnrollmentRepository enrollmentRepository, IUnitOfWork unitOfWork)
+public class Handler(EnrollmentRepository repository, IUnitOfWork unitOfWork, CancellationToken cancellationToken)
 {
-    public async Task<Guid> HandleAsync(Request request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> HandleAsync(Request request)
     {
-        var enrollment = Enrollment.Create(
+        var enrollmentResult = Enrollment.Create(
             request.Name,
             request.Email,
             request.Phone,
@@ -18,10 +19,13 @@ public class Handler(EnrollmentRepository enrollmentRepository, IUnitOfWork unit
             request.Address
         );
 
-        await enrollmentRepository.AddAsync(enrollment, cancellationToken);
-        
-        unitOfWork.Commit();
+        if (enrollmentResult.IsFailure)
+            return Result.Failure<Guid>(enrollmentResult.Error);
 
-        return enrollment.Id;
+        var enrollment = enrollmentResult.Value;
+        await repository.AddAsync(enrollment, cancellationToken);
+        await unitOfWork.Commit(cancellationToken);
+
+        return Result.Success(enrollment.Id);
     }
 } 

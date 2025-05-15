@@ -1,3 +1,4 @@
+using GymErp.Domain.Subscriptions.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Testcontainers.PostgreSql;
 using Xunit;
@@ -7,7 +8,7 @@ namespace GymErp.IntegrationTests.Infrastructure;
 public abstract class IntegrationTestBase : IAsyncLifetime
 {
     protected readonly PostgreSqlContainer _postgresContainer;
-    protected readonly DbContext _dbContext;
+    protected SubscriptionsDbContext _dbContext = null!;
 
     protected IntegrationTestBase()
     {
@@ -22,13 +23,19 @@ public abstract class IntegrationTestBase : IAsyncLifetime
     public async Task InitializeAsync()
     {
         await _postgresContainer.StartAsync();
+        var options = new DbContextOptionsBuilder<SubscriptionsDbContext>()
+            .UseNpgsql(_postgresContainer.GetConnectionString())
+            .Options;
+        _dbContext = new SubscriptionsDbContext(options);
+        await _dbContext.Database.EnsureCreatedAsync();
         await SetupDatabase();
     }
 
     public async Task DisposeAsync()
     {
+        await _dbContext.Database.EnsureDeletedAsync();
         await _postgresContainer.DisposeAsync();
     }
 
-    protected abstract Task SetupDatabase();
+    protected virtual Task SetupDatabase() => Task.CompletedTask;
 } 

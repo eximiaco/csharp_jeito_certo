@@ -1,8 +1,7 @@
 using FluentAssertions;
 using GymErp.Common;
 using GymErp.Domain.Subscriptions;
-using Gymerp.Domain.Subscriptions.AddNewEnrollment;
-using Gymerp.Domain.Subscriptions.Infrastructure;
+using GymErp.Domain.Subscriptions.AddNewEnrollment;
 using GymErp.Domain.Subscriptions.Infrastructure;
 using GymErp.IntegrationTests.Infrastructure;
 using Microsoft.EntityFrameworkCore;
@@ -10,24 +9,28 @@ using Xunit;
 
 namespace GymErp.IntegrationTests.Subscriptions.AddNewEnrollment;
 
-public class HandlerTests : IntegrationTestBase
+public class HandlerTests : IntegrationTestBase, IAsyncLifetime
 {
-    private Handler? _handler;
-    private EnrollmentRepository? _enrollmentRepository;
-    private IUnitOfWork? _unitOfWork;
-    private SubscriptionsDbContext? _context;
+    private Handler _handler = null!;
+    private EnrollmentRepository _enrollmentRepository = null!;
+    private IUnitOfWork _unitOfWork = null!;
+    private EfDbContextAccessor<SubscriptionsDbContext> _dbContextAccessor = null!;
 
-    protected override async Task SetupDatabase()
+    public HandlerTests() : base() { }
+
+    public async Task InitializeAsync()
     {
-        var options = new DbContextOptionsBuilder<SubscriptionsDbContext>()
-            .UseNpgsql(_postgresContainer.GetConnectionString())
-            .Options;
+        await base.InitializeAsync();
+        _dbContextAccessor = new EfDbContextAccessor<SubscriptionsDbContext>(_dbContext);
+        _enrollmentRepository = new EnrollmentRepository(_dbContextAccessor);
+        _unitOfWork = new UnitOfWork(_dbContext);
+        _handler = new Handler(_enrollmentRepository, _unitOfWork, CancellationToken.None);
+    }
 
-        _context = new SubscriptionsDbContext(options);
-        await _context.Database.EnsureCreatedAsync();
-        _enrollmentRepository = new EnrollmentRepository(_context);
-        _unitOfWork = new UnitOfWork(_context);
-        _handler = new Handler(_enrollmentRepository, _unitOfWork);
+    public async Task DisposeAsync()
+    {
+        await base.DisposeAsync();
+        _dbContextAccessor?.Dispose();
     }
 
     [Fact]
@@ -36,33 +39,67 @@ public class HandlerTests : IntegrationTestBase
         // Arrange
         var request = new Request
         {
-            Name = "João Silva",
-            Email = "joao@email.com",
+            Name = "João da Silva Santos",
+            Email = "joao.silva@email.com",
             Phone = "11999999999",
-            Document = "12345678900",
+            Document = "52998224725", // CPF válido
             BirthDate = new DateTime(1990, 1, 1),
             Gender = "M",
             Address = "Rua Exemplo, 123"
         };
 
         // Act
-        var enrollmentId = await _handler!.HandleAsync(request, CancellationToken.None);
+        var result = await _handler.HandleAsync(request);
 
         // Assert
-        enrollmentId.Should().NotBeEmpty();
-
-        var options = new DbContextOptionsBuilder<SubscriptionsDbContext>()
-            .UseNpgsql(_postgresContainer.GetConnectionString())
-            .Options;
-
-        using var context = new SubscriptionsDbContext(options);
-        var enrollment = await context.Enrollments.FindAsync(enrollmentId);
-        
+        result.IsSuccess.Should().BeTrue();
+        var enrollment = await _dbContext.Enrollments.FindAsync(result.Value);
         enrollment.Should().NotBeNull();
         enrollment!.Client.Name.Should().Be(request.Name);
         enrollment.Client.Email.Should().Be(request.Email);
         enrollment.Client.Phone.Should().Be(request.Phone);
         enrollment.Client.Cpf.Should().Be(request.Document);
         enrollment.Client.Address.Should().Be(request.Address);
+        enrollment.RequestDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        enrollment.State.Should().Be(EState.Suspended);
+    }
+
+    [Theory]
+    [InlineData("", "email@test.com", "11999999999", "52998224725", "1990-01-01", "M", "Rua Teste", "Nome não pode ser vazio")]
+    [InlineData("João S.", "email@test.com", "11999999999", "52998224725", "1990-01-01", "M", "Rua Teste", "Nome deve ter pelo menos 10 caracteres")]
+    [InlineData("João da Silva Santos", "", "11999999999", "52998224725", "1990-01-01", "M", "Rua Teste", "Email não pode ser vazio")]
+    [InlineData("João da Silva Santos", "invalid-email", "11999999999", "52998224725", "1990-01-01", "M", "Rua Teste", "Email inválido")]
+    [InlineData("João da Silva Santos", "email@test.com", "", "52998224725", "1990-01-01", "M", "Rua Teste", "Telefone não pode ser vazio")]
+    [InlineData("João da Silva Santos", "email@test.com", "123", "52998224725", "1990-01-01", "M", "Rua Teste", "Telefone inválido")]
+    [InlineData("João da Silva Santos", "email@test.com", "11999999999", "", "1990-01-01", "M", "Rua Teste", "CPF não pode ser vazio")]
+    [InlineData("João da Silva Santos", "email@test.com", "11999999999", "12345678901", "1990-01-01", "M", "Rua Teste", "CPF inválido")]
+    public async Task HandleAsync_ShouldReturnFailure_WhenInvalidRequest(
+        string name,
+        string email,
+        string phone,
+        string document,
+        string birthDate,
+        string gender,
+        string address,
+        string expectedError)
+    {
+        // Arrange
+        var request = new Request
+        {
+            Name = name,
+            Email = email,
+            Phone = phone,
+            Document = document,
+            BirthDate = DateTime.Parse(birthDate),
+            Gender = gender,
+            Address = address
+        };
+
+        // Act
+        var result = await _handler.HandleAsync(request);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(expectedError);
     }
 } 

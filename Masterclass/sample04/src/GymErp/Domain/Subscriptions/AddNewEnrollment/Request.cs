@@ -1,4 +1,4 @@
-namespace Gymerp.Domain.Subscriptions.AddNewEnrollment;
+namespace GymErp.Domain.Subscriptions.AddNewEnrollment;
 
 public record Request
 {

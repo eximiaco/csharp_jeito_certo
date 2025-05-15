@@ -7,7 +7,7 @@ using GymErp.Bootstrap;
 using GymErp.Common.Settings;
 using GymErp.Domain.Orchestration.Features.NewEnrollmentFlow;
 using GymErp.Domain.Orchestration.Infrastructure;
-using Gymerp.Domain.Subscriptions.Infrastructure;
+using GymErp.Domain.Subscriptions.Infrastructure;
 using GymErp.Tenant;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Serilog;

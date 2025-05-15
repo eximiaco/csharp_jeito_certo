@@ -1,10 +1,10 @@
 using Autofac;
 using GymErp.Common;
-using Gymerp.Domain.Subscriptions.AddNewEnrollment;
+using GymErp.Domain.Subscriptions.AddNewEnrollment;
 using GymErp.Domain.Subscriptions.Infrastructure;
-using Endpoint = Gymerp.Domain.Subscriptions.AddNewEnrollment.Endpoint;
+using Endpoint = GymErp.Domain.Subscriptions.AddNewEnrollment.Endpoint;
 
-namespace Gymerp.Domain.Subscriptions.Infrastructure;
+namespace GymErp.Domain.Subscriptions.Infrastructure;
 
 public class SubscriptionsModule : Module
 {

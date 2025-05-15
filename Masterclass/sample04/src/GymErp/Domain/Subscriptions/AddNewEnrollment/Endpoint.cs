@@ -1,9 +1,8 @@
 using FastEndpoints;
-using Gymerp.Domain.Subscriptions.Infrastructure;
 
-namespace Gymerp.Domain.Subscriptions.AddNewEnrollment;
+namespace GymErp.Domain.Subscriptions.AddNewEnrollment;
 
-public class Endpoint : Endpoint<Request, Response>
+public class Endpoint : Endpoint<Request, Guid>
 {
     private readonly Handler _handler;
 
@@ -18,9 +17,14 @@ public class Endpoint : Endpoint<Request, Response>
         AllowAnonymous();
     }
 
-    public override async Task HandleAsync(Request request, CancellationToken ct)
+    public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var enrollmentId = await _handler.HandleAsync(request, ct);
-        await SendAsync(new Response { EnrollmentId = enrollmentId }, cancellation: ct);
+        var result = await _handler.HandleAsync(req);
+        if (result.IsFailure)
+        {
+            await SendErrorsAsync(cancellation: ct);
+            return;
+        }
+        await SendOkAsync(result.Value, ct);
     }
 }

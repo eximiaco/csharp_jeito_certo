@@ -9,8 +9,8 @@ public class UnitOfWork(SubscriptionsDbContext context) : IUnitOfWork
         return await context.SaveChangesAsync(cancellationToken);
     }
 
-    public void Commit()
+    public async Task Commit(CancellationToken cancellationToken = default)
     {
-        context.SaveChanges();
+        await context.SaveChangesAsync(cancellationToken);
     }
 }
