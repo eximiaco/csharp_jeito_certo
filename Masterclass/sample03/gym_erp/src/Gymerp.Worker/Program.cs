@@ -17,7 +17,7 @@ var host = Host.CreateDefaultBuilder(args)
         services.AddScoped<IPaymentRepository, PaymentRepository>();
         services.AddScoped<IPaymentService, PaymentService>();
         services.AddScoped<INotificationService, NotificationService>();
-        services.AddScoped<IAttendanceCheckService, AttendanceCheckService>();
+        services.AddScoped<IAttendanceCheckService, AttendanceService>();
     })
     .Build();
 

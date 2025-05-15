@@ -7,16 +7,16 @@ using Gymerp.Application.Interfaces;
 
 namespace Gymerp.Application.Services
 {
-    public class AttendanceCheckService : IAttendanceCheckService
+    public class AttendanceService : IAttendanceCheckService
     {
-        private readonly ILogger<AttendanceCheckService> _logger;
+        private readonly ILogger<AttendanceService> _logger;
         private readonly IAccessRecordRepository _accessRecordRepository;
         private readonly IScheduledClassRepository _scheduledClassRepository;
         private readonly IPaymentRepository _paymentRepository;
         private const decimal FINE_AMOUNT = 10.00m;
 
-        public AttendanceCheckService(
-            ILogger<AttendanceCheckService> logger,
+        public AttendanceService(
+            ILogger<AttendanceService> logger,
             IAccessRecordRepository accessRecordRepository,
             IScheduledClassRepository scheduledClassRepository,
             IPaymentRepository paymentRepository)
