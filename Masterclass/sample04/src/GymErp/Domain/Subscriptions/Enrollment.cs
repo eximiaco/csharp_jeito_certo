@@ -11,6 +11,7 @@ public enum EState
     Suspended,
     Canceled
 }
+
 public sealed class Enrollment : IAggregate
 {
     private Enrollment(Guid id, Client client, DateTime requestDate, EState state)
@@ -28,6 +29,19 @@ public sealed class Enrollment : IAggregate
 
     public static Result<Enrollment> Create(Client client)
     {
+        return new Enrollment(Guid.NewGuid(), client, DateTime.UtcNow, EState.Suspended);
+    }
+
+    public static Enrollment Create(
+        string name,
+        string email,
+        string phone,
+        string document,
+        DateTime birthDate,
+        string gender,
+        string address)
+    {
+        var client = new Client(document, name, email, phone, address);
         return new Enrollment(Guid.NewGuid(), client, DateTime.UtcNow, EState.Suspended);
     }
 }

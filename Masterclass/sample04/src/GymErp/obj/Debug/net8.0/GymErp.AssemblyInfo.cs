@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GymErp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a8772cdca526b602b46be03313365ac317a69946")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d6776943aa76d9b41214ce9338048534600f9cf4")]
 [assembly: System.Reflection.AssemblyProductAttribute("GymErp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GymErp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
