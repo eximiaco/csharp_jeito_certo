@@ -4,6 +4,7 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <InvariantGlobalization>false</InvariantGlobalization>
     </PropertyGroup>
 
     <ItemGroup>
@@ -29,6 +30,7 @@
 
     <ItemGroup>
       <Folder Include="Domain\Financial\" />
+      <Folder Include="Domain\Orchestration\Features\CancelEnrollmentFlow\" />
       <Folder Include="Domain\Scheduling\" />
       <Folder Include="Tenant\" />
     </ItemGroup>

@@ -1,3 +1,4 @@
+using Flurl;
 using Flurl.Http;
 using GymErp.Common;
 using GymErp.Common.Settings;
@@ -13,21 +14,44 @@ public class AddEnrollmentStep(IOptions<ServicesSettings> options) : StepBodyAsy
     public override async Task<ExecutionResult> RunAsync(IStepExecutionContext context)
     {
         var data = context.Workflow.Data as NewEnrollmentFlowData;
-        NewEnrollmentRequest request = new(data!.ClientId, data.PlanId, data.StartDate, data.EndDate);
+        
+        var request = new AddEnrollmentRequest(
+            data!.Name,
+            data.Email,
+            data.Phone,
+            data.Document,
+            data.BirthDate,
+            data.Gender,
+            data.Address
+        );
 
         var response = await HttpRetryPolicy.AsyncRetryPolicy.ExecuteAndCaptureAsync(async () =>
         {
-            return await options.Value.AddEnrollmentUri
+            return await options.Value.SubscriptionsUri
+                .AppendPathSegment("enrollments")
                 .PostJsonAsync(request);
         });
 
         if (response.Outcome == OutcomeType.Failure)
             throw response.FinalException;
         if (!response.Result.ResponseMessage.IsSuccessStatusCode)
-            throw new InvalidOperationException("Falha realizando matrícula.");
+            throw new InvalidOperationException("Falha ao criar matrÃ­cula.");
 
+        var enrollmentResponse = await response.Result.GetJsonAsync<AddEnrollmentResponse>();
+        data.EnrollmentId = enrollmentResponse.EnrollmentId;
+        data.EnrollmentCreated = true;
         return ExecutionResult.Next();
     }
 
-    public record NewEnrollmentRequest(Guid ClientId, Guid PlanId, DateTime StartDate, DateTime EndDate);
+    public record AddEnrollmentRequest(
+        string Name,
+        string Email,
+        string Phone,
+        string Document,
+        DateTime BirthDate,
+        string Gender,
+        string Address
+    );
+
+    public record AddEnrollmentResponse(Guid EnrollmentId);
 }

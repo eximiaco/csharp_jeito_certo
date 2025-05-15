@@ -4,9 +4,13 @@ using Autofac.Extensions.DependencyInjection;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using GymErp.Bootstrap;
+using GymErp.Common.Settings;
+using GymErp.Domain.Orchestration.Features.NewEnrollmentFlow;
+using GymErp.Domain.Orchestration.Infrastructure;
 using Gymerp.Domain.Subscriptions.Infrastructure;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Serilog;
+using WorkflowCore.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 var assemblyName = Assembly.GetExecutingAssembly().GetName();
@@ -35,11 +39,14 @@ try
         .AddHttpContextAccessor()
         .AddHealth(builder.Configuration)
         .AddOptions()
-        .AddCaching();
+        .AddCaching()
+        .Configure<ServicesSettings>(builder.Configuration.GetSection("ServicesSettings"))
+        .AddWorkflow();
     
     builder.Host.ConfigureContainer<ContainerBuilder>(builder =>
     {
         builder.RegisterModule(new SubscriptionsModule());
+        builder.RegisterModule(new OrchestrationModule());
     });
     builder.Host.UseSerilog();
     builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
@@ -69,6 +76,11 @@ try
                     settings.DocumentPath = $"/{basePath}/{settings.DocumentPath}";
                 }
             });
+
+    // Registrar workflows
+    var host = app.Services.GetService<IWorkflowHost>();
+    host?.RegisterWorkflow<MainWorkflow, NewEnrollmentFlowData>();
+    host?.Start();
 
     app.Run();
     return 0;

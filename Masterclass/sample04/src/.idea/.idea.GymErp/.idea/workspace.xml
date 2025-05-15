@@ -8,21 +8,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="103c6f03-3ab3-4305-81a4-e974d96cf4dc" name="Changes" comment="Criar inscricao">
-      <change afterPath="$PROJECT_DIR$/GymErp/Domain/Subscriptions/Infrastructure/SubscriptionsDbContext.cs" afterDir="false" />
+    <list default="true" id="103c6f03-3ab3-4305-81a4-e974d96cf4dc" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.GymErp/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.GymErp/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GymErp/Common/Settings/ServicesSettings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/Common/Settings/ServicesSettings.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GymErp/Domain/Orchestration/Features/NewEnrollmentFlow/Endpoint.cs" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/Domain/Orchestration/Features/NewEnrollmentFlow/Endpoint.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GymErp/Domain/Orchestration/Features/NewEnrollmentFlow/MainWorkflow.cs" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/Domain/Orchestration/Features/NewEnrollmentFlow/MainWorkflow.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GymErp/Domain/Orchestration/Features/NewEnrollmentFlow/NewEnrollmentFlowData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/Domain/Orchestration/Features/NewEnrollmentFlow/NewEnrollmentFlowData.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GymErp/Domain/Orchestration/Features/NewEnrollmentFlow/Steps/AddEnrollmentStep.cs" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/Domain/Orchestration/Features/NewEnrollmentFlow/Steps/AddEnrollmentStep.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GymErp/Domain/Orchestration/Features/NewEnrollmentFlow/Steps/ProcessPaymentStep.cs" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/Domain/Orchestration/Features/NewEnrollmentFlow/Steps/ProcessPaymentStep.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GymErp/Domain/Orchestration/Features/NewEnrollmentFlow/Steps/ScheduleEvaluationStep.cs" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/Domain/Orchestration/Features/NewEnrollmentFlow/Steps/ScheduleEvaluationStep.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GymErp/GymErp.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/GymErp.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GymErp/obj/Debug/net8.0/GymErp.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/obj/Debug/net8.0/GymErp.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GymErp/obj/Debug/net8.0/GymErp.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/obj/Debug/net8.0/GymErp.AssemblyInfoInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GymErp/obj/Debug/net8.0/GymErp.assets.cache" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/obj/Debug/net8.0/GymErp.assets.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GymErp/obj/Debug/net8.0/GymErp.csproj.AssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/obj/Debug/net8.0/GymErp.csproj.AssemblyReference.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GymErp/obj/GymErp.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/obj/GymErp.csproj.nuget.dgspec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GymErp/obj/GymErp.csproj.nuget.g.props" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/obj/GymErp.csproj.nuget.g.props" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GymErp/obj/GymErp.csproj.nuget.g.targets" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/obj/GymErp.csproj.nuget.g.targets" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GymErp/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/obj/project.assets.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GymErp/obj/project.nuget.cache" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/obj/project.nuget.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GymErp/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GymErp/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/appsettings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GymErp/obj/Debug/net8.0/GymErp.MvcApplicationPartsAssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/obj/Debug/net8.0/GymErp.MvcApplicationPartsAssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GymErp/obj/Debug/net8.0/GymErp.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/obj/Debug/net8.0/GymErp.csproj.CoreCompileInputs.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GymErp/obj/Debug/net8.0/GymErp.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/obj/Debug/net8.0/GymErp.csproj.FileListAbsolute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GymErp/obj/Debug/net8.0/GymErp.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/obj/Debug/net8.0/GymErp.sourcelink.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GymErp/obj/project.packagespec.json" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/obj/project.packagespec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GymErp/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/obj/rider.project.model.nuget.info" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GymErp/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/obj/rider.project.restore.info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -48,6 +50,7 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/../../sample03/gym_erp/src/Gymerp.Worker/Services/AttendanceCheckWorker.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Users/gabrielkohlrausch/Documents/dev/csharp_jeito_certo/Masterclass/sample03/gym_erp/src/Gymerp.Worker/Services/AttendanceCheckWorker.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/gabrielkohlrausch/Documents/dev/csharp_jeito_certo/Masterclass/sample04/src/GymErp/Domain/Subscriptions/Enrollment.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/9147127ea87c94de7bdcfa6abd3a8d1be8ab591436a45dc11dea6b9fc52d7b6/OptionsServiceCollectionExtensions.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
@@ -132,7 +135,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1747334019657</updated>
-      <workItem from="1747334020722" duration="4028000" />
+      <workItem from="1747334020722" duration="6169000" />
     </task>
     <task id="LOCAL-00001" summary="Aplicacao base do sample 3">
       <option name="closed" value="true" />
@@ -166,7 +169,15 @@
       <option name="project" value="LOCAL" />
       <updated>1747338869487</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Funcionalidade de adicionar nova inscricao">
+      <option name="closed" value="true" />
+      <created>1747342311659</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1747342311659</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -180,6 +191,7 @@
     <MESSAGE value="estrutura base de enrollment" />
     <MESSAGE value="estrutura para workflow" />
     <MESSAGE value="Criar inscricao" />
-    <option name="LAST_COMMIT_MESSAGE" value="Criar inscricao" />
+    <MESSAGE value="Funcionalidade de adicionar nova inscricao" />
+    <option name="LAST_COMMIT_MESSAGE" value="Funcionalidade de adicionar nova inscricao" />
   </component>
 </project>
