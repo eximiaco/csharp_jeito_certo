@@ -1,7 +1,8 @@
 using System;
 using System.Threading.Tasks;
-using Gymerp.Application.Interfaces;
 using Microsoft.Extensions.Logging;
+using Gymerp.Application.Interfaces;
+using Gymerp.Domain.Entities;
 
 namespace Gymerp.Infrastructure.Services
 {
@@ -16,22 +17,35 @@ namespace Gymerp.Infrastructure.Services
 
         public async Task SendAsync(string to, string subject, string message)
         {
-            try
-            {
-                // TODO: Implementar integração real com serviço de email
-                // Por enquanto, apenas logamos a notificação
-                _logger.LogInformation(
-                    "Notificação enviada para {To}\nAssunto: {Subject}\nMensagem: {Message}",
-                    to, subject, message
-                );
+            // Simula o envio de email
+            _logger.LogInformation($"Email enviado para {to}");
+            _logger.LogInformation($"Assunto: {subject}");
+            _logger.LogInformation($"Mensagem: {message}");
+            await Task.CompletedTask;
+        }
 
-                await Task.CompletedTask;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Erro ao enviar notificação para {To}", to);
-                throw;
-            }
+        public async Task SendPaymentApprovedNotificationAsync(Payment payment)
+        {
+            var subject = "Pagamento Aprovado";
+            var message = $"Seu pagamento no valor de {payment.Amount:C} foi aprovado com sucesso!";
+            
+            await SendAsync(
+                payment.Enrollment.Student.Email,
+                subject,
+                message
+            );
+        }
+
+        public async Task SendPaymentRejectedNotificationAsync(Payment payment)
+        {
+            var subject = "Pagamento Não Aprovado";
+            var message = $"Seu pagamento no valor de {payment.Amount:C} não foi aprovado. Por favor, tente novamente ou entre em contato com o suporte.";
+            
+            await SendAsync(
+                payment.Enrollment.Student.Email,
+                subject,
+                message
+            );
         }
     }
 } 
