@@ -4,6 +4,7 @@ using Autofac.Extensions.DependencyInjection;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using GymErp.Bootstrap;
+using Gymerp.Domain.Subscriptions.Infrastructure;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Serilog;
 
@@ -38,7 +39,7 @@ try
     
     builder.Host.ConfigureContainer<ContainerBuilder>(builder =>
     {
-        //builder.RegisterModule(new SubscriptionModule());
+        builder.RegisterModule(new SubscriptionsModule());
     });
     builder.Host.UseSerilog();
     builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());

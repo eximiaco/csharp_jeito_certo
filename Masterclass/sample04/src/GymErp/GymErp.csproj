@@ -15,8 +15,10 @@
         <PackageReference Include="FastEndpoints.Swagger" Version="6.1.0" />
         <PackageReference Include="Flurl" Version="4.0.0" />
         <PackageReference Include="Flurl.Http" Version="4.0.2" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.7" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.7"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.5" />
         <PackageReference Include="Npgsql" Version="9.0.3" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
         <PackageReference Include="Polly" Version="8.5.2" />
         <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
         <PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
@@ -28,8 +30,6 @@
     <ItemGroup>
       <Folder Include="Domain\Financial\" />
       <Folder Include="Domain\Scheduling\" />
-      <Folder Include="Domain\Subscriptions\AddNewEnrollment\" />
-      <Folder Include="Domain\Subscriptions\Infrastructure\" />
       <Folder Include="Tenant\" />
     </ItemGroup>
 

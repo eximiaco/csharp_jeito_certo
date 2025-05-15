@@ -178,3 +178,9 @@ D:\Work\Eximia\Eximia\csharp_jeito_certo\Masterclass\sample04\src\GymErp\obj\Deb
 D:\Work\Eximia\Eximia\csharp_jeito_certo\Masterclass\sample04\src\GymErp\obj\Debug\net8.0\GymErp.csproj.Up2Date
 D:\Work\Eximia\Eximia\csharp_jeito_certo\Masterclass\sample04\src\GymErp\obj\Debug\net8.0\GymErp.genruntimeconfig.cache
 D:\Work\Eximia\Eximia\csharp_jeito_certo\Masterclass\sample04\src\GymErp\obj\Debug\net8.0\ref\GymErp.dll
+D:\Work\Eximia\Eximia\csharp_jeito_certo\Masterclass\sample04\src\GymErp\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.dll
+D:\Work\Eximia\Eximia\csharp_jeito_certo\Masterclass\sample04\src\GymErp\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+D:\Work\Eximia\Eximia\csharp_jeito_certo\Masterclass\sample04\src\GymErp\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Relational.dll
+D:\Work\Eximia\Eximia\csharp_jeito_certo\Masterclass\sample04\src\GymErp\bin\Debug\net8.0\Microsoft.Extensions.Caching.Abstractions.dll
+D:\Work\Eximia\Eximia\csharp_jeito_certo\Masterclass\sample04\src\GymErp\bin\Debug\net8.0\Microsoft.Extensions.Caching.Memory.dll
+D:\Work\Eximia\Eximia\csharp_jeito_certo\Masterclass\sample04\src\GymErp\bin\Debug\net8.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
