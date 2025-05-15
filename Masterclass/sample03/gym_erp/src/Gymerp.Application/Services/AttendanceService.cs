@@ -27,7 +27,7 @@ namespace Gymerp.Application.Services
             _paymentRepository = paymentRepository;
         }
 
-        public async Task CheckAttendanceAsync()
+        public async Task CheckTodayAttendancesAsync()
         {
             var today = DateTime.UtcNow.Date;
             var scheduledClasses = await _scheduledClassRepository.GetByDateAsync(today);

@@ -25,7 +25,7 @@ namespace Gymerp.Worker.Services
             while (!stoppingToken.IsCancellationRequested)
             {
                 _logger.LogInformation("Verificando agendamentos de aulas sem registro de acesso...");
-                await _attendanceCheckService.CheckAttendanceAsync();
+                await _attendanceCheckService.CheckTodayAttendancesAsync();
                 await Task.Delay(TimeSpan.FromHours(24), stoppingToken);
             }
         }
