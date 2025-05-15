@@ -10,13 +10,14 @@ using Gymerp.Infrastructure.Services;
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>
     {
-        services.AddHostedService<AttendanceCheckService>();
+        services.AddHostedService<AttendanceCheckWorker>();
         services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
         services.AddScoped<IAccessRecordRepository, AccessRecordRepository>();
         services.AddScoped<IScheduledClassRepository, ScheduledClassRepository>();
         services.AddScoped<IPaymentRepository, PaymentRepository>();
         services.AddScoped<IPaymentService, PaymentService>();
         services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<IAttendanceCheckService, AttendanceCheckService>();
     })
     .Build();
 
