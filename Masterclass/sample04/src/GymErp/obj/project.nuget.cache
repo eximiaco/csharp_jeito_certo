@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "Js0C5JCdT34=",
+  "dgSpecHash": "wrE7qtcR4hc=",
   "success": true,
   "projectFilePath": "/Users/gabrielkohlrausch/Documents/dev/csharp_jeito_certo/Masterclass/sample04/src/GymErp/GymErp.csproj",
   "expectedPackageFiles": [
     "/Users/gabrielkohlrausch/.nuget/packages/autofac/8.3.0/autofac.8.3.0.nupkg.sha512",
     "/Users/gabrielkohlrausch/.nuget/packages/autofac.extensions.dependencyinjection/10.0.0/autofac.extensions.dependencyinjection.10.0.0.nupkg.sha512",
+    "/Users/gabrielkohlrausch/.nuget/packages/csharpfunctionalextensions/3.6.0/csharpfunctionalextensions.3.6.0.nupkg.sha512",
     "/Users/gabrielkohlrausch/.nuget/packages/dapper/2.1.66/dapper.2.1.66.nupkg.sha512",
     "/Users/gabrielkohlrausch/.nuget/packages/fastendpoints/6.1.0/fastendpoints.6.1.0.nupkg.sha512",
     "/Users/gabrielkohlrausch/.nuget/packages/fastendpoints.attributes/6.1.0/fastendpoints.attributes.6.1.0.nupkg.sha512",

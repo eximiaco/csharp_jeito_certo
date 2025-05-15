@@ -9,6 +9,7 @@
     <ItemGroup>
         <PackageReference Include="Autofac" Version="8.3.0" />
         <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="10.0.0" />
+        <PackageReference Include="CSharpFunctionalExtensions" Version="3.6.0" />
         <PackageReference Include="Dapper" Version="2.1.66" />
         <PackageReference Include="FastEndpoints" Version="6.1.0" />
         <PackageReference Include="FastEndpoints.Swagger" Version="6.1.0" />
