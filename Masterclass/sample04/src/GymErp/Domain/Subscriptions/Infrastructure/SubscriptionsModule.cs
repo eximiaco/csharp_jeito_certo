@@ -1,6 +1,7 @@
 using Autofac;
 using GymErp.Common;
 using GymErp.Domain.Subscriptions.AddNewEnrollment;
+using GymErp.Domain.Subscriptions.Aggreates.Enrollments;
 using GymErp.Domain.Subscriptions.Infrastructure;
 using Endpoint = GymErp.Domain.Subscriptions.AddNewEnrollment.Endpoint;
 

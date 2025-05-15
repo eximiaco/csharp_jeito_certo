@@ -1,35 +1,8 @@
 using CSharpFunctionalExtensions;
 using GymErp.Common;
-using System.Text.RegularExpressions;
+using GymErp.Domain.Subscriptions.Aggreates.Enrollments.States;
 
-namespace GymErp.Domain.Subscriptions;
-
-public record Client
-{
-    public string Cpf { get; set; } = string.Empty;
-    public string Name { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-    public string Phone { get; set; } = string.Empty;
-    public string Address { get; set; } = string.Empty;
-
-    public Client() { }
-
-    public Client(string cpf, string name, string email, string phone, string address)
-    {
-        Cpf = cpf;
-        Name = name;
-        Email = email;
-        Phone = phone;
-        Address = address;
-    }
-}
-
-public enum EState
-{
-    Active,
-    Suspended,
-    Canceled
-}
+namespace GymErp.Domain.Subscriptions.Aggreates.Enrollments;
 
 public sealed class Enrollment : IAggregate
 {
@@ -41,12 +14,14 @@ public sealed class Enrollment : IAggregate
         Client = client;
         RequestDate = requestDate;
         State = state;
+        _state = EnrollmentStateFactory.CreateState(state);
     }
     
     public Guid Id { get; private set; }
     public Client Client { get; private set; } = null!;
     public DateTime RequestDate { get; private set; }
     public EState State { get; private set; }
+    private IEnrollmentState _state = null!;
 
     public static Result<Enrollment> Create(Client client)
     {
@@ -68,6 +43,27 @@ public sealed class Enrollment : IAggregate
     {
         var client = new Client(document, name, email, phone, address);
         return Create(client);
+    }
+
+    public Result Activate()
+    {
+        return _state.Activate(this);
+    }
+
+    public Result Suspend()
+    {
+        return _state.Suspend(this);
+    }
+
+    public Result Cancel()
+    {
+        return _state.Cancel(this);
+    }
+
+    internal void ChangeState(EState newState)
+    {
+        _state = EnrollmentStateFactory.CreateState(newState);
+        State = newState;
     }
 
     private static Result ValidateClient(Client client)

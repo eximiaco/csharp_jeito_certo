@@ -1,5 +1,6 @@
 using FluentAssertions;
 using GymErp.Domain.Subscriptions;
+using GymErp.Domain.Subscriptions.Aggreates.Enrollments;
 using Xunit;
 
 namespace GymErp.UnitTests.Subscriptions;

@@ -1,7 +1,7 @@
 using GymErp.Common;
 using GymErp.Domain.Subscriptions.Infrastructure;
 
-namespace GymErp.Domain.Subscriptions;
+namespace GymErp.Domain.Subscriptions.Aggreates.Enrollments;
 
 public class EnrollmentRepository(IEfDbContextAccessor<SubscriptionsDbContext> context)
 {

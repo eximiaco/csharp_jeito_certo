@@ -1,6 +1,7 @@
 using CSharpFunctionalExtensions;
 using GymErp.Common;
 using GymErp.Domain.Subscriptions.AddNewEnrollment;
+using GymErp.Domain.Subscriptions.Aggreates.Enrollments;
 using GymErp.Domain.Subscriptions.Infrastructure;
 
 namespace GymErp.Domain.Subscriptions.AddNewEnrollment;
