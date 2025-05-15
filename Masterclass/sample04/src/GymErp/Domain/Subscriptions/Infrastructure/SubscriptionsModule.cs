@@ -1,4 +1,5 @@
 using Autofac;
+using GymErp.Common;
 using Gymerp.Domain.Subscriptions.AddNewEnrollment;
 using GymErp.Domain.Subscriptions.Infrastructure;
 using Endpoint = Gymerp.Domain.Subscriptions.AddNewEnrollment.Endpoint;
@@ -9,6 +10,10 @@ public class SubscriptionsModule : Module
 {
     protected override void Load(ContainerBuilder builder)
     {
+        builder.RegisterType<UnitOfWork>()
+            .As<IUnitOfWork>()
+            .InstancePerLifetimeScope();
+        
         // Registra o DbContext
         builder.RegisterType<SubscriptionsDbContext>()
             .AsSelf()

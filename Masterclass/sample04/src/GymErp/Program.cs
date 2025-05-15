@@ -8,6 +8,7 @@ using GymErp.Common.Settings;
 using GymErp.Domain.Orchestration.Features.NewEnrollmentFlow;
 using GymErp.Domain.Orchestration.Infrastructure;
 using Gymerp.Domain.Subscriptions.Infrastructure;
+using GymErp.Tenant;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Serilog;
 using WorkflowCore.Interface;
@@ -58,7 +59,7 @@ try
         .UseHealthChecks("/healthz")
         .UseAuthentication()
         .UseAuthorization()
-        //.UseTenantDbContext()
+        .UseTenant()
         .UseDefaultExceptionHandler()
         .UseFastEndpoints(config =>
         {

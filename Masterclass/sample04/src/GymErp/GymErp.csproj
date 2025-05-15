@@ -32,7 +32,6 @@
       <Folder Include="Domain\Financial\" />
       <Folder Include="Domain\Orchestration\Features\CancelEnrollmentFlow\" />
       <Folder Include="Domain\Scheduling\" />
-      <Folder Include="Tenant\" />
     </ItemGroup>
 
 </Project>

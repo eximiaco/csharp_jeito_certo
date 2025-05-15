@@ -2,15 +2,15 @@
 
 public class TenantAccessor : IDisposable
 {
-    public Common.GymErpTenant GymErpTenant { get; private set; }
+    public Common.GymErpTenant Tenant { get; private set; }
 
     public void Register(Common.GymErpTenant gymErpTenant)
     {
-        GymErpTenant = gymErpTenant;
+        Tenant = gymErpTenant;
     }
 
     public void Dispose()
     {
-        GymErpTenant = null!;
+        Tenant = null!;
     }
 }

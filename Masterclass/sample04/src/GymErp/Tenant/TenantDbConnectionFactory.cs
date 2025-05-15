@@ -8,6 +8,6 @@ public class TenantDbConnectionFactory(TenantAccessor tenantAccessor) : IDbConne
 {
     public async Task<DbConnection> Create(CancellationToken cancellationToken)
     {
-        return new NpgsqlConnection(tenantAccessor.GymErpTenant.ConnectionString);
+        return new NpgsqlConnection(tenantAccessor.Tenant.ConnectionString);
     }
 }

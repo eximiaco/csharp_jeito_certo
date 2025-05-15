@@ -4,22 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Gymerp.Domain.Subscriptions.Infrastructure;
 
-public class EnrollmentRepository
+public class EnrollmentRepository(SubscriptionsDbContext context)
 {
-    private readonly SubscriptionsDbContext _context;
-
-    public EnrollmentRepository(SubscriptionsDbContext context)
-    {
-        _context = context;
-    }
-
     public async Task AddAsync(Enrollment enrollment, CancellationToken cancellationToken)
     {
-        await _context.Enrollments.AddAsync(enrollment, cancellationToken);
-    }
-
-    public async Task SaveAsync(CancellationToken cancellationToken)
-    {
-        await _context.SaveChangesAsync(cancellationToken);
+        await context.Enrollments.AddAsync(enrollment, cancellationToken);
     }
 } 

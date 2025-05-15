@@ -1,9 +1,10 @@
+using GymErp.Common;
 using GymErp.Domain.Subscriptions;
 using Gymerp.Domain.Subscriptions.Infrastructure;
 
 namespace Gymerp.Domain.Subscriptions.AddNewEnrollment;
 
-public class Handler(EnrollmentRepository enrollmentRepository)
+public class Handler(EnrollmentRepository enrollmentRepository, IUnitOfWork unitOfWork)
 {
     public async Task<Guid> HandleAsync(Request request, CancellationToken cancellationToken)
     {
@@ -18,7 +19,8 @@ public class Handler(EnrollmentRepository enrollmentRepository)
         );
 
         await enrollmentRepository.AddAsync(enrollment, cancellationToken);
-        await enrollmentRepository.SaveAsync(cancellationToken);
+        
+        unitOfWork.Commit();
 
         return enrollment.Id;
     }

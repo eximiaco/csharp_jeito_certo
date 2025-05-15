@@ -1,4 +1,5 @@
 using GymErp.Common;
+using GymErp.Domain.Subscriptions.Infrastructure;
 
 namespace GymErp.Tenant;
 
@@ -20,14 +21,5 @@ public class TenantAccessorRegisterMiddleware(
             await next(context);
             tenantAccessor.Dispose();    
         }
-    }
-}
-
-public static class TenantMiddlewareExtensions
-{
-    public static IApplicationBuilder UseTenantDbContext(
-        this IApplicationBuilder builder)
-    {
-        return builder.UseMiddleware<TenantAccessorRegisterMiddleware>();
     }
 }
