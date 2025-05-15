@@ -8,13 +8,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="103c6f03-3ab3-4305-81a4-e974d96cf4dc" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/GymErp/Bootstrap/ServiceExtensions.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GymErp/Common/GymErpTenant.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GymErp/Domain/Subscriptions/Enrollment.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../sample03/gym_erp/src/Gymerp.Application/Interfaces/IAttendanceCheckService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../../sample03/gym_erp/src/Gymerp.Application/Interfaces/IAttendanceCheckService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../sample03/gym_erp/src/Gymerp.Application/Services/AttendanceService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../../sample03/gym_erp/src/Gymerp.Application/Services/AttendanceService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../sample03/gym_erp/src/Gymerp.Worker/Services/AttendanceCheckWorker.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../../sample03/gym_erp/src/Gymerp.Worker/Services/AttendanceCheckWorker.cs" afterDir="false" />
+    <list default="true" id="103c6f03-3ab3-4305-81a4-e974d96cf4dc" name="Changes" comment="estrutura base de enrollment">
+      <change afterPath="$PROJECT_DIR$/GymErp/Domain/Orchestration/Features/NewEnrollmentFlow/Endpoint.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GymErp/Domain/Orchestration/Features/NewEnrollmentFlow/MainWorkflow.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GymErp/Domain/Orchestration/Features/NewEnrollmentFlow/Steps/AddEnrollmentStep.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GymErp/Domain/Orchestration/Features/NewEnrollmentFlow/Steps/ProcessPaymentStep.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GymErp/Domain/Subscriptions/Enrollment.cs" beforeDir="false" afterPath="$PROJECT_DIR$/GymErp/Domain/Subscriptions/Enrollment.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,8 +36,11 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/../../sample03/gym_erp/src/Gymerp.Worker/Services/AttendanceCheckWorker.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Users/gabrielkohlrausch/Documents/dev/csharp_jeito_certo/Masterclass/sample03/gym_erp/src/Gymerp.Worker/Services/AttendanceCheckWorker.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/9147127ea87c94de7bdcfa6abd3a8d1be8ab591436a45dc11dea6b9fc52d7b6/OptionsServiceCollectionExtensions.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
+  <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
 }</component>
@@ -120,15 +122,36 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1747334019657</updated>
-      <workItem from="1747334020722" duration="2222000" />
+      <workItem from="1747334020722" duration="3081000" />
     </task>
+    <task id="LOCAL-00001" summary="Aplicacao base do sample 3">
+      <option name="closed" value="true" />
+      <created>1747337569384</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1747337569384</updated>
+    </task>
+    <task id="LOCAL-00002" summary="estrutura base de enrollment">
+      <option name="closed" value="true" />
+      <created>1747337891681</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1747337891681</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="Aplicacao base do sample 3" />
+    <MESSAGE value="estrutura base de enrollment" />
+    <option name="LAST_COMMIT_MESSAGE" value="estrutura base de enrollment" />
   </component>
 </project>
