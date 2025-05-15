@@ -1,10 +1,18 @@
+using GymErp.Domain.Orchestration.Features.NewEnrollmentFlow.Steps;
+using WorkflowCore.Interface;
+
 namespace GymErp.Domain.Orchestration.Features.NewEnrollmentFlow;
 
-public class MainWorkflow
+public class MainWorkflow : IWorkflow<NewEnrollmentFlowData>
 {
-    // Adiciona matricula
-    
-    // processa pagamento
-    
-    // Agenda avaliacao
+    public string Id => nameof(MainWorkflow);
+    public int Version => 1;
+
+    public void Build(IWorkflowBuilder<NewEnrollmentFlowData> builder)
+    {
+        builder
+            .StartWith<AddEnrollmentStep>()
+            .Then<ProcessPaymentStep>()
+            .Then<ScheduleEvaluationStep>();
+    }
 }

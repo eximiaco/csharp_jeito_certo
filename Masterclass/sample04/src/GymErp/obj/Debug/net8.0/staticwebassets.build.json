@@ -1,11 +1,12 @@
 {
   "Version": 1,
-  "Hash": "gJ5mm9EhnIqSzQM87PL/y/JmzM9xYz/TedXHOZ3JPhI=",
+  "Hash": "GpIAmms3VbBP5g51baZaiVdaNweiuYJkX6uusQYGfWM=",
   "Source": "GymErp",
   "BasePath": "_content/GymErp",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
   "DiscoveryPatterns": [],
-  "Assets": []
+  "Assets": [],
+  "Endpoints": []
 }
