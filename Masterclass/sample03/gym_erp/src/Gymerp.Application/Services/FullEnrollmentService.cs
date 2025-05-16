@@ -52,7 +52,7 @@ namespace Gymerp.Application.Services
 
             return enrollment;
         }
-
+        
         private async Task<Student> GetOrCreateStudentAsync(StudentDto studentDto)
         {
             var student = await _studentRepository.GetByDocumentAsync(studentDto.Document);

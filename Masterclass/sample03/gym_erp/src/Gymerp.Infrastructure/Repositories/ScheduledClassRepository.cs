@@ -16,7 +16,7 @@ namespace Gymerp.Infrastructure.Repositories
         {
             _context = context;
         }
-
+        
         public async Task<IEnumerable<ScheduledClass>> GetByEnrollmentAndDateAsync(Guid enrollmentId, DateTime date)
         {
             return await _context.ScheduledClasses
