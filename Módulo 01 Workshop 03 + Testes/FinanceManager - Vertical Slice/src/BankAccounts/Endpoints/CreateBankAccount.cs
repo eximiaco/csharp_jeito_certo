@@ -4,7 +4,7 @@ using FinanceManager.Crosscutting.Filters;
 
 namespace FinanceManager.BankAccounts.Endpoints;
 
-public record struct CreateBankAccountRequest(string Name);
+public record struct CreateBankAccountRequest(string Name, string Description);
 public record struct CreateBankAccountReponse(string Id, string Name);
 
 public class CreateBankAccountEndpoint : IEndpoint

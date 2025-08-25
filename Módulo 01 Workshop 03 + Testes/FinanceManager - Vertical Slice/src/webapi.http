@@ -1,5 +1,5 @@
 @FinanceManager_HostAddress = https://localhost:7008
-@Token = BEARER_TOKEN (Utilize o endpoint abaixo para criar o usuário. Após isso, realize o login).
+@Token = {SEU_TOKEN}
 
 ### Create User 
 
@@ -9,8 +9,8 @@ Content-Type: application/json
 {
   "name": "Usuário principal",
   "email": "user@email.com",
-  "password": "Userpassword@123",
-  "confirmPassword": "Userpassword@123"
+  "password": "{PASSWORD}",
+  "confirmPassword": "{PASSWORD}"
 }
 
 ### Login
@@ -20,14 +20,14 @@ Content-Type: application/json
 
 {
   "email": "user@email.com",
-  "password": "Userpassword@123"
+  "password": "{PASSWORD}"
 }
 
 ### Get bank accounts
 
 GET {{FinanceManager_HostAddress}}/api/v1/bank-accounts
 Authorization:  Bearer {{Token}}
-X-Correlation-Id: "requestDemo"
+X-Correlation-Id: "turma3"
 Content-Type: application/json
 
 ### Create bank account

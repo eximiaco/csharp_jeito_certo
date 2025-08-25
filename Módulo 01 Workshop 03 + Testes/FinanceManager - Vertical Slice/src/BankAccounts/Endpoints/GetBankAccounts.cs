@@ -34,7 +34,7 @@ public class GetBankAccountsEndpoint : IEndpoint
        [FromQuery] int take = 10,
        CancellationToken cancellationToken = default)
     {
-        logger.LogInformation("Getting all bank accounts");
+        logger.LogDebug("Getting all bank accounts");
 
         var accounts = await context
             .BankAccounts
