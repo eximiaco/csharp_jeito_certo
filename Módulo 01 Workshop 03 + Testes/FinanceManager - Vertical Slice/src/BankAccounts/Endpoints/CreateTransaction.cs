@@ -52,12 +52,6 @@ public class CreateTransactionEndpoint : IEndpoint
             return BadRequest(ValidationErrors.Category.CategoryDoesNotExists);
         }
 
-        var values = new decimal[] { 1, 2, 3 };
-
-        new ValueTask
-
-        IEnumerable<Result<decimal>> valuesUsd = await Task.WhenAll(values.Select(exchangeService.GetUsdValueAsync));
-
         var usdValueResult = await exchangeService.GetUsdValueAsync(request.Value);
         if (!usdValueResult.TryGetValue(out decimal usdValue))
         {
