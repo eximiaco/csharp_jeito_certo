@@ -11,10 +11,10 @@ public class EnrollmentStateTests : IntegrationTestBase, IAsyncLifetime
 {
     private Enrollment _enrollment = null!;
 
-    public async Task InitializeAsync()
+    public new async Task InitializeAsync()
     {
         await base.InitializeAsync();
-        
+
         var client = new Client(
             "52998224725",
             "João da Silva Santos",
@@ -28,7 +28,7 @@ public class EnrollmentStateTests : IntegrationTestBase, IAsyncLifetime
         _enrollment = result.Value;
     }
 
-    public Task DisposeAsync()
+    public new Task DisposeAsync()
     {
         return base.DisposeAsync();
     }

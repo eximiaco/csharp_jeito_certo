@@ -1,14 +1,18 @@
+using GymErp.Common;
 using Microsoft.EntityFrameworkCore;
-using GymErp.Domain.Subscriptions;
 using GymErp.Domain.Subscriptions.Aggreates.Enrollments;
 
 namespace GymErp.Domain.Subscriptions.Infrastructure;
 
 public sealed class SubscriptionsDbContext : DbContext
 {
+    private readonly IServiceBus _serviceBus;
     public DbSet<Enrollment> Enrollments { get; set; }
 
-    public SubscriptionsDbContext(DbContextOptions<SubscriptionsDbContext> options) : base(options) { }
+    public SubscriptionsDbContext(DbContextOptions<SubscriptionsDbContext> options, IServiceBus serviceBus) : base(options)
+    {
+        _serviceBus = serviceBus;
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -48,7 +52,7 @@ public sealed class SubscriptionsDbContext : DbContext
                         item.Property("CreatedAt").CurrentValue = DateTime.UtcNow;
             }
             var result = await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-            //await _serviceBus.DispatchDomainEventsAsync(this).ConfigureAwait(false);
+            await _serviceBus.DispatchDomainEventsAsync(this).ConfigureAwait(false);
             return result;
         }
         catch (DbUpdateException e)

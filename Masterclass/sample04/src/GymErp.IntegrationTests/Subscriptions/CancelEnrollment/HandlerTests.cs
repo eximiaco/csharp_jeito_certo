@@ -20,7 +20,7 @@ public class HandlerTests : IntegrationTestBase, IAsyncLifetime
 
     public HandlerTests() : base() { }
 
-    public async Task InitializeAsync()
+    public new async Task InitializeAsync()
     {
         await base.InitializeAsync();
         _dbContextAccessor = new EfDbContextAccessor<SubscriptionsDbContext>(_dbContext);
@@ -44,7 +44,7 @@ public class HandlerTests : IntegrationTestBase, IAsyncLifetime
         await _unitOfWork.Commit(CancellationToken.None);
     }
 
-    public async Task DisposeAsync()
+    public new async Task DisposeAsync()
     {
         await base.DisposeAsync();
         _dbContextAccessor?.Dispose();

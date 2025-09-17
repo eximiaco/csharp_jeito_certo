@@ -8,26 +8,16 @@ using WorkflowCore.Models;
 
 namespace GymErp.Domain.Orchestration.Features.NewEnrollmentFlow.Steps;
 
-public class ProcessPaymentStep : StepBodyAsync
+public class ProcessPaymentStep(IOptions<ServicesSettings> options) : StepBodyAsync
 {
-    private readonly IOptions<ServicesSettings> _options;
-
-    public ProcessPaymentStep(IOptions<ServicesSettings> options)
-    {
-        _options = options;
-    }
-
     public override async Task<ExecutionResult> RunAsync(IStepExecutionContext context)
     {
         var data = context.Workflow.Data as NewEnrollmentFlowData;
         
         ProcessPaymentRequest request = new(data!.ClientId, data.PlanId);
 
-        var response = await HttpRetryPolicy.AsyncRetryPolicy.ExecuteAndCaptureAsync(async () =>
-        {
-            return await _options.Value.ProcessPaymentUri
-                .PostJsonAsync(request);
-        });
+        var response = await HttpRetryPolicy.AsyncRetryPolicy.ExecuteAndCaptureAsync(async () => 
+            await options.Value.ProcessPaymentUri.PostJsonAsync(request));
 
         if (response.Outcome == OutcomeType.Failure)
             throw response.FinalException;

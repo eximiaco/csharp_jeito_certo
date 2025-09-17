@@ -4,7 +4,7 @@ using GymErp.Domain.Subscriptions.Aggreates.Enrollments.States;
 
 namespace GymErp.Domain.Subscriptions.Aggreates.Enrollments;
 
-public sealed class Enrollment : IAggregate
+public sealed class Enrollment : Aggregate
 {
     private Enrollment() { }
 
@@ -30,8 +30,9 @@ public sealed class Enrollment : IAggregate
         var validationResult = ValidateClient(client);
         if (validationResult.IsFailure)
             return Result.Failure<Enrollment>(validationResult.Error);
-
-        return new Enrollment(Guid.NewGuid(), client, DateTime.UtcNow, EState.Suspended);
+        var enrollment = new Enrollment(Guid.NewGuid(), client, DateTime.UtcNow, EState.Suspended);
+        enrollment.AddDomainEvent(new EnrollmentCreatedEvent(enrollment.Id));
+        return enrollment;
     }
 
     public static Result<Enrollment> Create(

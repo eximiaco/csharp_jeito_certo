@@ -19,7 +19,7 @@ public class HandlerTests : IntegrationTestBase, IAsyncLifetime
 
     public HandlerTests() : base() { }
 
-    public async Task InitializeAsync()
+    public new async Task InitializeAsync()
     {
         await base.InitializeAsync();
         _dbContextAccessor = new EfDbContextAccessor<SubscriptionsDbContext>(_dbContext);
@@ -28,7 +28,7 @@ public class HandlerTests : IntegrationTestBase, IAsyncLifetime
         _handler = new Handler(_enrollmentRepository, _unitOfWork, CancellationToken.None);
     }
 
-    public async Task DisposeAsync()
+    public new async Task DisposeAsync()
     {
         await base.DisposeAsync();
         _dbContextAccessor?.Dispose();
@@ -63,6 +63,32 @@ public class HandlerTests : IntegrationTestBase, IAsyncLifetime
         enrollment.Client.Address.Should().Be(request.Address);
         enrollment.RequestDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
         enrollment.State.Should().Be(EState.Suspended);
+    }
+
+    [Fact]
+    public async Task HandleAsync_ShouldPublishEnrollmentCreatedEvent_WhenValidRequest()
+    {
+        // Arrange
+        var request = new Request
+        {
+            Name = "Maria da Silva Santos",
+            Email = "maria.silva@email.com",
+            Phone = "11888888888",
+            Document = "52998224725", // CPF válido
+            BirthDate = new DateTime(1985, 5, 15),
+            Gender = "F",
+            Address = "Rua das Flores, 456"
+        };
+
+        // Act
+        var result = await _handler.HandleAsync(request);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+
+        // Verificar se o evento de domínio foi publicado
+        VerifyMessagePublished<EnrollmentCreatedEvent>(
+            evt => evt.EnrollmentId == result.Value);
     }
 
     [Theory]
@@ -102,5 +128,31 @@ public class HandlerTests : IntegrationTestBase, IAsyncLifetime
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be(expectedError);
+    }
+
+    [Fact]
+    public async Task HandleAsync_ShouldNotPublishEvent_WhenValidationFails()
+    {
+        // Arrange
+        var request = new Request
+        {
+            Name = "", // Nome inválido - vazio
+            Email = "email@test.com",
+            Phone = "11999999999",
+            Document = "52998224725",
+            BirthDate = new DateTime(1990, 1, 1),
+            Gender = "M",
+            Address = "Rua Teste"
+        };
+
+        // Act
+        var result = await _handler.HandleAsync(request);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Nome não pode ser vazio");
+
+        // Verificar que nenhum evento foi publicado
+        VerifyNoMessagesPublished();
     }
 } 
