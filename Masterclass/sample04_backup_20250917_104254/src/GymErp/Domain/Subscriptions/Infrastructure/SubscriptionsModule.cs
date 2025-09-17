@@ -27,7 +27,7 @@ public class SubscriptionsModule : Module
             .InstancePerLifetimeScope();
 
         // Registra o Handler de Nova Inscrição
-        builder.RegisterType<AddNewEnrollment.Handler>()
+        builder.RegisterType<Handler>()
             .AsSelf()
             .InstancePerLifetimeScope();
 

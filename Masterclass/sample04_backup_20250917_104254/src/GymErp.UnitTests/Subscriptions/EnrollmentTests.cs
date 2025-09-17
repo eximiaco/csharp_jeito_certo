@@ -63,7 +63,7 @@ public class EnrollmentTests
 
     [Theory]
     [InlineData("", "email@test.com", "11999999999", "52998224725", "1990-01-01", "M", "Rua Teste", "Nome não pode ser vazio")]
-    [InlineData("João", "email@test.com", "11999999999", "52998224725", "1990-01-01", "M", "Rua Teste", "Nome deve ter pelo menos 10 caracteres")]
+    [InlineData("João Silva", "email@test.com", "11999999999", "52998224725", "1990-01-01", "M", "Rua Teste", "Nome deve ter pelo menos 10 caracteres")]
     [InlineData("João da Silva Santos", "", "11999999999", "52998224725", "1990-01-01", "M", "Rua Teste", "Email não pode ser vazio")]
     [InlineData("João da Silva Santos", "invalid-email", "11999999999", "52998224725", "1990-01-01", "M", "Rua Teste", "Email inválido")]
     [InlineData("João da Silva Santos", "email@test.com", "", "52998224725", "1990-01-01", "M", "Rua Teste", "Telefone não pode ser vazio")]

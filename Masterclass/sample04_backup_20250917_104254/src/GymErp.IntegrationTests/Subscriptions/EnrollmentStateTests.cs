@@ -63,10 +63,8 @@ public class EnrollmentStateTests : IntegrationTestBase, IAsyncLifetime
     public void Suspend_ShouldChangeStateToSuspended_WhenActive()
     {
         _enrollment.Activate();
-        var startDate = DateTime.Now;
-        var endDate = DateTime.Now.AddDays(30);
-        var result = _enrollment.Suspend(startDate, endDate);
-
+        var result = _enrollment.Suspend();
+        
         result.IsSuccess.Should().BeTrue();
         _enrollment.State.Should().Be(EState.Suspended);
     }
@@ -74,10 +72,8 @@ public class EnrollmentStateTests : IntegrationTestBase, IAsyncLifetime
     [Fact]
     public void Suspend_ShouldReturnFailure_WhenAlreadySuspended()
     {
-        var startDate = DateTime.Now;
-        var endDate = DateTime.Now.AddDays(30);
-        var result = _enrollment.Suspend(startDate, endDate);
-
+        var result = _enrollment.Suspend();
+        
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be("Inscrição já está suspensa");
         _enrollment.State.Should().Be(EState.Suspended);
@@ -128,10 +124,8 @@ public class EnrollmentStateTests : IntegrationTestBase, IAsyncLifetime
     public void Suspend_ShouldReturnFailure_WhenCanceled()
     {
         _enrollment.Cancel();
-        var startDate = DateTime.Now;
-        var endDate = DateTime.Now.AddDays(30);
-        var result = _enrollment.Suspend(startDate, endDate);
-
+        var result = _enrollment.Suspend();
+        
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be("Não é possível suspender uma inscrição cancelada");
         _enrollment.State.Should().Be(EState.Canceled);

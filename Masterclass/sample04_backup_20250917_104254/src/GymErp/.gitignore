@@ -1,0 +1,62 @@
+# Build results
+bin/
+obj/
+
+# Visual Studio
+.vs/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+*.sln.iml
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Dotnet artifacts
+*.dll
+*.exe
+*.pdb
+*.cache
+*.log
+*.vspscc
+*.vssscc
+*.dbmdl
+*.bak
+*.swp
+*.tmp
+*.userprefs
+
+# Test results
+TestResults/
+
+# NuGet
+*.nupkg
+.nuget/
+
+# Others
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# Local history for Visual Studio
+.localhistory/
+
+# Windows image file caches
+*.jfif
+
+# Rider logs
+/log/
+
+# VS Code
+.vscode/ 
