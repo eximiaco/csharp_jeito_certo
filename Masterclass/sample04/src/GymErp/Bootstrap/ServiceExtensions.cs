@@ -1,7 +1,9 @@
+using Confluent.Kafka;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using GymErp.Common.Kafka;
+using GymErp.Domain.Financial.Features.ProcessCharging;
 using GymErp.Domain.Subscriptions.Aggreates.Enrollments;
 using Silverback.Messaging.Configuration;
 
@@ -131,7 +133,16 @@ internal static class ServicesExtensions
                     .ProduceTo("enrollment-events")
                     .WithKafkaKey<EnrollmentCreatedEvent>(envelope => envelope.Message!.EnrollmentId)
                     .SerializeAsJson(serializer => serializer.UseFixedType<EnrollmentCreatedEvent>())
-                    .DisableMessageValidation()));
+                    .DisableMessageValidation())
+                .AddInbound<EnrollmentCreatedEvent>(endpoint => endpoint
+                    .ConsumeFrom("enrollment-events")
+                    .Configure(config =>
+                    {
+                        config.GroupId = "financial-module";
+                        config.AutoOffsetReset = AutoOffsetReset.Latest;
+                    })
+                    .DisableMessageValidation()))
+            .AddScopedSubscriber<GymErp.Domain.Financial.Features.ProcessCharging.Handler>();
 
         return services;
     }

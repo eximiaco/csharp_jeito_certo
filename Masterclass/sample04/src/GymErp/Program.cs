@@ -6,11 +6,11 @@ using FastEndpoints.Swagger;
 using GymErp.Bootstrap;
 using GymErp.Common.Infrastructure;
 using GymErp.Common.Settings;
+using GymErp.Domain.Financial.Infrastructure;
 using GymErp.Domain.Orchestration.Features.NewEnrollmentFlow;
 using GymErp.Domain.Orchestration.Infrastructure;
 using GymErp.Domain.Subscriptions.Infrastructure;
 using GymErp.Tenant;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Serilog;
 using WorkflowCore.Interface;
 
@@ -51,6 +51,7 @@ try
         builder.RegisterModule(new CommonModule());
         builder.RegisterModule(new SubscriptionsModule());
         builder.RegisterModule(new OrchestrationModule());
+        builder.RegisterModule(new FinancialModule());
     });
     builder.Host.UseSerilog();
     builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
