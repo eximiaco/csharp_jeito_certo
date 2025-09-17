@@ -2,7 +2,6 @@ using CSharpFunctionalExtensions;
 using GymErp.Common;
 using GymErp.Domain.Subscriptions.Aggreates.Enrollments;
 using GymErp.Domain.Subscriptions.Infrastructure;
-using MediatR;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
