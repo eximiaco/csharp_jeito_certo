@@ -1,31 +1,24 @@
 using CSharpFunctionalExtensions;
 using GymErp.Common;
 using GymErp.Domain.Subscriptions.Aggreates.Enrollments;
-using GymErp.Domain.Subscriptions.Infrastructure;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace GymErp.Domain.Subscriptions.SuspendEnrollment;
+namespace GymErp.Domain.Subscriptions.Features.CancelEnrollment;
 
 public class Handler(EnrollmentRepository repository, IUnitOfWork unitOfWork, CancellationToken cancellationToken)
 {
-    public async Task<bool> HandleAsync(SuspendEnrollmentCommand request)
+    public async Task<Result> HandleAsync(Request request)
     {
-        if (!request.IsValid())
-            return false;
-
         var enrollment = await repository.GetByIdAsync(request.EnrollmentId, cancellationToken);
         if (enrollment == null)
-            return false;
+            return Result.Failure("Inscrição não encontrada");
 
-        var result = enrollment.Suspend(request.SuspensionStartDate, request.SuspensionEndDate);
+        var result = enrollment.Cancel();
         if (result.IsFailure)
-            return false;
+            return result;
 
         await repository.UpdateAsync(enrollment, cancellationToken);
         await unitOfWork.Commit(cancellationToken);
 
-        return true;
+        return Result.Success();
     }
 } 

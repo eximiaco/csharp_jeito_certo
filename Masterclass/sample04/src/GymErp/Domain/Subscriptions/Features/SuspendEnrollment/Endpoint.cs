@@ -1,7 +1,6 @@
 using FastEndpoints;
-using GymErp.Domain.Subscriptions.Infrastructure;
 
-namespace GymErp.Domain.Subscriptions.SuspendEnrollment;
+namespace GymErp.Domain.Subscriptions.Features.SuspendEnrollment;
 
 public class Endpoint : Endpoint<SuspendEnrollmentCommand, bool>
 {

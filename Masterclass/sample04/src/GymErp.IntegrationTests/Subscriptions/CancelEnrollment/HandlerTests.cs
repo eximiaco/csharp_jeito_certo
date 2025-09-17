@@ -2,7 +2,7 @@ using FluentAssertions;
 using GymErp.Common;
 using GymErp.Domain.Subscriptions;
 using GymErp.Domain.Subscriptions.Aggreates.Enrollments;
-using GymErp.Domain.Subscriptions.CancelEnrollment;
+using GymErp.Domain.Subscriptions.Features.CancelEnrollment;
 using GymErp.Domain.Subscriptions.Infrastructure;
 using GymErp.IntegrationTests.Infrastructure;
 using Microsoft.EntityFrameworkCore;

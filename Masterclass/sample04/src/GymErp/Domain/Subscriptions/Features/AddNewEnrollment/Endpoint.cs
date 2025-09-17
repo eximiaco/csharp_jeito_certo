@@ -1,6 +1,6 @@
 using FastEndpoints;
 
-namespace GymErp.Domain.Subscriptions.AddNewEnrollment;
+namespace GymErp.Domain.Subscriptions.Features.AddNewEnrollment;
 
 public class Endpoint : Endpoint<Request, Guid>
 {
