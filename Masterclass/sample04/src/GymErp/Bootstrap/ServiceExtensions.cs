@@ -1,6 +1,9 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using GymErp.Common.Kafka;
+using GymErp.Domain.Subscriptions.Aggreates.Enrollments;
+using Silverback.Messaging.Configuration;
 
 namespace GymErp.Bootstrap;
 
@@ -105,6 +108,31 @@ internal static class ServicesExtensions
                 return new MemoryCache(new MemoryCacheOptions());
             });
         //services.AddMemoryCache();
+        return services;
+    }
+
+    public static IServiceCollection AddSilverbackKafka(this IServiceCollection services, IConfiguration configuration)
+    {
+        IConfigurationSection kafkaSection = configuration.GetSection("Kafka");
+        var kafkaConfig = new KafkaConfig();
+        kafkaConfig.Connection = kafkaSection.GetSection("Connection").Get<KafkaConnectionConfig>()!;
+        services.AddSingleton(kafkaConfig);
+
+        services
+            .AddSilverback()
+            .WithConnectionToMessageBroker(config => config.AddKafka())
+            .AddKafkaEndpoints(endpoints => endpoints
+                .Configure(config =>
+                {
+                    config.BootstrapServers = kafkaConfig.Connection.BootstrapServers;
+                    config.ClientId = kafkaConfig.Connection.ClientId;
+                })
+                .AddOutbound<EnrollmentCreatedEvent>(endpoint => endpoint
+                    .ProduceTo("enrollment-events")
+                    .WithKafkaKey<EnrollmentCreatedEvent>(envelope => envelope.Message!.EnrollmentId)
+                    .SerializeAsJson(serializer => serializer.UseFixedType<EnrollmentCreatedEvent>())
+                    .DisableMessageValidation()));
+
         return services;
     }
 }

@@ -4,6 +4,7 @@ using Autofac.Extensions.DependencyInjection;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using GymErp.Bootstrap;
+using GymErp.Common.Infrastructure;
 using GymErp.Common.Settings;
 using GymErp.Domain.Orchestration.Features.NewEnrollmentFlow;
 using GymErp.Domain.Orchestration.Infrastructure;
@@ -42,10 +43,12 @@ try
         .AddOptions()
         .AddCaching()
         .Configure<ServicesSettings>(builder.Configuration.GetSection("ServicesSettings"))
+        .AddSilverbackKafka(builder.Configuration)
         .AddWorkflow();
     
     builder.Host.ConfigureContainer<ContainerBuilder>(builder =>
     {
+        builder.RegisterModule(new CommonModule());
         builder.RegisterModule(new SubscriptionsModule());
         builder.RegisterModule(new OrchestrationModule());
     });

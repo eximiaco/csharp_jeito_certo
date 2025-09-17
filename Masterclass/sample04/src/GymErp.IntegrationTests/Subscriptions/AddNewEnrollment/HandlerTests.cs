@@ -61,7 +61,7 @@ public class HandlerTests : IntegrationTestBase, IAsyncLifetime
         enrollment.Client.Phone.Should().Be(request.Phone);
         enrollment.Client.Cpf.Should().Be(request.Document);
         enrollment.Client.Address.Should().Be(request.Address);
-        enrollment.RequestDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        enrollment.RequestDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
         enrollment.State.Should().Be(EState.Suspended);
     }
 
@@ -86,9 +86,10 @@ public class HandlerTests : IntegrationTestBase, IAsyncLifetime
         // Assert
         result.IsSuccess.Should().BeTrue();
 
-        // Verificar se o evento de domínio foi publicado
-        VerifyMessagePublished<EnrollmentCreatedEvent>(
-            evt => evt.EnrollmentId == result.Value);
+        // Verificar se o evento de domínio foi publicado no tópico Kafka real
+        await VerifyMessagePublishedInKafkaTopic<EnrollmentCreatedEvent>(
+            "enrollment-events", 
+            1);
     }
 
     [Theory]

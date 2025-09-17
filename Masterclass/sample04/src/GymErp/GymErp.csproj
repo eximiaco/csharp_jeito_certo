@@ -25,6 +25,8 @@
         <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
         <PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
         <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
+        <PackageReference Include="Silverback.Integration" Version="4.5.0" />
+        <PackageReference Include="Silverback.Integration.Kafka" Version="4.5.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
         <PackageReference Include="WorkflowCore" Version="3.13.0" />
     </ItemGroup>
