@@ -28,6 +28,8 @@ public sealed class SubscriptionsDbContext : DbContext
             });
             builder.Property(e => e.RequestDate).HasColumnName("RequestDate");
             builder.Property(e => e.State).HasColumnName("State");
+            builder.Property(e => e.SuspensionStartDate).HasColumnName("SuspensionStartDate");
+            builder.Property(e => e.SuspensionEndDate).HasColumnName("SuspensionEndDate");
         });
     }
     

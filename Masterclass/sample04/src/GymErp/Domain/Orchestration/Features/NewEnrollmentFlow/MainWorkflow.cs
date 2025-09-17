@@ -12,11 +12,13 @@ public class MainWorkflow : IWorkflow<NewEnrollmentFlowData>
     public void Build(IWorkflowBuilder<NewEnrollmentFlowData> builder)
     {
         builder
+            .Saga(saga=> saga
             .StartWith<AddEnrollmentStep>()
                 .CompensateWith<AddEnrollmentCompensationStep>()
             .Then<ProcessPaymentStep>()
                 .CompensateWith<ProcessPaymentCompensationStep>()
             .Then<ScheduleEvaluationStep>()
-                .CompensateWith<ScheduleEvaluationCompensationStep>();
+                .CompensateWith<ScheduleEvaluationCompensationStep>())
+            .OnError(WorkflowErrorHandling.Retry, TimeSpan.FromDays(30));
     }
 }

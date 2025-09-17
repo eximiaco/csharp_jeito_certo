@@ -21,6 +21,8 @@ public sealed class Enrollment : IAggregate
     public Client Client { get; private set; } = null!;
     public DateTime RequestDate { get; private set; }
     public EState State { get; private set; }
+    public DateTime? SuspensionStartDate { get; private set; }
+    public DateTime? SuspensionEndDate { get; private set; }
     private IEnrollmentState _state = null!;
 
     public static Result<Enrollment> Create(Client client)
@@ -50,9 +52,23 @@ public sealed class Enrollment : IAggregate
         return _state.Activate(this);
     }
 
-    public Result Suspend()
+    public Result Suspend(DateTime startDate, DateTime endDate)
     {
-        return _state.Suspend(this);
+        if (startDate >= endDate)
+            return Result.Failure("A data de início da suspensão deve ser anterior à data de término");
+
+        var minimumSuspensionPeriod = TimeSpan.FromDays(30);
+        if (endDate - startDate < minimumSuspensionPeriod)
+            return Result.Failure("O período mínimo de suspensão é de 30 dias");
+
+        var result = _state.Suspend(this);
+        if (result.IsSuccess)
+        {
+            SuspensionStartDate = startDate;
+            SuspensionEndDate = endDate;
+        }
+
+        return result;
     }
 
     public Result Cancel()

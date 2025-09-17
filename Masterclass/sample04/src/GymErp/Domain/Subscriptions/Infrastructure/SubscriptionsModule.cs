@@ -3,6 +3,7 @@ using GymErp.Common;
 using GymErp.Domain.Subscriptions.AddNewEnrollment;
 using GymErp.Domain.Subscriptions.Aggreates.Enrollments;
 using GymErp.Domain.Subscriptions.Infrastructure;
+using GymErp.Domain.Subscriptions.SuspendEnrollment;
 using Endpoint = GymErp.Domain.Subscriptions.AddNewEnrollment.Endpoint;
 
 namespace GymErp.Domain.Subscriptions.Infrastructure;
@@ -25,13 +26,23 @@ public class SubscriptionsModule : Module
             .AsSelf()
             .InstancePerLifetimeScope();
 
-        // Registra o Handler
+        // Registra o Handler de Nova Inscrição
         builder.RegisterType<Handler>()
             .AsSelf()
             .InstancePerLifetimeScope();
 
-        // Registra o Endpoint
+        // Registra o Endpoint de Nova Inscrição
         builder.RegisterType<Endpoint>()
+            .AsSelf()
+            .InstancePerLifetimeScope();
+
+        // Registra o Handler de Suspensão
+        builder.RegisterType<SuspendEnrollment.Handler>()
+            .AsSelf()
+            .InstancePerLifetimeScope();
+
+        // Registra o Endpoint de Suspensão
+        builder.RegisterType<SuspendEnrollment.Endpoint>()
             .AsSelf()
             .InstancePerLifetimeScope();
     }
