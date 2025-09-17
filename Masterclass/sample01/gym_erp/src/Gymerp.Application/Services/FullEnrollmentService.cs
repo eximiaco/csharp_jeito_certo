@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using Gymerp.Application.DTOs;
 using Gymerp.Application.Interfaces;
 using Gymerp.Domain.Entities;
@@ -7,13 +5,9 @@ using Gymerp.Domain.Interfaces;
 
 namespace Gymerp.Application.Services
 {
-    public class FullEnrollmentService(
-        IStudentRepository studentRepository,
-        IPlanRepository planRepository,
-        IEnrollmentRepository enrollmentRepository,
-        IPhysicalAssessmentRepository assessmentRepository,
-        IPersonalRepository personalRepository,
-        IPaymentService paymentService)
+    public class FullEnrollmentService(IStudentRepository studentRepository, IPlanRepository planRepository,
+        IEnrollmentRepository enrollmentRepository, IPhysicalAssessmentRepository assessmentRepository,
+        IPersonalRepository personalRepository, IPaymentService paymentService)
         : IFullEnrollmentService
     {
         public async Task<Guid> EnrollAsync(FullEnrollmentDto dto)
@@ -40,12 +34,7 @@ namespace Gymerp.Application.Services
                 throw new InvalidOperationException("Plano não encontrado");
 
             // 3. Cria a matrícula
-            var enrollment = new Enrollment(
-                student.Id,
-                plan.Id,
-                dto.StartDate,
-                dto.EndDate
-            );
+            var enrollment = new Enrollment(student.Id, plan.Id, dto.StartDate, dto.EndDate);
             await enrollmentRepository.AddAsync(enrollment);
 
             // 4. Processa o pagamento
@@ -64,15 +53,9 @@ namespace Gymerp.Application.Services
             if (existingAssessment.Any(a => a.PersonalId == personal.Id && a.Status != PhysicalAssessmentStatus.Cancelled))
                 throw new InvalidOperationException("Personal não está disponível neste horário para avaliação física");
 
-            var assessment = new PhysicalAssessment(
-                student.Id,
-                personal.Id,
-                dto.PhysicalAssessment.AssessmentDate,
-                dto.PhysicalAssessment.Weight,
-                dto.PhysicalAssessment.Height,
-                dto.PhysicalAssessment.BodyFatPercentage,
-                dto.PhysicalAssessment.Notes
-            );
+            var assessment = new PhysicalAssessment(student.Id, personal.Id, dto.PhysicalAssessment.AssessmentDate,
+                dto.PhysicalAssessment.Weight, dto.PhysicalAssessment.Height, dto.PhysicalAssessment.BodyFatPercentage, 
+                dto.PhysicalAssessment.Notes);
             await assessmentRepository.AddAsync(assessment);
 
             return enrollment.Id;

@@ -8,7 +8,7 @@ public class NewEnrollmentFlowData
     public bool EnrollmentCreated { get; set; }
     public bool PaymentProcessed { get; set; }
     public bool EvaluationScheduled { get; set; }
-    
+
     // Propriedades necessárias para o AddEnrollmentStep
     public string Name { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;

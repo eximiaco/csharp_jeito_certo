@@ -15,7 +15,7 @@ public class AddEnrollmentCompensationStep(IOptions<ServicesSettings> options) :
     {
         var data = context.Workflow.Data as NewEnrollmentFlowData;
         
-        if (data?.EnrollmentCreated == true)
+        if (data.EnrollmentCreated == true)
         {
             var response = await HttpRetryPolicy.AsyncRetryPolicy.ExecuteAndCaptureAsync(async () =>
             {

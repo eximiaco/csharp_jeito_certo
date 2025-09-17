@@ -19,6 +19,6 @@ public class MainWorkflow : IWorkflow<NewEnrollmentFlowData>
                 .CompensateWith<ProcessPaymentCompensationStep>()
             .Then<ScheduleEvaluationStep>()
                 .CompensateWith<ScheduleEvaluationCompensationStep>())
-            .OnError(WorkflowErrorHandling.Retry, TimeSpan.FromDays(30));
+            .OnError(WorkflowErrorHandling.Retry, TimeSpan.FromSeconds(30));
     }
 }
