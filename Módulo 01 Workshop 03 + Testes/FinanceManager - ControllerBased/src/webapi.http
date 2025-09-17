@@ -1,0 +1,45 @@
+@FinanceManager_HostAddress = https://localhost:7008
+
+###
+
+GET {{FinanceManager_HostAddress}}/user-account/
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJTUXljeTdVWXdpZGxzaG9BV210aDU4RDJvUElaQnctYnRZSVlvVExMMGFNIn0.eyJleHAiOjE3MDU5NDU2NjIsImlhdCI6MTcwNTk0NTM2MiwianRpIjoiYWRhZTk1ZGItZDM5OC00MTczLTgwMmYtZDEwYmRjZDA1ZTZjIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy9iYW5rLWFjY291bnQiLCJhdWQiOlsiYmFua2FjY291bnRhcGkiLCJhY2NvdW50Il0sInN1YiI6IjhiMmI5NjZmLTliMzUtNDM0OS1hZmZiLWMzMTcwOTFmNGI4ZiIsInR5cCI6IkJlYXJlciIsImF6cCI6ImJhbmthY2NvdW50YXBpIiwic2Vzc2lvbl9zdGF0ZSI6IjMzNjI2YjgwLWIxMmUtNDNkMi1iODkxLTMzM2IzZWFhOTkyMiIsImFjciI6IjEiLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiIsImRlZmF1bHQtcm9sZXMtYmFuay1hY2NvdW50Il19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJwcm9maWxlIGVtYWlsIiwic2lkIjoiMzM2MjZiODAtYjEyZS00M2QyLWI4OTEtMzMzYjNlYWE5OTIyIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInByZWZlcnJlZF91c2VybmFtZSI6ImJydW5vIiwiZ2l2ZW5fbmFtZSI6IiIsImZhbWlseV9uYW1lIjoiIiwiZW1haWwiOiJicnVuby5qb2FxdWltQGV4aW1pYS5jbyJ9.eaC4agFVC_k7QbIoNRZYo-RwBxzZLwKaxDwqXcnK1RufYm4iIPXagN32e-lbSnKPAHXg3mBsn8y0h9DLrpX8qbq-WKIMJTILRGNHDa3rL5aRBFeQr6L6v0rQnyRJpw7zLm7II1mpSEsBDZl0v2WdtTXMLHn5ofBRv0Z44xJ6YgedwALt7AVnIBum7U6AxrP35WhdbV0fIUxXzb1SJ9wWM4s0KHHhKJDlEoT8iPNGzmvX3JnKCZKwGetSQHqIMRjPgdzs3d_JxToYbzNK6YcBe5GrGuyg9tZIDg5-Bpfa1PNhipx_diwJsdXObwC_IA0w9k3jtEvIF57hPCD2CZUp_A
+
+###
+
+POST {{FinanceManager_HostAddress}}/user-account/
+Accept: application/json
+Authorization: Bearer 
+
+###
+
+POST {{FinanceManager_HostAddress}}/api/user-account
+Content-Type: application/json
+
+{
+  "name": "Bruno Joaquim",
+  "email": "bruno_dev@outlook.com",
+  "password": "Password@123",
+  "confirmPassword": "Password@123"
+}
+
+###
+
+POST {{FinanceManager_HostAddress}}/api/v1/user-account/login
+Content-Type: application/json
+
+{
+  "email": "admin@admin.com",
+  "password": "SuperPassword@123"
+}
+
+###
+
+
+GET {{FinanceManager_HostAddress}}/api/v1/bank-accounts
+Authorization:  Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlMzQ1YjRiNy0xYmFlLTQxYTktODQ0Ny1mNmY2M2VmZDAyZDIiLCJ1bmlxdWVfbmFtZSI6IkFkbWluIiwiZW1haWwiOiJhZG1pbkBhZG1pbi5jb20iLCJqdGkiOiJiMGFiNDQyNC02OGUxLTQ3MjAtYjRkZS0zMThmNzdmMjg5ZjQiLCJpYXQiOjE3MjE3NzgwODIsIlJvbGUiOiJBZG1pbiIsIm5iZiI6MTcyMTc3ODA4MiwiZXhwIjoxNzIxNzc4OTgyLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjUxNTIiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjUxNTIifQ.hDiVr2ymOWXdCKUOkoc3sv8tZ1YmllbiCxIztAyJLBM
+X-Correlation-Id: "requestDemo"
+Content-Type: application/json
+
+###

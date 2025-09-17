@@ -17,7 +17,7 @@ public class PaymentProcessedConsumer(
         {
             try
             {
-                // Scheduling shipping logic
+                //throw new Exception();
                 logger.LogInformation("Shipping scheduled for order {OrderId}", order.OrderId);
                 await _queueService.PublishAsync(QueueNames.ShippingScheduledQueue, new ShippingScheduledEvent(order.OrderId));
             }
