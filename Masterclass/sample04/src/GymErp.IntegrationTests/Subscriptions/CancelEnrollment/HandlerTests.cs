@@ -26,7 +26,7 @@ public class HandlerTests : IntegrationTestBase, IAsyncLifetime
         _dbContextAccessor = new EfDbContextAccessor<SubscriptionsDbContext>(_dbContext);
         _enrollmentRepository = new EnrollmentRepository(_dbContextAccessor);
         _unitOfWork = new UnitOfWork(_dbContext);
-        _handler = new Handler(_enrollmentRepository, _unitOfWork, CancellationToken.None);
+        _handler = new Handler(_enrollmentRepository, _unitOfWork);
 
         // Criar uma inscrição para os testes
         var client = new Client(
@@ -108,5 +108,70 @@ public class HandlerTests : IntegrationTestBase, IAsyncLifetime
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().Be("Inscrição já está cancelada");
+    }
+
+    [Fact]
+    public async Task HandleAsync_ShouldPublishEnrollmentCanceledEvent_WhenSuccessfullyCanceled()
+    {
+        // Arrange
+        var request = new Request
+        {
+            EnrollmentId = _enrollment.Id,
+            Reason = "Cliente solicitou cancelamento"
+        };
+
+        // Act
+        var result = await _handler.HandleAsync(request);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        
+        // Verificar se o evento foi publicado
+        await Task.Delay(1000); // Aguardar processamento assíncrono
+        VerifyMessagePublished<EnrollmentCanceledEvent>();
+    }
+
+    [Fact]
+    public async Task HandleAsync_ShouldChangeStateToCanceled_WhenEnrollmentIsActive()
+    {
+        // Arrange - Ativar a inscrição primeiro
+        _enrollment.Activate();
+        await _enrollmentRepository.UpdateAsync(_enrollment, CancellationToken.None);
+        await _unitOfWork.Commit(CancellationToken.None);
+
+        var request = new Request
+        {
+            EnrollmentId = _enrollment.Id,
+            Reason = "Cliente solicitou cancelamento"
+        };
+
+        // Act
+        var result = await _handler.HandleAsync(request);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        var enrollment = await _dbContext.Enrollments.FindAsync(_enrollment.Id);
+        enrollment.Should().NotBeNull();
+        enrollment!.State.Should().Be(EState.Canceled);
+    }
+
+    [Fact]
+    public async Task HandleAsync_ShouldReturnFailure_WhenEnrollmentIsSuspended()
+    {
+        // Arrange - Inscrição já está suspensa por padrão
+        var request = new Request
+        {
+            EnrollmentId = _enrollment.Id,
+            Reason = "Cliente solicitou cancelamento"
+        };
+
+        // Act
+        var result = await _handler.HandleAsync(request);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue(); // Suspended pode ser cancelado
+        var enrollment = await _dbContext.Enrollments.FindAsync(_enrollment.Id);
+        enrollment.Should().NotBeNull();
+        enrollment!.State.Should().Be(EState.Canceled);
     }
 } 

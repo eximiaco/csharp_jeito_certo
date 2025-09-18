@@ -74,7 +74,12 @@ public sealed class Enrollment : Aggregate
 
     public Result Cancel()
     {
-        return _state.Cancel(this);
+        var result = _state.Cancel(this);
+        if (result.IsSuccess)
+        {
+            AddDomainEvent(new EnrollmentCanceledEvent(Id, DateTime.UtcNow));
+        }
+        return result;
     }
 
     internal void ChangeState(EState newState)

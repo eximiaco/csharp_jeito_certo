@@ -83,6 +83,8 @@ public abstract class IntegrationTestBase : IAsyncLifetime
                     config.SecurityProtocol = Confluent.Kafka.SecurityProtocol.Plaintext;
                 })
                 .AddOutbound<EnrollmentCreatedEvent>(endpoint => endpoint
+                    .ProduceTo("enrollment-events"))
+                .AddOutbound<EnrollmentCanceledEvent>(endpoint => endpoint
                     .ProduceTo("enrollment-events")))
             .AddIntegrationSpy();
 
@@ -129,7 +131,7 @@ public abstract class IntegrationTestBase : IAsyncLifetime
     /// <param name="expectedCount">Número de vezes que a mensagem deve ter sido publicada (padrão: 1)</param>
     protected void VerifyMessagePublished<T>(int expectedCount = 1) where T : class
     {
-        var messages = _spy.OutboundEnvelopes.Where(e => e.Message is T).Cast<T>();
+        var messages = _spy.OutboundEnvelopes.Where(e => e.Message is T).Select(e => (T)e.Message!);
         messages.Should().HaveCount(expectedCount);
     }
 

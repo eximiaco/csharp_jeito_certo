@@ -44,5 +44,15 @@ public class SubscriptionsModule : Module
         builder.RegisterType<Features.SuspendEnrollment.Endpoint>()
             .AsSelf()
             .InstancePerLifetimeScope();
+
+        // Registra o Handler de Cancelamento
+        builder.RegisterType<Features.CancelEnrollment.Handler>()
+            .AsSelf()
+            .InstancePerLifetimeScope();
+
+        // Registra o Endpoint de Cancelamento
+        builder.RegisterType<Features.CancelEnrollment.Endpoint>()
+            .AsSelf()
+            .InstancePerLifetimeScope();
     }
 } 
