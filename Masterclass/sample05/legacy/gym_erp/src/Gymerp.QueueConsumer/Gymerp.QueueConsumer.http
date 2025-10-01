@@ -1,0 +1,6 @@
+@Gymerp.QueueConsumer_HostAddress = http://localhost:5038
+
+GET {{Gymerp.QueueConsumer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
