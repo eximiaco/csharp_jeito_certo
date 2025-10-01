@@ -13,6 +13,7 @@ using Silverback.Testing;
 using Silverback.Messaging.Broker;
 using Testcontainers.Kafka;
 using Testcontainers.PostgreSql;
+using Testcontainers;
 using Xunit;
 using FluentAssertions;
 

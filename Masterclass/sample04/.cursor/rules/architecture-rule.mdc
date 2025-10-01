@@ -1,8 +1,9 @@
 ---
-description:
+description: Regras e Padrões do Projeto GymErp
 globs:
 alwaysApply: true
 ---
+
 # SWEEP.md - Regras e Padrões do Projeto GymErp
 
 ## 🏗️ Arquitetura

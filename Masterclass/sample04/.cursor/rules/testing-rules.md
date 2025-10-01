@@ -1,0 +1,450 @@
+---
+description: Regras de Testes do Projeto GymErp
+globs:
+alwaysApply: true
+---
+
+# Testing Rules - GymErp Project
+
+## 🏗️ Arquitetura de Testes
+
+### Organização por Contextos
+```
+src/GymErp.IntegrationTests/
+├── Infrastructure/              # Infraestrutura compartilhada
+│   ├── IntegrationTestBase.cs   # Classe base para testes de integração
+│   └── EfDbContextAccessor.cs   # Acesso ao DbContext para testes
+├── Subscriptions/               # Testes do contexto Subscriptions
+│   ├── AddNewEnrollment/
+│   ├── CancelEnrollment/
+│   └── EnrollmentStateTests.cs
+├── Financial/                   # Testes do contexto Financial
+│   └── ProcessCharging/
+├── Orchestration/               # Testes do contexto Orchestration
+│   ├── NewEnrollmentFlow/
+│   │   ├── SimpleWorkflowTests.cs
+│   │   ├── TestHelpers/
+│   │   └── StepTests/
+│   └── CancelEnrollmentFlow/
+└── Masterclass/sample04/src/GymErp.UnitTests/  # Testes unitários
+```
+
+## 📋 Regras Gerais
+
+### ✅ DO - Boas Práticas
+
+#### Estrutura de Arquivos
+- **SEMPRE** organize testes por contexto de domínio (Subscriptions, Financial, Orchestration)
+- **SEMPRE** use `IntegrationTestBase` para testes que envolvem infraestrutura
+- **SEMPRE** crie pastas separadas para cada feature dentro do contexto
+- **SEMPRE** use nomenclatura `[Feature]Tests.cs` para arquivos de teste
+
+#### Nomenclatura de Testes
+- **SEMPRE** use padrão `MethodName_ShouldExpectedBehavior_WhenCondition`
+- **SEMPRE** use `[Fact]` para testes únicos e `[Theory]` para testes parametrizados
+- **SEMPRE** use `InlineData` para cenários de teste com dados diferentes
+
+#### Setup e Teardown
+- **SEMPRE** implemente `IAsyncLifetime` para testes que usam `IntegrationTestBase`
+- **SEMPRE** chame `await base.InitializeAsync()` no setup personalizado
+- **SEMPRE** chame `await base.DisposeAsync()` no cleanup personalizado
+- **SEMPRE** dispose recursos criados manualmente no `DisposeAsync`
+
+#### Assertions
+- **SEMPRE** use `FluentAssertions` para assertions mais legíveis
+- **SEMPRE** verifique tanto `IsSuccess` quanto `IsFailure` em Result patterns
+- **SEMPRE** valide dados específicos após operações de criação/atualização
+- **SEMPRE** use `Should().BeCloseTo()` para comparações de DateTime
+
+### ❌ DON'T - Anti-patterns
+
+#### Estrutura de Arquivos
+- **NUNCA** misture testes de contextos diferentes no mesmo arquivo
+- **NUNCA** coloque testes de workflow no contexto de domínio específico
+- **NUNCA** crie dependências circulares entre classes de teste
+
+#### Setup e Configuração
+- **NUNCA** use mocks desnecessários em testes de integração
+- **NUNCA** compartilhe estado entre testes (cada teste deve ser independente)
+- **NUNCA** deixe containers Docker rodando após os testes
+
+#### Assertions
+- **NUNCA** use `Assert.True(true)` como placeholder
+- **NUNCA** ignore exceções não tratadas nos testes
+- **NUNCA** faça assertions em dados que não foram explicitamente testados
+
+## 🎯 Tipos de Testes por Contexto
+
+### Contexto Subscriptions
+
+#### ✅ DO
+```csharp
+public class HandlerTests : IntegrationTestBase, IAsyncLifetime
+{
+    private Handler _handler = null!;
+    private EnrollmentRepository _enrollmentRepository = null!;
+    private IUnitOfWork _unitOfWork = null!;
+    private EfDbContextAccessor<SubscriptionsDbContext> _dbContextAccessor = null!;
+
+    public new async Task InitializeAsync()
+    {
+        await base.InitializeAsync();
+        _dbContextAccessor = new EfDbContextAccessor<SubscriptionsDbContext>(_dbContext);
+        _enrollmentRepository = new EnrollmentRepository(_dbContextAccessor);
+        _unitOfWork = new UnitOfWork(_dbContext);
+        _handler = new Handler(_enrollmentRepository, _unitOfWork, CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task HandleAsync_ShouldCreateEnrollment_WhenValidRequest()
+    {
+        // Arrange
+        var request = new Request
+        {
+            Name = "João da Silva Santos",
+            Email = "joao.silva@email.com",
+            // ... outros campos
+        };
+
+        // Act
+        var result = await _handler.HandleAsync(request);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        var enrollment = await _dbContext.Enrollments.FindAsync(result.Value);
+        enrollment.Should().NotBeNull();
+        enrollment!.Client.Name.Should().Be(request.Name);
+    }
+
+    [Theory]
+    [InlineData("", "email@test.com", "11999999999", "Nome não pode ser vazio")]
+    [InlineData("João S.", "email@test.com", "11999999999", "Nome deve ter pelo menos 10 caracteres")]
+    public async Task HandleAsync_ShouldReturnFailure_WhenInvalidRequest(
+        string name, string email, string phone, string expectedError)
+    {
+        // Arrange
+        var request = new Request { Name = name, Email = email, Phone = phone };
+
+        // Act
+        var result = await _handler.HandleAsync(request);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(expectedError);
+    }
+}
+```
+
+#### ❌ DON'T
+- **NUNCA** teste validações de domínio em testes de integração (use testes unitários)
+- **NUNCA** faça testes de integração para lógica pura de negócio
+- **NUNCA** ignore verificação de eventos publicados no Kafka
+
+### Contexto Financial
+
+#### ✅ DO
+```csharp
+public class HandlerTests : IntegrationTestBase
+{
+    private FinancialHandler _handler = null!;
+    private IBroker _broker = null!;
+
+    protected override async Task SetupDatabase()
+    {
+        await base.SetupDatabase();
+        
+        _handler = new FinancialHandler(new NullLogger<FinancialHandler>());
+        _broker = _serviceProvider.GetRequiredService<IBroker>();
+    }
+
+    [Fact]
+    public async Task HandleAsync_ShouldProcessEvent_WhenValidEnrollmentCreated()
+    {
+        // Arrange
+        var enrollmentId = Guid.NewGuid();
+        var enrollmentCreatedEvent = new EnrollmentCreatedEvent(enrollmentId);
+
+        // Act
+        await _handler.HandleAsync(enrollmentCreatedEvent, CancellationToken.None);
+
+        // Assert
+        // Verificar processamento sem exceções
+        true.Should().BeTrue(); // Placeholder para validação futura
+    }
+}
+```
+
+#### ❌ DON'T
+- **NUNCA** teste lógica de negócio complexa em testes de mensageria
+- **NUNCA** ignore configuração do broker Kafka nos testes
+- **NUNCA** faça assertions em logs (não são testáveis)
+
+### Contexto Orchestration
+
+#### ✅ DO
+```csharp
+public class SimpleWorkflowTests : IntegrationTestBase, IAsyncLifetime
+{
+    private IWorkflowHost _workflowHost = null!;
+
+    public new async Task InitializeAsync()
+    {
+        await base.InitializeAsync();
+        
+        // Configurar WorkflowCore para testes
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddWorkflow();
+        
+        // Registrar workflow e steps
+        services.AddTransient<MainWorkflow>();
+        services.AddTransient<AddEnrollmentStep>();
+        // ... outros steps
+        
+        var serviceProvider = services.BuildServiceProvider();
+        _workflowHost = serviceProvider.GetRequiredService<IWorkflowHost>();
+        
+        // CRÍTICO: Registrar o workflow no host
+        _workflowHost.RegisterWorkflow<MainWorkflow, NewEnrollmentFlowData>();
+        _workflowHost.Start();
+    }
+
+    [Fact]
+    public async Task Workflow_ShouldStartSuccessfully_WhenValidData()
+    {
+        // Arrange
+        var data = TestDataBuilder.CreateValidData().Build();
+
+        // Act
+        var workflowId = await _workflowHost.StartWorkflow("new-enrollment-workflow", data);
+
+        // Assert
+        workflowId.Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public async Task Workflow_ShouldThrowException_WhenInvalidWorkflowId()
+    {
+        // Arrange
+        var data = TestDataBuilder.CreateValidData().Build();
+
+        // Act & Assert
+        var act = async () => await _workflowHost.StartWorkflow("invalid-workflow-id", data);
+        await act.Should().ThrowAsync<WorkflowNotRegisteredException>();
+    }
+}
+```
+
+#### ❌ DON'T
+- **NUNCA** esqueça de registrar workflows com `RegisterWorkflow<>()`
+- **NUNCA** teste steps individuais em testes de workflow (use testes unitários)
+- **NUNCA** ignore o lifecycle do `IWorkflowHost` (Start/Stop)
+
+## 🛠️ Test Helpers e Builders
+
+### ✅ DO - TestDataBuilder Pattern
+```csharp
+public class TestDataBuilder
+{
+    private NewEnrollmentFlowData _data;
+
+    public TestDataBuilder()
+    {
+        _data = new NewEnrollmentFlowData();
+    }
+
+    public static TestDataBuilder CreateValidData()
+    {
+        return new TestDataBuilder()
+            .WithClientId(Guid.NewGuid())
+            .WithPlanId(Guid.NewGuid())
+            .WithName("João da Silva Santos")
+            .WithEmail("joao.silva@email.com");
+    }
+
+    public static TestDataBuilder CreateWithInvalidClient()
+    {
+        return new TestDataBuilder()
+            .WithClientId(Guid.Empty) // Cliente inválido
+            .WithPlanId(Guid.NewGuid());
+    }
+
+    public TestDataBuilder WithClientId(Guid clientId)
+    {
+        _data.ClientId = clientId;
+        return this;
+    }
+
+    public NewEnrollmentFlowData Build()
+    {
+        return _data;
+    }
+}
+```
+
+#### ❌ DON'T
+- **NUNCA** crie dados de teste inline sem builders para casos complexos
+- **NUNCA** use dados hardcoded quando há múltiplos cenários
+- **NUNCA** ignore cenários de falha nos builders
+
+## 🔧 Configuração de Infraestrutura
+
+### ✅ DO - IntegrationTestBase Usage
+```csharp
+public abstract class IntegrationTestBase : IAsyncLifetime
+{
+    protected readonly PostgreSqlContainer _postgresContainer;
+    protected readonly KafkaContainer _kafkaContainer;
+    protected SubscriptionsDbContext _dbContext = null!;
+    protected IServiceBus _serviceBus = null!;
+    protected IIntegrationSpy _spy = null!;
+    protected ServiceProvider _serviceProvider = null!;
+
+    protected IntegrationTestBase()
+    {
+        _postgresContainer = new PostgreSqlBuilder()
+            .WithImage("postgres:latest")
+            .WithDatabase("gym_erp_test")
+            .WithUsername("postgres")
+            .WithPassword("postgres")
+            .Build();
+
+        _kafkaContainer = new KafkaBuilder()
+            .WithImage("confluentinc/cp-kafka:latest")
+            .WithEnvironment("KAFKA_AUTO_CREATE_TOPICS_ENABLE", "true")
+            .Build();
+    }
+
+    public virtual async Task InitializeAsync()
+    {
+        await _postgresContainer.StartAsync();
+        await _kafkaContainer.StartAsync();
+        
+        // Setup DbContext
+        var options = new DbContextOptionsBuilder<SubscriptionsDbContext>()
+            .UseNpgsql(_postgresContainer.GetConnectionString())
+            .Options;
+        
+        _dbContext = new SubscriptionsDbContext(options);
+        await _dbContext.Database.EnsureCreatedAsync();
+        
+        // Setup Silverback
+        await SetupSilverback();
+    }
+}
+```
+
+### ❌ DON'T
+- **NUNCA** configure containers Docker manualmente em cada teste
+- **NUNCA** ignore cleanup de recursos nos testes
+- **NUNCA** use banco de dados compartilhado entre testes
+
+## 📦 Dependências e Packages
+
+### ✅ DO - Packages Necessários
+```xml
+<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+<PackageReference Include="xunit" Version="2.9.2" />
+<PackageReference Include="FluentAssertions" Version="6.12.2" />
+<PackageReference Include="Testcontainers" Version="4.0.0" />
+<PackageReference Include="Testcontainers.PostgreSql" Version="4.0.0" />
+<PackageReference Include="Testcontainers.Kafka" Version="4.0.0" />
+<PackageReference Include="Silverback.Integration.Testing" Version="4.5.0" />
+<PackageReference Include="Moq" Version="4.20.72" />
+```
+
+### ❌ DON'T
+- **NUNCA** adicione packages desnecessários para testes
+- **NUNCA** use versões antigas de TestContainers
+- **NUNCA** misture frameworks de teste (use apenas xUnit)
+
+## 🚀 Execução de Testes
+
+### ✅ DO - Comandos Recomendados
+```bash
+# Executar todos os testes
+dotnet test
+
+# Executar testes específicos por filtro
+dotnet test --filter "SimpleWorkflowTests"
+dotnet test --filter "Subscriptions"
+dotnet test --filter "Orchestration"
+
+# Executar com verbosidade
+dotnet test --verbosity normal
+
+# Executar testes em paralelo (cuidado com recursos)
+dotnet test --parallel
+```
+
+### ❌ DON'T
+- **NUNCA** execute testes de integração em paralelo sem isolamento adequado
+- **NUNCA** ignore falhas de timeout nos testes
+- **NUNCA** deixe containers Docker rodando após execução
+
+## 📊 Cobertura e Métricas
+
+### ✅ DO - Estratégia de Cobertura
+- **Testes Unitários**: Lógica de domínio, validações, business rules
+- **Testes de Integração**: Handlers, workflows, mensageria, banco de dados
+- **Testes End-to-End**: Fluxos completos via API (quando necessário)
+
+### ❌ DON'T
+- **NUNCA** teste código de infraestrutura que não é seu (Entity Framework, etc.)
+- **NUNCA** force 100% de cobertura em código trivial
+- **NUNCA** ignore testes de cenários de falha
+
+## 🎯 Padrões Específicos por Tecnologia
+
+### WorkflowCore Tests
+```csharp
+// ✅ DO - Configuração correta
+services.AddWorkflow();
+services.AddTransient<MainWorkflow>();
+services.AddTransient<StepImplementation>();
+
+// CRÍTICO: Registrar workflow
+_workflowHost.RegisterWorkflow<MainWorkflow, WorkflowData>();
+_workflowHost.Start();
+
+// ✅ DO - Teste de exceção
+var act = async () => await _workflowHost.StartWorkflow("invalid-id", data);
+await act.Should().ThrowAsync<WorkflowNotRegisteredException>();
+```
+
+### Silverback/Kafka Tests
+```csharp
+// ✅ DO - Verificação de mensagens
+await VerifyMessagePublishedInKafkaTopic<EnrollmentCreatedEvent>(
+    "enrollment-events", 
+    1);
+
+// ✅ DO - Verificação de não publicação
+VerifyNoMessagesPublished();
+```
+
+### Entity Framework Tests
+```csharp
+// ✅ DO - Verificação de persistência
+var enrollment = await _dbContext.Enrollments.FindAsync(result.Value);
+enrollment.Should().NotBeNull();
+enrollment!.Client.Name.Should().Be(request.Name);
+
+// ✅ DO - Cleanup
+await _dbContext.Database.EnsureDeletedAsync();
+```
+
+---
+
+## 📝 Resumo das Regras Críticas
+
+1. **SEMPRE** use `IntegrationTestBase` para testes de infraestrutura
+2. **SEMPRE** implemente `IAsyncLifetime` para lifecycle correto
+3. **SEMPRE** registre workflows com `RegisterWorkflow<>()` em testes de orchestration
+4. **SEMPRE** use `TestDataBuilder` para dados complexos
+5. **SEMPRE** valide eventos publicados no Kafka
+6. **NUNCA** compartilhe estado entre testes
+7. **NUNCA** ignore cleanup de recursos
+8. **NUNCA** teste lógica de domínio em testes de integração
+
+Essas regras garantem testes confiáveis, isolados e que realmente validam o comportamento da aplicação em cenários reais.

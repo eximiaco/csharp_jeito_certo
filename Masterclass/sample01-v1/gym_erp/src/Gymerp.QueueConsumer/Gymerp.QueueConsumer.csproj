@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Gymerp.Application\Gymerp.Application.csproj" />
+    <ProjectReference Include="..\Gymerp.Infrastructure\Gymerp.Infrastructure.csproj" />
+    <ProjectReference Include="..\Gymerp.Common\Gymerp.Common.csproj" />
+  </ItemGroup>
+
+</Project>
