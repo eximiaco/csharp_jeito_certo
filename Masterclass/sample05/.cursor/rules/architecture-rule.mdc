@@ -4,9 +4,10 @@ globs:
 alwaysApply: true
 ---
 
-# SWEEP.md - Regras e Padrões do Projeto GymErp
+# Regras e Padrões do Projeto GymErp
 
-Essas regras valem apenas para o projeto sample04
+- **Regras validas apenas para projeto modernizado contido na pasta src**:
+- **NUNCA** aplique essas regras para o projeto legado, dentro da pasta legacy
 
 ## 🏗️ Arquitetura
 

@@ -1,12 +1,4 @@
----
-description: Regras e Padrões do Projeto GymErp
-globs:
-alwaysApply: true
----
-
 # SWEEP.md - Regras e Padrões do Projeto GymErp
-
-Essas regras valem apenas para o projeto sample04
 
 ## 🏗️ Arquitetura
 
@@ -36,8 +28,6 @@ Essas regras valem apenas para o projeto sample04
 - **Entity Framework Core**: ORM com PostgreSQL
 - **Dapper**: Queries SQL diretas quando necessário
 - **WorkflowCore**: Para orquestração de workflows
-- **TestContainers**: Testes de integracao
-- **Silverback**: Mensageria com Kafka
 
 ### Logging e Observabilidade
 - **Serilog**: Logging estruturado
@@ -288,5 +278,3 @@ public override void Configure()
 5. **Repository pattern** apenas quando necessário
 6. **Unit of Work** para transações
 7. **Workflows** para processos complexos multi-step
-8. **Testes de integração** - com TestContainers
-9. **Mensageria** - com Kafka atraves da biblioteca Silverback
