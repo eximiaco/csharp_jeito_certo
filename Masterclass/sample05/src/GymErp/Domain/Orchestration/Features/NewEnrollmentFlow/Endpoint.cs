@@ -16,7 +16,22 @@ public class NewEnrollmentEndpoint(IWorkflowHost workflowHost) : Endpoint<Reques
         var workflowData = new NewEnrollmentFlowData
         {
             ClientId = request.ClientId,
-            PlanId = request.PlanId
+            PlanId = request.PlanId,
+            Name = request.Name,
+            Email = request.Email,
+            Phone = request.Phone,
+            Document = request.Document,
+            BirthDate = request.BirthDate,
+            Gender = request.Gender,
+            Address = request.Address,
+            StartDate = request.StartDate,
+            EndDate = request.EndDate,
+            PersonalId = request.PersonalId,
+            AssessmentDate = request.AssessmentDate,
+            Weight = request.Weight,
+            Height = request.Height,
+            BodyFatPercentage = request.BodyFatPercentage,
+            Notes = request.Notes
         };
 
         var workflowId = await workflowHost.StartWorkflow("new-enrollment-workflow", workflowData);

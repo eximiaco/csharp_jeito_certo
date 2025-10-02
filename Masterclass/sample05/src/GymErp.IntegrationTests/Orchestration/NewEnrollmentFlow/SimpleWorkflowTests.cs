@@ -1,6 +1,7 @@
 using GymErp.Common.Settings;
 using GymErp.Domain.Orchestration.Features.NewEnrollmentFlow;
 using GymErp.IntegrationTests.Infrastructure;
+using GymErp.IntegrationTests.Orchestration.NewEnrollmentFlow.TestHelpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -30,9 +31,11 @@ public class SimpleWorkflowTests : IntegrationTestBase, IAsyncLifetime
         // Registrar workflow e steps do NewEnrollmentFlow
         services.AddTransient<MainWorkflow>();
         services.AddTransient<GymErp.Domain.Orchestration.Features.NewEnrollmentFlow.Steps.AddEnrollmentStep>();
+        services.AddTransient<GymErp.Domain.Orchestration.Features.NewEnrollmentFlow.Steps.AddLegacyEnrollmentStep>();
         services.AddTransient<GymErp.Domain.Orchestration.Features.NewEnrollmentFlow.Steps.ProcessPaymentStep>();
         services.AddTransient<GymErp.Domain.Orchestration.Features.NewEnrollmentFlow.Steps.ScheduleEvaluationStep>();
         services.AddTransient<GymErp.Domain.Orchestration.Features.NewEnrollmentFlow.Steps.AddEnrollmentCompensationStep>();
+        services.AddTransient<GymErp.Domain.Orchestration.Features.NewEnrollmentFlow.Steps.AddLegacyEnrollmentCompensationStep>();
         services.AddTransient<GymErp.Domain.Orchestration.Features.NewEnrollmentFlow.Steps.ProcessPaymentCompensationStep>();
         services.AddTransient<GymErp.Domain.Orchestration.Features.NewEnrollmentFlow.Steps.ScheduleEvaluationCompensationStep>();
         
@@ -40,6 +43,7 @@ public class SimpleWorkflowTests : IntegrationTestBase, IAsyncLifetime
         var servicesSettings = new ServicesSettings
         {
             SubscriptionsUri = "http://localhost:5001",
+            LegacyApiUri = "http://localhost:5000",
             ProcessPaymentUri = "http://localhost:5002",
             ScheduleEvaluationUri = "http://localhost:5003"
         };
@@ -100,8 +104,19 @@ public class SimpleWorkflowTests : IntegrationTestBase, IAsyncLifetime
         data.Gender.Should().NotBeEmpty();
         data.Address.Should().NotBeEmpty();
         
+        // Novos campos para integração com sistema legado
+        data.StartDate.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMinutes(1));
+        data.EndDate.Should().BeAfter(data.StartDate);
+        data.PersonalId.Should().NotBeEmpty();
+        data.AssessmentDate.Should().BeAfter(DateTime.Now);
+        data.Weight.Should().BeGreaterThan(0);
+        data.Height.Should().BeGreaterThan(0);
+        data.BodyFatPercentage.Should().BeGreaterOrEqualTo(0);
+        data.Notes.Should().NotBeEmpty();
+        
         // Flags de estado
         data.EnrollmentCreated.Should().BeFalse();
+        data.LegacyEnrollmentCreated.Should().BeFalse();
         data.PaymentProcessed.Should().BeFalse();
         data.EvaluationScheduled.Should().BeFalse();
     }
@@ -152,17 +167,6 @@ public class SimpleWorkflowTests : IntegrationTestBase, IAsyncLifetime
     /// </summary>
     private NewEnrollmentFlowData CreateValidWorkflowData()
     {
-        return new NewEnrollmentFlowData
-        {
-            ClientId = Guid.NewGuid(),
-            PlanId = Guid.NewGuid(),
-            Name = "João da Silva Santos",
-            Email = "joao.silva@email.com",
-            Phone = "11999999999",
-            Document = "52998224725",
-            BirthDate = new DateTime(1990, 1, 1),
-            Gender = "M",
-            Address = "Rua Exemplo, 123"
-        };
+        return TestDataBuilder.CreateValidData().Build();
     }
 }

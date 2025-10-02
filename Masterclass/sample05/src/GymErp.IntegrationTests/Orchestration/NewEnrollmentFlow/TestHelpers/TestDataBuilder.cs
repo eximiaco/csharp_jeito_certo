@@ -28,7 +28,15 @@ public class TestDataBuilder
             .WithDocument("52998224725")
             .WithBirthDate(new DateTime(1990, 1, 1))
             .WithGender("M")
-            .WithAddress("Rua Exemplo, 123");
+            .WithAddress("Rua Exemplo, 123")
+            .WithStartDate(DateTime.Now)
+            .WithEndDate(DateTime.Now.AddMonths(12))
+            .WithPersonalId(Guid.NewGuid())
+            .WithAssessmentDate(DateTime.Now.AddDays(7))
+            .WithWeight(75.5m)
+            .WithHeight(1.75m)
+            .WithBodyFatPercentage(15.0m)
+            .WithNotes("Cliente iniciante");
     }
 
     /// <summary>
@@ -45,7 +53,15 @@ public class TestDataBuilder
             .WithDocument("52998224725")
             .WithBirthDate(new DateTime(1990, 1, 1))
             .WithGender("M")
-            .WithAddress("Rua Exemplo, 123");
+            .WithAddress("Rua Exemplo, 123")
+            .WithStartDate(DateTime.Now)
+            .WithEndDate(DateTime.Now.AddMonths(12))
+            .WithPersonalId(Guid.NewGuid())
+            .WithAssessmentDate(DateTime.Now.AddDays(7))
+            .WithWeight(75.5m)
+            .WithHeight(1.75m)
+            .WithBodyFatPercentage(15.0m)
+            .WithNotes("Cliente iniciante");
     }
 
     /// <summary>
@@ -62,7 +78,15 @@ public class TestDataBuilder
             .WithDocument("52998224725")
             .WithBirthDate(new DateTime(1990, 1, 1))
             .WithGender("M")
-            .WithAddress("Rua Exemplo, 123");
+            .WithAddress("Rua Exemplo, 123")
+            .WithStartDate(DateTime.Now)
+            .WithEndDate(DateTime.Now.AddMonths(12))
+            .WithPersonalId(Guid.NewGuid())
+            .WithAssessmentDate(DateTime.Now.AddDays(7))
+            .WithWeight(75.5m)
+            .WithHeight(1.75m)
+            .WithBodyFatPercentage(15.0m)
+            .WithNotes("Cliente iniciante");
     }
 
     /// <summary>
@@ -77,12 +101,18 @@ public class TestDataBuilder
             case FailingStep.AddEnrollment:
                 builder.WithEnrollmentCreated(false);
                 break;
+            case FailingStep.AddLegacyEnrollment:
+                builder.WithEnrollmentCreated(true)
+                       .WithLegacyEnrollmentCreated(false);
+                break;
             case FailingStep.ProcessPayment:
                 builder.WithEnrollmentCreated(true)
+                       .WithLegacyEnrollmentCreated(true)
                        .WithPaymentProcessed(false);
                 break;
             case FailingStep.ScheduleEvaluation:
                 builder.WithEnrollmentCreated(true)
+                       .WithLegacyEnrollmentCreated(true)
                        .WithPaymentProcessed(true)
                        .WithEvaluationScheduled(false);
                 break;
@@ -169,6 +199,66 @@ public class TestDataBuilder
         return this;
     }
 
+    public TestDataBuilder WithStartDate(DateTime startDate)
+    {
+        _data.StartDate = startDate;
+        return this;
+    }
+
+    public TestDataBuilder WithEndDate(DateTime endDate)
+    {
+        _data.EndDate = endDate;
+        return this;
+    }
+
+    public TestDataBuilder WithPersonalId(Guid personalId)
+    {
+        _data.PersonalId = personalId;
+        return this;
+    }
+
+    public TestDataBuilder WithAssessmentDate(DateTime assessmentDate)
+    {
+        _data.AssessmentDate = assessmentDate;
+        return this;
+    }
+
+    public TestDataBuilder WithWeight(decimal weight)
+    {
+        _data.Weight = weight;
+        return this;
+    }
+
+    public TestDataBuilder WithHeight(decimal height)
+    {
+        _data.Height = height;
+        return this;
+    }
+
+    public TestDataBuilder WithBodyFatPercentage(decimal bodyFatPercentage)
+    {
+        _data.BodyFatPercentage = bodyFatPercentage;
+        return this;
+    }
+
+    public TestDataBuilder WithNotes(string notes)
+    {
+        _data.Notes = notes;
+        return this;
+    }
+
+    public TestDataBuilder WithLegacyEnrollmentId(Guid legacyEnrollmentId)
+    {
+        _data.LegacyEnrollmentId = legacyEnrollmentId;
+        return this;
+    }
+
+    public TestDataBuilder WithLegacyEnrollmentCreated(bool created)
+    {
+        _data.LegacyEnrollmentCreated = created;
+        return this;
+    }
+
     public NewEnrollmentFlowData Build()
     {
         return _data;
@@ -181,6 +271,7 @@ public class TestDataBuilder
 public enum FailingStep
 {
     AddEnrollment,
+    AddLegacyEnrollment,
     ProcessPayment,
     ScheduleEvaluation
 }

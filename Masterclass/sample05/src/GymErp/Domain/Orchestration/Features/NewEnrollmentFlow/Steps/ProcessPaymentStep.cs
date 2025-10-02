@@ -1,3 +1,4 @@
+using Flurl;
 using Flurl.Http;
 using GymErp.Common;
 using GymErp.Common.Settings;
@@ -14,19 +15,21 @@ public class ProcessPaymentStep(IOptions<ServicesSettings> options) : StepBodyAs
     {
         var data = context.Workflow.Data as NewEnrollmentFlowData;
         
-        ProcessPaymentRequest request = new(data!.ClientId, data.PlanId);
+        ProcessPaymentRequest request = new(data!.LegacyEnrollmentId);
 
         var response = await HttpRetryPolicy.AsyncRetryPolicy.ExecuteAndCaptureAsync(async () => 
-            await options.Value.ProcessPaymentUri.PostJsonAsync(request));
+            await options.Value.LegacyApiUri
+                .AppendPathSegment("api/enrollment/process-payment")
+                .PostJsonAsync(request));
 
         if (response.Outcome == OutcomeType.Failure)
             throw response.FinalException;
         if (!response.Result.ResponseMessage.IsSuccessStatusCode)
-            throw new InvalidOperationException("Falha processando pagamento.");
+            throw new InvalidOperationException("Falha processando pagamento no sistema legado.");
 
         data.PaymentProcessed = true;
         return ExecutionResult.Next();
     }
 
-    public record ProcessPaymentRequest(Guid ClientId, Guid PlanId);
+    public record ProcessPaymentRequest(Guid EnrollmentId);
 }
