@@ -10,9 +10,24 @@ namespace Gymerp.Api.Controllers
     [Route("api/[controller]")]
     public class EnrollmentController(
         IFullEnrollmentService fullEnrollmentService,
+        IEnrollmentService enrollmentService,
         IScheduleAssessmentService scheduleAssessmentService,
         IProcessPaymentService processPaymentService) : ControllerBase
     {
+        [HttpPost("create")]
+        public async Task<IActionResult> CreateEnrollment([FromBody] EnrollmentDto dto)
+        {
+            try
+            {
+                var enrollmentId = await enrollmentService.CreateEnrollmentAsync(dto);
+                return Ok(new { EnrollmentId = enrollmentId });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
         [HttpPost("enroll")]
         public async Task<IActionResult> Enroll([FromBody] FullEnrollmentDto dto)
         {

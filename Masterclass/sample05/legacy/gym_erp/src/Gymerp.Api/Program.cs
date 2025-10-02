@@ -29,6 +29,7 @@ builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 
 // Register services
 builder.Services.AddScoped<IFullEnrollmentService, FullEnrollmentService>();
+builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
 builder.Services.AddScoped<IScheduleAssessmentService, ScheduleAssessmentService>();
 builder.Services.AddScoped<IProcessPaymentService, ProcessPaymentService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
