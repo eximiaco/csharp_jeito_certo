@@ -3,6 +3,7 @@ using GymErp.Domain.Orchestration.Features.NewEnrollmentFlow;
 using GymErp.Domain.Orchestration.Features.NewEnrollmentFlow.Steps;
 using GymErp.Domain.Orchestration.Features.CancelEnrollmentFlow;
 using GymErp.Domain.Orchestration.Features.CancelEnrollmentFlow.Steps;
+using GymErp.Domain.Orchestration.Features.EnrollmentOrchestrator;
 using WorkflowCore.Interface;
 
 namespace GymErp.Domain.Orchestration.Infrastructure;
@@ -27,5 +28,11 @@ public class OrchestrationModule : Module
         builder.RegisterType<ProcessRefundStep>().AsSelf().InstancePerLifetimeScope();
         builder.RegisterType<ProcessRefundCompensationStep>().AsSelf().InstancePerLifetimeScope();
         builder.RegisterType<GymErp.Domain.Orchestration.Features.CancelEnrollmentFlow.Endpoint>().AsSelf().InstancePerLifetimeScope();
+        
+        // Registra o EnrollmentOrchestrator
+        builder.RegisterType<LegacyAdapter>().AsSelf().InstancePerLifetimeScope();
+        builder.RegisterType<ModernizedAdapter>().AsSelf().InstancePerLifetimeScope();
+        builder.RegisterType<Handler>().AsSelf().InstancePerLifetimeScope();
+        builder.RegisterType<GymErp.Domain.Orchestration.Features.EnrollmentOrchestrator.Endpoint>().AsSelf().InstancePerLifetimeScope();
     }
 } 
