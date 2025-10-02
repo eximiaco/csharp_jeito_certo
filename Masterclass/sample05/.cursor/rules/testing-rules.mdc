@@ -28,11 +28,51 @@ src/GymErp.IntegrationTests/
 │   │   ├── SimpleWorkflowTests.cs
 │   │   ├── TestHelpers/
 │   │   └── StepTests/
-│   └── CancelEnrollmentFlow/
+│   ├── CancelEnrollmentFlow/
+│   └── EnrollmentOrchestrator/ # Testes do EnrollmentOrchestrator
+│       ├── HandlerTests.cs
+│       ├── EndpointTests.cs
+│       └── TestHelpers/
+│           └── TestDataBuilder.cs
 └── Masterclass/sample04/src/GymErp.UnitTests/  # Testes unitários
 ```
 
 ## 📋 Regras Gerais
+
+### 🎯 Princípios Fundamentais de Testes
+
+#### ✅ DO - Premissas Gerais
+- **SEMPRE** prefira testes de integração que testam comportamento real
+- **SEMPRE** use serviços reais com configurações mockadas quando possível
+- **SEMPRE** teste cenários de falha para serviços externos
+- **SEMPRE** use mocks do próprio framework (ex: Flurl) para testes HTTP
+- **SEMPRE** mantenha testes simples e focados no comportamento
+
+#### ❌ DON'T - Premissas Gerais
+- **NUNCA** crie interfaces apenas para facilitar testes
+- **NUNCA** use mocks de classes concretas que não são virtuais
+- **NUNCA** teste chamadas HTTP reais em testes de integração (exceto casos explícitos)
+- **NUNCA** adicione complexidade acidental por conta dos testes
+- **NUNCA** ignore o tratamento de erros de serviços externos
+
+### 🌐 Testes HTTP: Quando Usar Mocks vs Serviços Reais
+
+#### ✅ DO - Use Mocks do Framework (Flurl)
+- **SEMPRE** para testes de integração que validam comportamento interno
+- **SEMPRE** para testes de cenários de falha (timeout, erro 500, etc.)
+- **SEMPRE** para testes de orquestração e lógica de decisão
+- **SEMPRE** para testes que não dependem de serviços externos específicos
+
+#### ✅ DO - Use Serviços Reais (Casos Explícitos)
+- **APENAS** para testes end-to-end que validam integração completa
+- **APENAS** para testes de contratos de API com serviços externos
+- **APENAS** para testes de performance e carga
+- **APENAS** quando explicitamente necessário para validar comportamento real
+
+#### ❌ DON'T - Testes HTTP
+- **NUNCA** use serviços reais para testes de integração internos
+- **NUNCA** ignore configuração de timeout e retry policies
+- **NUNCA** teste cenários de sucesso quando serviços externos não estão disponíveis
 
 ### ✅ DO - Boas Práticas
 
@@ -243,6 +283,21 @@ public class SimpleWorkflowTests : IntegrationTestBase, IAsyncLifetime
 - **NUNCA** teste steps individuais em testes de workflow (use testes unitários)
 - **NUNCA** ignore o lifecycle do `IWorkflowHost` (Start/Stop)
 
+### Contexto Orchestration - EnrollmentOrchestrator
+
+#### ✅ DO - Princípios de Teste de Orquestração
+- **SEMPRE** teste a lógica de decisão do orquestrador (qual sistema usar baseado no tipo de plano)
+- **SEMPRE** teste cenários de falha quando serviços externos não estão disponíveis
+- **SEMPRE** valide que o Result pattern está sendo usado corretamente
+- **SEMPRE** teste o comportamento de fallback quando adapters falham
+- **SEMPRE** use configurações mockadas para URLs de serviços externos
+
+#### ❌ DON'T - EnrollmentOrchestrator
+- **NUNCA** teste cenários de sucesso quando serviços externos não estão disponíveis
+- **NUNCA** ignore o tratamento de erros de conectividade
+- **NUNCA** teste chamadas HTTP reais em testes de integração
+- **NUNCA** crie interfaces apenas para facilitar testes
+
 ## 🛠️ Test Helpers e Builders
 
 ### ✅ DO - TestDataBuilder Pattern
@@ -437,17 +492,51 @@ enrollment!.Client.Name.Should().Be(request.Name);
 await _dbContext.Database.EnsureDeletedAsync();
 ```
 
+### Serviços HTTP com Flurl Tests
+
+#### ✅ DO - Princípios para Testes HTTP
+- **SEMPRE** use serviços reais com configurações mockadas (URLs que não existem)
+- **SEMPRE** teste cenários de falha quando serviços externos não estão disponíveis
+- **SEMPRE** valide que o Result pattern está sendo usado corretamente
+- **SEMPRE** use mocks do próprio Flurl para testes HTTP quando necessário
+- **SEMPRE** teste o tratamento de erros de conectividade
+
+#### ❌ DON'T - Serviços HTTP
+- **NUNCA** crie interfaces apenas para facilitar testes de serviços HTTP
+- **NUNCA** use mocks de classes concretas que fazem chamadas HTTP
+- **NUNCA** teste cenários de sucesso quando serviços externos não estão disponíveis
+- **NUNCA** ignore o tratamento de erros de conectividade
+- **NUNCA** use URLs reais em testes de integração (exceto casos explícitos)
+
 ---
 
 ## 📝 Resumo das Regras Críticas
 
-1. **SEMPRE** use `IntegrationTestBase` para testes de infraestrutura
-2. **SEMPRE** implemente `IAsyncLifetime` para lifecycle correto
-3. **SEMPRE** registre workflows com `RegisterWorkflow<>()` em testes de orchestration
-4. **SEMPRE** use `TestDataBuilder` para dados complexos
-5. **SEMPRE** valide eventos publicados no Kafka
-6. **NUNCA** compartilhe estado entre testes
-7. **NUNCA** ignore cleanup de recursos
-8. **NUNCA** teste lógica de domínio em testes de integração
+### 🎯 Princípios Fundamentais
+1. **SEMPRE** prefira testes de integração que testam comportamento real
+2. **SEMPRE** use serviços reais com configurações mockadas quando possível
+3. **SEMPRE** teste cenários de falha para serviços externos
+4. **SEMPRE** use mocks do próprio framework (ex: Flurl) para testes HTTP
+5. **NUNCA** crie interfaces apenas para facilitar testes
+6. **NUNCA** use mocks de classes concretas que não são virtuais
+7. **NUNCA** teste chamadas HTTP reais em testes de integração (exceto casos explícitos)
+8. **NUNCA** adicione complexidade acidental por conta dos testes
 
-Essas regras garantem testes confiáveis, isolados e que realmente validam o comportamento da aplicação em cenários reais.
+### 🏗️ Regras de Infraestrutura
+9. **SEMPRE** use `IntegrationTestBase` para testes de infraestrutura
+10. **SEMPRE** implemente `IAsyncLifetime` para lifecycle correto
+11. **SEMPRE** registre workflows com `RegisterWorkflow<>()` em testes de orchestration
+12. **SEMPRE** use `TestDataBuilder` para dados complexos
+13. **SEMPRE** valide eventos publicados no Kafka
+14. **NUNCA** compartilhe estado entre testes
+15. **NUNCA** ignore cleanup de recursos
+16. **NUNCA** teste lógica de domínio em testes de integração
+
+### 🎯 Regras Específicas para Orquestração
+- **SEMPRE** teste a lógica de decisão do orquestrador (qual sistema usar)
+- **SEMPRE** valide que planos mensais são direcionados para o sistema legado
+- **SEMPRE** valide que planos semestrais/anuais são direcionados para o sistema modernizado
+- **SEMPRE** teste cenários de falha quando serviços externos não estão disponíveis
+- **NUNCA** ignore o tratamento de erros de conectividade
+
+Essas regras garantem testes confiáveis, isolados e que realmente validam o comportamento da aplicação em cenários reais, mantendo simplicidade e foco no comportamento.
