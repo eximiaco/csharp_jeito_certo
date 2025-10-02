@@ -1,6 +1,7 @@
 using GymErp.Common;
 using Microsoft.EntityFrameworkCore;
 using GymErp.Domain.Subscriptions.Aggreates.Enrollments;
+using GymErp.Domain.Subscriptions.Aggreates.Plans;
 
 namespace GymErp.Domain.Subscriptions.Infrastructure;
 
@@ -8,6 +9,7 @@ public sealed class SubscriptionsDbContext : DbContext
 {
     private readonly IServiceBus _serviceBus;
     public DbSet<Enrollment> Enrollments { get; set; }
+    public DbSet<Plan> Plans { get; set; }
 
     public SubscriptionsDbContext(DbContextOptions<SubscriptionsDbContext> options, IServiceBus serviceBus) : base(options)
     {
@@ -34,6 +36,14 @@ public sealed class SubscriptionsDbContext : DbContext
             builder.Property(e => e.State).HasColumnName("State");
             builder.Property(e => e.SuspensionStartDate).HasColumnName("SuspensionStartDate");
             builder.Property(e => e.SuspensionEndDate).HasColumnName("SuspensionEndDate");
+        });
+
+        modelBuilder.Entity<Plan>(builder =>
+        {
+            builder.ToTable("Plans");
+            builder.HasKey(p => p.Id);
+            builder.Property(p => p.Description).HasColumnName("Description").HasMaxLength(100);
+            builder.Property(p => p.Type).HasColumnName("Type").HasConversion<int>();
         });
     }
     

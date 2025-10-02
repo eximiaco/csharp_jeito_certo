@@ -54,5 +54,10 @@ public class SubscriptionsModule : Module
         builder.RegisterType<Features.CancelEnrollment.Endpoint>()
             .AsSelf()
             .InstancePerLifetimeScope();
+
+        // Registra o Endpoint de Consulta de Plano
+        builder.RegisterType<Features.GetPlanById.Endpoint>()
+            .AsSelf()
+            .InstancePerLifetimeScope();
     }
 } 
