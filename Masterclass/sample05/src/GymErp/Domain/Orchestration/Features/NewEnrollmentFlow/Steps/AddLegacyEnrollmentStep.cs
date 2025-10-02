@@ -16,26 +16,13 @@ public class AddLegacyEnrollmentStep(IOptions<ServicesSettings> options) : StepB
         var data = context.Workflow.Data as NewEnrollmentFlowData;
         
         var request = new AddLegacyEnrollmentRequest(
-            new StudentDto(
-                data!.Name,
-                data.Email,
-                data.Phone,
-                data.Document,
-                data.BirthDate,
-                data.Gender,
-                data.Address
-            ),
-            data.PlanId,
-            data.StartDate,
-            data.EndDate
-        );
+            new StudentDto(data!.Name, data.Email, data.Phone, data.Document, data.BirthDate, data.Gender, data.Address),
+            data.PlanId, data.StartDate, data.EndDate);
 
-        var response = await HttpRetryPolicy.AsyncRetryPolicy.ExecuteAndCaptureAsync(async () =>
-        {
-            return await options.Value.LegacyApiUri
-                .AppendPathSegment("api/enrollment/create")
-                .PostJsonAsync(request);
-        });
+        var response = await HttpRetryPolicy.AsyncRetryPolicy.ExecuteAndCaptureAsync(async () => 
+            await options.Value.LegacyApiUri
+            .AppendPathSegment("api/enrollment/create")
+            .PostJsonAsync(request));
 
         if (response.Outcome == OutcomeType.Failure)
             throw response.FinalException;
@@ -48,22 +35,10 @@ public class AddLegacyEnrollmentStep(IOptions<ServicesSettings> options) : StepB
         return ExecutionResult.Next();
     }
 
-    public record AddLegacyEnrollmentRequest(
-        StudentDto Student,
-        Guid PlanId,
-        DateTime StartDate,
-        DateTime EndDate
-    );
+    public record AddLegacyEnrollmentRequest(StudentDto Student, Guid PlanId, DateTime StartDate, DateTime EndDate);
 
-    public record StudentDto(
-        string Name,
-        string Email,
-        string Phone,
-        string Document,
-        DateTime BirthDate,
-        string Gender,
-        string Address
-    );
+    public record StudentDto(string Name, string Email, string Phone, string Document, DateTime BirthDate, 
+        string Gender, string Address);
 
     public record AddLegacyEnrollmentResponse(Guid EnrollmentId);
 }

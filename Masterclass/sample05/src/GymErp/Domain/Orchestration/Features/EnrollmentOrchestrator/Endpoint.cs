@@ -3,18 +3,11 @@ using CSharpFunctionalExtensions;
 
 namespace GymErp.Domain.Orchestration.Features.EnrollmentOrchestrator;
 
-public class Endpoint : Endpoint<Request, Response>
+public class Endpoint(Handler handler) : Endpoint<Request, Response>
 {
-    private readonly Handler _handler;
-
-    public Endpoint(Handler handler)
-    {
-        _handler = handler;
-    }
-
     public override void Configure()
     {
-        Post("/api/enrollments-orchestrator");
+        Post("/api/orchestrator/enroll");
         AllowAnonymous();
         
         Tags("Orchestration");
@@ -22,7 +15,7 @@ public class Endpoint : Endpoint<Request, Response>
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var result = await _handler.HandleAsync(req);
+        var result = await handler.HandleAsync(req);
         
         if (result.IsFailure)
         {

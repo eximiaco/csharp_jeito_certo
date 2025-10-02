@@ -66,7 +66,7 @@ public class EndpointTests : IntegrationTestBase, IAsyncLifetime
     //     request.PlanId = planId;
 
     //     // Act
-    //     var response = await _httpClient.PostAsJsonAsync("http://localhost:5000/api/orchestration/enrollment", request);
+    //     var response = await _httpClient.PostAsJsonAsync("http://localhost:5000/api/orchestrator/enroll", request);
 
     //     // Assert
     //     response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
