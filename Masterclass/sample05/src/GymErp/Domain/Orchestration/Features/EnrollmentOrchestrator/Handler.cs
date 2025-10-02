@@ -1,4 +1,5 @@
 using CSharpFunctionalExtensions;
+using GymErp.Domain.Subscriptions.Aggreates.Plans;
 
 namespace GymErp.Domain.Orchestration.Features.EnrollmentOrchestrator;
 
@@ -6,18 +7,28 @@ public class Handler
 {
     private readonly LegacyAdapter _legacyAdapter;
     private readonly ModernizedAdapter _modernizedAdapter;
+    private readonly PlanService _planService;
 
-    public Handler(LegacyAdapter legacyAdapter, ModernizedAdapter modernizedAdapter)
+    public Handler(LegacyAdapter legacyAdapter, ModernizedAdapter modernizedAdapter, PlanService planService)
     {
         _legacyAdapter = legacyAdapter;
         _modernizedAdapter = modernizedAdapter;
+        _planService = planService;
     }
 
     public async Task<Result<Response>> HandleAsync(Request request)
     {
-        // TODO: Implementar lógica de decisão baseada em critérios futuros
-        // Por enquanto, sempre usa o sistema legado
-        var useLegacySystem = true;
+        // Buscar informações do plano para decidir qual sistema usar
+        var planResult = await _planService.GetPlanByIdAsync(request.PlanId);
+        if (planResult.IsFailure)
+        {
+            return Result.Failure<Response>(planResult.Error);
+        }
+
+        var plan = planResult.Value;
+        
+        // Usar sistema legado apenas para planos mensais
+        var useLegacySystem = plan.Type == PlanType.Mensal;
 
         if (useLegacySystem)
         {

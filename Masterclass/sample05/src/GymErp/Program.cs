@@ -44,6 +44,7 @@ try
         .AddCaching()
         .Configure<ServicesSettings>(builder.Configuration.GetSection("ServicesSettings"))
         .Configure<GymErp.Domain.Orchestration.Features.EnrollmentOrchestrator.LegacyApiConfiguration>(builder.Configuration.GetSection("LegacyApi"))
+        .Configure<GymErp.Domain.Orchestration.Features.EnrollmentOrchestrator.SubscriptionsApiConfiguration>(builder.Configuration.GetSection("SubscriptionsApi"))
         .AddSilverbackKafka(builder.Configuration)
         .AddWorkflow();
     

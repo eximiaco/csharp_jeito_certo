@@ -32,6 +32,7 @@ public class OrchestrationModule : Module
         // Registra o EnrollmentOrchestrator
         builder.RegisterType<LegacyAdapter>().AsSelf().InstancePerLifetimeScope();
         builder.RegisterType<ModernizedAdapter>().AsSelf().InstancePerLifetimeScope();
+        builder.RegisterType<PlanService>().AsSelf().InstancePerLifetimeScope();
         builder.RegisterType<Handler>().AsSelf().InstancePerLifetimeScope();
         builder.RegisterType<GymErp.Domain.Orchestration.Features.EnrollmentOrchestrator.Endpoint>().AsSelf().InstancePerLifetimeScope();
     }
