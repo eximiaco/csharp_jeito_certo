@@ -45,19 +45,22 @@ public class TestDataBuilder
     public static TestDataBuilder CreateWithMensalPlan()
     {
         return new TestDataBuilder()
-            .WithPlanId(Guid.NewGuid());
+            .WithPlanId(Guid.NewGuid())
+            .WithEndDate(DateTime.UtcNow.AddDays(31)); // Mensal = 31 dias
     }
 
     public static TestDataBuilder CreateWithSemestralPlan()
     {
         return new TestDataBuilder()
-            .WithPlanId(Guid.NewGuid());
+            .WithPlanId(Guid.NewGuid())
+            .WithEndDate(DateTime.UtcNow.AddDays(180)); // Semestral = ~6 meses
     }
 
     public static TestDataBuilder CreateWithAnualPlan()
     {
         return new TestDataBuilder()
-            .WithPlanId(Guid.NewGuid());
+            .WithPlanId(Guid.NewGuid())
+            .WithEndDate(DateTime.UtcNow.AddDays(365)); // Anual = 1 ano
     }
 
     public static TestDataBuilder CreateWithInvalidPlan()
