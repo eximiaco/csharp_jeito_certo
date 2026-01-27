@@ -23,7 +23,6 @@ public class CacheProvider(IDistributedCache distributedCache)
 
         var value = await valueProvider();
         
-        // Não cacheia valores null para evitar cachear resultados de "não encontrado"
         if (value == null)
         {
             return value;
@@ -44,7 +43,6 @@ public class CacheProvider(IDistributedCache distributedCache)
         }
         else if (!slidingExpiration.HasValue)
         {
-            // Default: 60 segundos absoluto se nenhum TTL for especificado
             cacheOptions.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(60);
         }
 
@@ -95,14 +93,5 @@ public class CacheProvider(IDistributedCache distributedCache)
     public async Task RemoveAsync(string key)
     {
         await distributedCache.RemoveAsync(key);
-    }
-
-    public async Task RemoveByPatternAsync(string pattern)
-    {
-        // Nota: Redis não suporta nativamente remoção por padrão via IDistributedCache
-        // Em produção, considere usar StackExchange.Redis diretamente para operações avançadas
-        // Por enquanto, este método serve como placeholder para documentação
-        // Para implementação real, seria necessário injetar IConnectionMultiplexer do StackExchange.Redis
-        await Task.CompletedTask;
     }
 }

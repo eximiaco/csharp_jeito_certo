@@ -35,8 +35,6 @@ public class TransactionCategoryController : ControllerBase
         [FromServices] FinanceManagerDbContext context,
         [FromServices] CacheProvider cacheProvider)
     {
-        // Usa GetOrCreateAsync: busca do cache ou busca do banco e cacheia
-        // Só cacheia se houver dados válidos no contexto
         var categories = await cacheProvider.GetOrCreateAsync(
             CacheKeyAll,
             async () =>
@@ -45,7 +43,6 @@ public class TransactionCategoryController : ControllerBase
                     .AsNoTracking()
                     .ToListAsync();
                 
-                // Retorna lista vazia se não houver dados (não cacheia null)
                 return result ?? new List<TransactionCategory>();
             },
             slidingExpiration: TimeSpan.FromMinutes(5),
@@ -63,8 +60,6 @@ public class TransactionCategoryController : ControllerBase
     {
         var cacheKey = GetCacheKeyById(id);
 
-        // Usa GetOrCreateAsync: busca do cache ou busca do banco e cacheia
-        // Só cacheia se a categoria existir no contexto
         var category = await cacheProvider.GetOrCreateAsync(
             cacheKey,
             async () =>
@@ -73,7 +68,6 @@ public class TransactionCategoryController : ControllerBase
                     .AsNoTracking()
                     .FirstOrDefaultAsync(c => c.Id == id);
 
-                // Retorna null se não encontrar (não será cacheado)
                 return found;
             },
             slidingExpiration: TimeSpan.FromMinutes(5),
@@ -96,8 +90,6 @@ public class TransactionCategoryController : ControllerBase
     {
         var cacheKey = $"{CacheKeyPrefix}:type:{type}";
 
-        // Usa GetOrCreateAsync: busca do cache ou busca do banco e cacheia
-        // Só cacheia se houver dados válidos no contexto
         var categories = await cacheProvider.GetOrCreateAsync(
             cacheKey,
             async () =>
@@ -107,7 +99,6 @@ public class TransactionCategoryController : ControllerBase
                     .Where(c => c.Type == type)
                     .ToListAsync();
                 
-                // Retorna lista vazia se não houver dados (não cacheia null)
                 return result ?? new List<TransactionCategory>();
             },
             slidingExpiration: TimeSpan.FromMinutes(5),
