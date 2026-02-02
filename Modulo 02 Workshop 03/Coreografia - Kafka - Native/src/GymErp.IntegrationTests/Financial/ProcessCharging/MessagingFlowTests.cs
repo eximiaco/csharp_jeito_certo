@@ -1,0 +1,91 @@
+using GymErp.Domain.Financial.Features.ProcessCharging;
+using GymErp.Domain.Subscriptions.Aggreates.Enrollments;
+using GymErp.Domain.Subscriptions.Features.AddNewEnrollment;
+using GymErp.Domain.Subscriptions.Infrastructure;
+using GymErp.IntegrationTests.Infrastructure;
+using Microsoft.Extensions.Logging.Abstractions;
+using Xunit;
+using FluentAssertions;
+using FinancialHandler = GymErp.Domain.Financial.Features.ProcessCharging.Handler;
+using SubscriptionsHandler = GymErp.Domain.Subscriptions.Features.AddNewEnrollment.Handler;
+
+namespace GymErp.IntegrationTests.Financial.ProcessCharging;
+
+public class MessagingFlowTests : IntegrationTestBase
+{
+    private FinancialHandler _financialHandler = null!;
+    private SubscriptionsHandler _subscriptionsHandler = null!;
+
+    protected override async Task SetupDatabase()
+    {
+        await base.SetupDatabase();
+
+        _financialHandler = new FinancialHandler(new NullLogger<FinancialHandler>(), _serviceBus);
+
+        var dbContextAccessor = new EfDbContextAccessor<SubscriptionsDbContext>(_dbContext);
+        var enrollmentRepository = new EnrollmentRepository(dbContextAccessor);
+        var unitOfWork = new UnitOfWork(_dbContext);
+        _subscriptionsHandler = new SubscriptionsHandler(
+            enrollmentRepository,
+            unitOfWork,
+            CancellationToken.None
+        );
+    }
+
+    [Fact]
+    public async Task CreateEnrollment_ShouldTriggerFinancialProcessing_WhenEnrollmentCreated()
+    {
+        // Arrange
+        var request = new Request
+        {
+            Name = "João da Silva Santos",
+            Email = "joao.silva@email.com",
+            Phone = "11999999999",
+            Document = "52998224725", // CPF válido
+            BirthDate = new DateTime(1990, 1, 1),
+            Gender = "M",
+            Address = "Rua Exemplo, 123"
+        };
+
+        // Act
+        var result = await _subscriptionsHandler.HandleAsync(request);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        
+        // Verificar se o evento foi publicado no topic Kafka (via FakeServiceBus)
+        await VerifyMessagePublishedInBroker<EnrollmentCreatedEvent>(
+            "enrollment-events",
+            1);
+    }
+
+    [Fact]
+    public async Task FinancialHandler_ShouldProcessEnrollmentCreatedEvent_WhenEventReceived()
+    {
+        // Arrange
+        var enrollmentId = Guid.NewGuid();
+        var enrollmentCreatedEvent = new EnrollmentCreatedEvent(enrollmentId);
+
+        // Act
+        await _financialHandler.HandleAsync(enrollmentCreatedEvent, CancellationToken.None);
+
+        // Assert
+        true.Should().BeTrue(); // Garante que não houve exceções
+    }
+
+    [Fact]
+    public async Task FinancialHandler_ShouldPublishChargingProcessedEvent_WhenProcessingEnrollmentCreatedEvent()
+    {
+        // Arrange
+        var enrollmentId = Guid.NewGuid();
+        var enrollmentCreatedEvent = new EnrollmentCreatedEvent(enrollmentId);
+
+        // Act
+        await _financialHandler.HandleAsync(enrollmentCreatedEvent, CancellationToken.None);
+
+        // Assert
+        VerifyMessagePublished<ChargingProcessedEvent>(1);
+        var messages = GetPublishedMessages<ChargingProcessedEvent>().ToList();
+        messages.Should().ContainSingle(m => m.EnrollmentId == enrollmentId);
+    }
+}
