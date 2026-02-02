@@ -4,6 +4,8 @@ using GymErp.Common.Kafka;
 using GymErp.Domain.Financial.Features.ProcessCharging;
 using GymErp.Domain.Financial.Features.ProcessCharging.Consumers;
 using GymErp.Domain.Subscriptions.Aggreates.Enrollments;
+using GymErp.Domain.Subscriptions.Features.CancelEnrollment;
+using GymErp.Domain.Subscriptions.Features.CancelEnrollment.Consumers;
 using MassTransit;
 
 namespace GymErp.Bootstrap;
@@ -38,8 +40,10 @@ internal static class MassTransitServiceExtensions
             x.AddRider(rider =>
             {
                 rider.AddConsumer<EnrollmentCreatedEventMassTransitConsumer>();
+                rider.AddConsumer<CancelEnrollmentCommandMassTransitConsumer>();
                 rider.AddProducer<EnrollmentCreatedEvent>("enrollment-events");
                 rider.AddProducer<ChargingProcessedEvent>("charging-processed-events");
+                rider.AddProducer<CancelEnrollmentCommand>("cancel-enrollment-commands");
 
                 rider.UsingKafka((context, k) =>
                 {
@@ -47,6 +51,10 @@ internal static class MassTransitServiceExtensions
                     k.TopicEndpoint<EnrollmentCreatedEvent>("enrollment-events", "financial-module", e =>
                     {
                         e.ConfigureConsumer<EnrollmentCreatedEventMassTransitConsumer>(context);
+                    });
+                    k.TopicEndpoint<CancelEnrollmentCommand>("cancel-enrollment-commands", "subscriptions-module", e =>
+                    {
+                        e.ConfigureConsumer<CancelEnrollmentCommandMassTransitConsumer>(context);
                     });
                 });
             });
