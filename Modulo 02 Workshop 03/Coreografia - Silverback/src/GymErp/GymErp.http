@@ -1,6 +1,0 @@
-@GymErp_HostAddress = http://localhost:5035
-
-GET {{GymErp_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
