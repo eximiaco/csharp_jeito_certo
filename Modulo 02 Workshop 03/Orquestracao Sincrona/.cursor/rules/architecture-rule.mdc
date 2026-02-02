@@ -1,0 +1,292 @@
+---
+description: Regras e Padrões do Projeto GymErp
+globs:
+alwaysApply: true
+---
+
+# SWEEP.md - Regras e Padrões do Projeto GymErp
+
+Essas regras valem apenas para o projeto sample04
+
+## 🏗️ Arquitetura
+
+### Vertical Slice Architecture
+- **Organização por features**: Cada funcionalidade é organizada em sua própria pasta com todos os arquivos relacionados
+- **Estrutura padrão por feature**:
+  ```
+  Domain/[Contexto]/[Feature]/
+  ├── Endpoint.cs      # FastEndpoints endpoint
+  ├── Handler.cs       # Business logic handler
+  ├── Request.cs       # Input model (record)
+  ├── Response.cs      # Output model (opcional)
+  └── Command.cs       # Command model (quando aplicável)
+  ```
+
+### Padrão REPR (Request-Endpoint-Response-Pattern)
+- **Endpoints** herdam de `Endpoint<TRequest, TResponse>`
+- **Handlers** são injetados diretamente nos endpoints via DI
+- **Sem MediatR**: Chamadas diretas aos handlers para simplicidade
+
+## 📚 Bibliotecas e Frameworks
+
+### Core Libraries
+- **FastEndpoints**: Framework principal para APIs
+- **CSharpFunctionalExtensions**: Para Result pattern e programação funcional
+- **Autofac**: Container de injeção de dependência
+- **Entity Framework Core**: ORM com PostgreSQL
+- **Dapper**: Queries SQL diretas quando necessário
+- **WorkflowCore**: Para orquestração de workflows
+- **TestContainers**: Testes de integracao
+- **Silverback**: Mensageria com Kafka
+
+### Logging e Observabilidade
+- **Serilog**: Logging estruturado
+- **HealthChecks**: Monitoramento de saúde da aplicação
+
+### Utilitários
+- **Flurl**: Cliente HTTP
+- **Polly**: Resilience patterns
+- **Dapper**: Queries SQL diretas quando necessário
+
+## 🎯 Padrões de Código
+
+### Naming Conventions
+- **Classes**: PascalCase (`Enrollment`, `Handler`, `Endpoint`)
+- **Métodos**: PascalCase (`HandleAsync`, `Create`)
+- **Propriedades**: PascalCase (`Name`, `Email`)
+- **Variáveis locais**: camelCase (`enrollmentResult`, `request`)
+- **Constantes**: PascalCase (`MinimumSuspensionPeriod`)
+
+### Estrutura de Classes
+
+#### Endpoints
+```csharp
+public class Endpoint : Endpoint<Request, Response>
+{
+    private readonly Handler _handler;
+
+    public Endpoint(Handler handler)
+    {
+        _handler = handler;
+    }
+
+    public override void Configure()
+    {
+        Post("/api/[resource]");
+        AllowAnonymous(); // ou configuração de auth
+
+        // Documentação Swagger
+        Summary(s => s
+            .Summary("Breve descrição da operação")
+            .Description("Descrição detalhada do que o endpoint faz")
+            .ExampleRequest(new Request { /* exemplo */ })
+            .Response<Response>(200, "Sucesso")
+            .Response(400, "Dados inválidos")
+            .Response(500, "Erro interno"));
+
+        Tags("Nome do Contexto"); // Ex: "Subscriptions", "Financial"
+    }
+
+    public override async Task HandleAsync(Request req, CancellationToken ct)
+    {
+        var result = await _handler.HandleAsync(req);
+        if (result.IsFailure)
+        {
+            await SendErrorsAsync(cancellation: ct);
+            return;
+        }
+        await SendOkAsync(result.Value, ct);
+    }
+}
+```
+
+#### Handlers
+```csharp
+public class Handler(Dependencies... dependencies)
+{
+    public async Task<Result<TResponse>> HandleAsync(TRequest request)
+    {
+        // Business logic here
+        // Use Result pattern for error handling
+    }
+}
+```
+
+#### Request/Response Models
+```csharp
+// Use records para immutability
+public record Request
+{
+    public string Property { get; set; } = string.Empty;
+    // Sempre inicializar strings com string.Empty
+}
+
+public record Response(Guid Id, string Name);
+```
+
+### Result Pattern
+- **Sempre use Result<T>** para operações que podem falhar
+- **Result.Success(value)** para sucesso
+- **Result.Failure(error)** para falhas
+- **Verifique IsFailure** antes de acessar Value
+
+### Dependency Injection
+- **Primary constructors** para injeção de dependências
+- **Registre no módulo Autofac** correspondente
+- **InstancePerLifetimeScope** para a maioria dos serviços
+
+## 🗂️ Organização de Pastas
+
+```
+src/GymErp/
+├── Bootstrap/           # Configurações de inicialização
+├── Common/             # Código compartilhado
+├── Domain/             # Lógica de domínio
+│   ├── [Contexto]/     # Ex: Subscriptions, Financial, Scheduling
+│   │   ├── [Feature]/  # Ex: AddNewEnrollment, SuspendEnrollment
+│   │   ├── Aggregates/ # Entidades de domínio
+│   │   └── Infrastructure/ # DbContext, Repositories, Modules
+├── Tenant/             # Multi-tenancy
+└── Program.cs          # Entry point
+```
+
+## 🔧 Comandos Úteis
+
+### Build e Test
+```bash
+# Build do projeto
+dotnet build
+
+# Executar testes
+dotnet test
+
+# Executar aplicação
+dotnet run --project src/GymErp/GymErp.csproj
+
+# Restore packages
+dotnet restore
+```
+
+### Entity Framework
+```bash
+# Adicionar migration
+dotnet ef migrations add [MigrationName] --project src/GymErp
+
+# Atualizar banco
+dotnet ef database update --project src/GymErp
+
+# Remover última migration
+dotnet ef migrations remove --project src/GymErp
+```
+
+## 🎨 Estilo de Código
+
+### Formatação
+- **Indentação**: 4 espaços
+- **Chaves**: Nova linha (Allman style)
+- **Using statements**: No topo do arquivo, ordenados
+- **Nullable**: Habilitado (`<Nullable>enable</Nullable>`)
+
+### Boas Práticas
+- **Async/await**: Sempre use para operações I/O
+- **CancellationToken**: Passe para operações async
+- **ConfigureAwait(false)**: Não necessário em ASP.NET Core
+- **Primary constructors**: Use quando apropriado
+- **Records**: Para DTOs e value objects
+- **Validation**: No domain model ou usando FluentValidation
+
+### Error Handling
+- **Result pattern** para business logic
+- **Exceptions** apenas para casos excepcionais
+- **Global exception handler** configurado no FastEndpoints
+
+### Documentação Swagger
+- **Sempre documente endpoints** com Summary e Description
+- **Use Tags** para agrupar endpoints por contexto
+- **Forneça exemplos** de request e response
+- **Documente todos os códigos de status** possíveis
+- **Use nomes descritivos** e padronizados
+
+#### Exemplo Completo de Documentação
+```csharp
+public override void Configure()
+{
+    Post("/api/enrollments");
+    AllowAnonymous();
+
+    Summary(s => s
+        .Summary("Criar nova matrícula")
+        .Description("Cria uma nova matrícula para um cliente no sistema")
+        .ExampleRequest(new Request 
+        { 
+            Name = "João Silva",
+            Email = "joao@email.com",
+            Phone = "11999999999",
+            Document = "12345678901",
+            BirthDate = new DateTime(1990, 1, 1),
+            Gender = "M",
+            Address = "Rua das Flores, 123"
+        })
+        .Response<Guid>(201, "Matrícula criada com sucesso")
+        .Response(400, "Dados de entrada inválidos")
+        .Response(409, "Cliente já possui matrícula ativa")
+        .Response(500, "Erro interno do servidor"));
+
+    Tags("Subscriptions");
+}
+```
+
+#### Padrões de Tags
+- **Subscriptions**: Matrículas e assinaturas
+- **Financial**: Pagamentos e cobrança
+- **Scheduling**: Agendamentos e horários
+- **Orchestration**: Workflows e processos
+
+## 🔐 Segurança e Configuração
+
+### Authentication/Authorization
+- Configure no método `Configure()` do endpoint
+- Use `AllowAnonymous()` para endpoints públicos
+- Implemente políticas de autorização quando necessário
+
+### Configuration
+- **appsettings.json** para configurações base
+- **User Secrets** para desenvolvimento
+- **Environment Variables** para produção
+- **Options pattern** para configurações tipadas
+
+## 📊 Monitoramento
+
+### Health Checks
+- Endpoint `/healthz` configurado
+- Adicione checks customizados conforme necessário
+
+### Logging
+- **Serilog** configurado com enrichers
+- **Structured logging** sempre que possível
+- **Log levels** apropriados (Information, Warning, Error)
+
+## 🚀 Deploy e CI/CD
+
+### Docker
+- Dockerfile otimizado para .NET 9
+- Multi-stage build para reduzir tamanho da imagem
+
+### Environment
+- **Development**: Local com User Secrets
+- **Staging/Production**: Environment Variables
+- **Database**: PostgreSQL com connection string configurável
+
+---
+
+## 📝 Notas Importantes
+
+1. **Não use MediatR** - Chamadas diretas aos handlers
+2. **Prefira composition over inheritance**
+3. **Mantenha handlers simples e focados**
+4. **Use aggregates para encapsular business rules**
+5. **Repository pattern** apenas quando necessário
+6. **Unit of Work** para transações
+7. **Workflows** para processos complexos multi-step
+8. **Testes de integração** - com TestContainers
+9. **Mensageria** - com Kafka atraves da biblioteca Silverback
