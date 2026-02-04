@@ -3,7 +3,7 @@ using GymErp.Common;
 using GymErp.Domain.Subscriptions.Features.Enrollments.Domain;
 using GymErp.Domain.Subscriptions.Infrastructure;
 
-namespace GymErp.Domain.Subscriptions.Features.CancelEnrollment;
+namespace GymErp.Domain.Subscriptions.Features.Enrollments.Application.CancelEnrollment;
 
 public class Handler(EnrollmentRepository repository, IUnitOfWork unitOfWork)
 {

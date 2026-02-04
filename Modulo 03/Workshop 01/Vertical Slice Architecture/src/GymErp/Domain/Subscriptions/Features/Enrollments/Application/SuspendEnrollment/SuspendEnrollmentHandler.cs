@@ -1,7 +1,7 @@
 using GymErp.Common;
 using GymErp.Domain.Subscriptions.Features.Enrollments.Domain;
 
-namespace GymErp.Domain.Subscriptions.Features.SuspendEnrollment;
+namespace GymErp.Domain.Subscriptions.Features.Enrollments.Application.SuspendEnrollment;
 
 public class Handler(EnrollmentRepository repository, IUnitOfWork unitOfWork, CancellationToken cancellationToken)
 {
@@ -23,4 +23,4 @@ public class Handler(EnrollmentRepository repository, IUnitOfWork unitOfWork, Ca
 
         return true;
     }
-} 
+}

@@ -2,8 +2,6 @@ using Autofac;
 using GymErp.Common;
 using GymErp.Domain.Subscriptions.Features.Enrollments.Domain;
 using GymErp.Domain.Subscriptions.Infrastructure;
-using Endpoint = GymErp.Domain.Subscriptions.Features.AddNewEnrollment.Endpoint;
-using Handler = GymErp.Domain.Subscriptions.Features.AddNewEnrollment.Handler;
 
 namespace GymErp.Domain.Subscriptions.Infrastructure;
 
@@ -26,32 +24,32 @@ public class SubscriptionsModule : Module
             .InstancePerLifetimeScope();
 
         // Registra o Handler de Nova Inscrição
-        builder.RegisterType<Handler>()
+        builder.RegisterType<GymErp.Domain.Subscriptions.Features.Enrollments.Application.AddNewEnrollment.Handler>()
             .AsSelf()
             .InstancePerLifetimeScope();
 
         // Registra o Endpoint de Nova Inscrição
-        builder.RegisterType<Endpoint>()
+        builder.RegisterType<GymErp.Domain.Subscriptions.Features.Enrollments.Application.AddNewEnrollment.Endpoint>()
             .AsSelf()
             .InstancePerLifetimeScope();
 
         // Registra o Handler de Suspensão
-        builder.RegisterType<Features.SuspendEnrollment.Handler>()
+        builder.RegisterType<GymErp.Domain.Subscriptions.Features.Enrollments.Application.SuspendEnrollment.Handler>()
             .AsSelf()
             .InstancePerLifetimeScope();
 
         // Registra o Endpoint de Suspensão
-        builder.RegisterType<Features.SuspendEnrollment.Endpoint>()
+        builder.RegisterType<GymErp.Domain.Subscriptions.Features.Enrollments.Application.SuspendEnrollment.Endpoint>()
             .AsSelf()
             .InstancePerLifetimeScope();
 
         // Registra o Handler de Cancelamento
-        builder.RegisterType<Features.CancelEnrollment.Handler>()
+        builder.RegisterType<GymErp.Domain.Subscriptions.Features.Enrollments.Application.CancelEnrollment.Handler>()
             .AsSelf()
             .InstancePerLifetimeScope();
 
         // Registra o Endpoint de Cancelamento
-        builder.RegisterType<Features.CancelEnrollment.Endpoint>()
+        builder.RegisterType<GymErp.Domain.Subscriptions.Features.Enrollments.Application.CancelEnrollment.Endpoint>()
             .AsSelf()
             .InstancePerLifetimeScope();
     }

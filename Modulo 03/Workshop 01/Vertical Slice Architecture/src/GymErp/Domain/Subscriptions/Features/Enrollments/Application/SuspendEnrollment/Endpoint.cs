@@ -1,6 +1,6 @@
 using FastEndpoints;
 
-namespace GymErp.Domain.Subscriptions.Features.SuspendEnrollment;
+namespace GymErp.Domain.Subscriptions.Features.Enrollments.Application.SuspendEnrollment;
 
 public class Endpoint : Endpoint<SuspendEnrollmentCommand, bool>
 {
@@ -22,4 +22,4 @@ public class Endpoint : Endpoint<SuspendEnrollmentCommand, bool>
         var result = await _handler.HandleAsync(req);
         await SendOkAsync(result, ct);
     }
-} 
+}

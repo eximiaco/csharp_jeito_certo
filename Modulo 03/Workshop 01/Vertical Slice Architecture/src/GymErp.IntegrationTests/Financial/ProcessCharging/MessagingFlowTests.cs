@@ -1,6 +1,6 @@
 using GymErp.Domain.Financial.Features.ProcessCharging;
 using GymErp.Domain.Subscriptions.Features.Enrollments.Domain;
-using GymErp.Domain.Subscriptions.Features.AddNewEnrollment;
+using GymErp.Domain.Subscriptions.Features.Enrollments.Application.AddNewEnrollment;
 using GymErp.Domain.Subscriptions.Infrastructure;
 using GymErp.IntegrationTests.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +11,7 @@ using Silverback.Testing;
 using Xunit;
 using FluentAssertions;
 using FinancialHandler = GymErp.Domain.Financial.Features.ProcessCharging.Handler;
-using SubscriptionsHandler = GymErp.Domain.Subscriptions.Features.AddNewEnrollment.Handler;
+using SubscriptionsHandler = GymErp.Domain.Subscriptions.Features.Enrollments.Application.AddNewEnrollment.Handler;
 
 namespace GymErp.IntegrationTests.Financial.ProcessCharging;
 

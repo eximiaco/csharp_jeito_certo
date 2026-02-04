@@ -1,16 +1,13 @@
 using FastEndpoints;
 
-namespace GymErp.Domain.Subscriptions.Features.CancelEnrollment;
+namespace GymErp.Domain.Subscriptions.Features.Enrollments.Application.AddNewEnrollment;
 
-public class Endpoint(Handler handler) : Endpoint<Request, Response>
+public class Endpoint(Handler handler) : Endpoint<Request, Guid>
 {
     public override void Configure()
     {
-        Post("/api/enrollments/{EnrollmentId}/cancel");
+        Post("/api/enrollments");
         AllowAnonymous();
-
-
-        Tags("Subscriptions");
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)

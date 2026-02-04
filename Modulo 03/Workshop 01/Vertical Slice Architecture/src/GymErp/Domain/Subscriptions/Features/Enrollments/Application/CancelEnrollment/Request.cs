@@ -1,4 +1,4 @@
-namespace GymErp.Domain.Subscriptions.Features.CancelEnrollment;
+namespace GymErp.Domain.Subscriptions.Features.Enrollments.Application.CancelEnrollment;
 
 public record Request
 {

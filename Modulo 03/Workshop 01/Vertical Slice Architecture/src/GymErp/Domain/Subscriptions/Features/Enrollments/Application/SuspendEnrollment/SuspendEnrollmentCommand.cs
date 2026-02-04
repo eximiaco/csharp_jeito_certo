@@ -1,4 +1,4 @@
-namespace GymErp.Domain.Subscriptions.Features.SuspendEnrollment;
+namespace GymErp.Domain.Subscriptions.Features.Enrollments.Application.SuspendEnrollment;
 
 public record SuspendEnrollmentCommand(
     Guid EnrollmentId,
@@ -16,4 +16,4 @@ public record SuspendEnrollmentCommand(
 
         return true;
     }
-} 
+}
