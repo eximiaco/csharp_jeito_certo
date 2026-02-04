@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
@@ -35,7 +35,7 @@
       <Folder Include="Domain\Financial\" />
       <Folder Include="Domain\Orchestration\Features\CancelEnrollmentFlow\" />
       <Folder Include="Domain\Scheduling\" />
-      <Folder Include="Domain\Subscriptions\Features\" />
+      <Folder Include="Domain\Subscriptions\Features\Enrollments\" />
     </ItemGroup>
 
 </Project>
