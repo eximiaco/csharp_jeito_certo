@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.5">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
+        <ProjectReference Include="..\GymErp.Application\GymErp.Application.csproj" />
+        <ProjectReference Include="..\GymErp.Infrastructure.Persistence\GymErp.Infrastructure.Persistence.csproj" />
+        <ProjectReference Include="..\GymErp.Infrastructure.ServiceBus\GymErp.Infrastructure.ServiceBus.csproj" />
+    </ItemGroup>
+
+</Project>
