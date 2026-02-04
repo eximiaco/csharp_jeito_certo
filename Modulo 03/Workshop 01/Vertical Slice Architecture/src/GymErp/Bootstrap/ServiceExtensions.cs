@@ -1,9 +1,13 @@
 using Confluent.Kafka;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OpenApi.Models;
+using Npgsql;
 using Serilog;
+using GymErp.Common;
 using GymErp.Common.Kafka;
-using GymErp.Domain.Financial.Features.ProcessCharging;
+using GymErp.Domain.Financial.Features.Payments.Application.ProcessCharging.Adapters;
+using GymErp.Domain.Financial.Infrastructure;
 using GymErp.Domain.Subscriptions.Features.Enrollments.Domain;
 using Silverback.Messaging.Configuration;
 
@@ -113,6 +117,33 @@ internal static class ServicesExtensions
         return services;
     }
 
+    public static IServiceCollection AddFinancialDbContext(this IServiceCollection services, IConfiguration configuration)
+    {
+        var databaseConfig = configuration.GetSection("DatabaseConnection").Get<DatabaseConfiguration>()
+            ?? new DatabaseConfiguration("localhost", 5432, "postgres", "", "gymerp", true, true, 200, 0, 15, 300, false);
+
+        var connectionString = new NpgsqlConnectionStringBuilder
+        {
+            Host = databaseConfig.Host,
+            Port = databaseConfig.Port,
+            Username = databaseConfig.User,
+            Password = databaseConfig.Password,
+            Database = databaseConfig.DatabaseName,
+            SslMode = databaseConfig.DisableSsl ? SslMode.Disable : SslMode.Allow,
+            Pooling = databaseConfig.Pooling,
+            MinPoolSize = databaseConfig.MinPoolSize,
+            MaxPoolSize = databaseConfig.MaxPoolSize,
+            Timeout = databaseConfig.Timeout,
+            ConnectionIdleLifetime = databaseConfig.ConnectionIdleLifetime,
+            Multiplexing = databaseConfig.Multiplexing
+        }.ConnectionString;
+
+        services.AddDbContext<FinancialDbContext>(options =>
+            options.UseNpgsql(connectionString));
+
+        return services;
+    }
+
     public static IServiceCollection AddSilverbackKafka(this IServiceCollection services, IConfiguration configuration)
     {
         IConfigurationSection kafkaSection = configuration.GetSection("Kafka");
@@ -142,7 +173,7 @@ internal static class ServicesExtensions
                         config.AutoOffsetReset = AutoOffsetReset.Latest;
                     })
                     .DisableMessageValidation()))
-            .AddScopedSubscriber<GymErp.Domain.Financial.Features.ProcessCharging.Handler>();
+            .AddScopedSubscriber<EnrollmentCreatedEventSubscriber>();
 
         return services;
     }

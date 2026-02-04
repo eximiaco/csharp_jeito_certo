@@ -43,6 +43,7 @@ try
         .AddOptions()
         .AddCaching()
         .Configure<ServicesSettings>(builder.Configuration.GetSection("ServicesSettings"))
+        .AddFinancialDbContext(builder.Configuration)
         .AddSilverbackKafka(builder.Configuration)
         .AddWorkflow();
     
