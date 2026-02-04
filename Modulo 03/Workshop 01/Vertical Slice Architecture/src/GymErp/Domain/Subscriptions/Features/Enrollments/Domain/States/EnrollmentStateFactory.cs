@@ -1,4 +1,6 @@
-namespace GymErp.Domain.Subscriptions.Aggreates.Enrollments.States;
+using GymErp.Domain.Subscriptions.Features.Enrollments.Domain;
+
+namespace GymErp.Domain.Subscriptions.Features.Enrollments.Domain.States;
 
 public static class EnrollmentStateFactory
 {
@@ -12,4 +14,4 @@ public static class EnrollmentStateFactory
             _ => throw new ArgumentException($"Estado inválido: {state}")
         };
     }
-} 
+}

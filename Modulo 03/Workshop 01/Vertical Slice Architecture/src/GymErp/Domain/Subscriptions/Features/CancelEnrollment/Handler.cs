@@ -1,6 +1,6 @@
 using CSharpFunctionalExtensions;
 using GymErp.Common;
-using GymErp.Domain.Subscriptions.Aggreates.Enrollments;
+using GymErp.Domain.Subscriptions.Features.Enrollments.Domain;
 using GymErp.Domain.Subscriptions.Infrastructure;
 
 namespace GymErp.Domain.Subscriptions.Features.CancelEnrollment;

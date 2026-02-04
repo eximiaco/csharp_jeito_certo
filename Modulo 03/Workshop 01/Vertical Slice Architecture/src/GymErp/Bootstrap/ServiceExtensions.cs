@@ -4,7 +4,7 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using GymErp.Common.Kafka;
 using GymErp.Domain.Financial.Features.ProcessCharging;
-using GymErp.Domain.Subscriptions.Aggreates.Enrollments;
+using GymErp.Domain.Subscriptions.Features.Enrollments.Domain;
 using Silverback.Messaging.Configuration;
 
 namespace GymErp.Bootstrap;

@@ -1,6 +1,7 @@
 using CSharpFunctionalExtensions;
+using GymErp.Domain.Subscriptions.Features.Enrollments.Domain;
 
-namespace GymErp.Domain.Subscriptions.Aggreates.Enrollments.States;
+namespace GymErp.Domain.Subscriptions.Features.Enrollments.Domain.States;
 
 public class SuspendedState : IEnrollmentState
 {
@@ -22,4 +23,4 @@ public class SuspendedState : IEnrollmentState
         enrollment.ChangeState(EState.Canceled);
         return Result.Success();
     }
-} 
+}

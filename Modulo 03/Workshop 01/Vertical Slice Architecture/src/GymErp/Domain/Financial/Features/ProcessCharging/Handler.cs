@@ -1,4 +1,4 @@
-using GymErp.Domain.Subscriptions.Aggreates.Enrollments;
+using GymErp.Domain.Subscriptions.Features.Enrollments.Domain;
 using Microsoft.Extensions.Logging;
 using Silverback.Messaging.Messages;
 

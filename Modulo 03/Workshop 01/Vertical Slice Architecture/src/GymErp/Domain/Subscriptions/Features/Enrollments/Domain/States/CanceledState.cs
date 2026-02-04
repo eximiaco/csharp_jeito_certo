@@ -1,6 +1,7 @@
 using CSharpFunctionalExtensions;
+using GymErp.Domain.Subscriptions.Features.Enrollments.Domain;
 
-namespace GymErp.Domain.Subscriptions.Aggreates.Enrollments.States;
+namespace GymErp.Domain.Subscriptions.Features.Enrollments.Domain.States;
 
 public class CanceledState : IEnrollmentState
 {
@@ -20,4 +21,4 @@ public class CanceledState : IEnrollmentState
     {
         return Result.Failure("Inscrição já está cancelada");
     }
-} 
+}

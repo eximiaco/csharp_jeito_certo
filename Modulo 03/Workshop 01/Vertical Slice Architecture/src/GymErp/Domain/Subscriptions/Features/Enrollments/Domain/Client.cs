@@ -1,4 +1,4 @@
-namespace GymErp.Domain.Subscriptions.Aggreates.Enrollments;
+namespace GymErp.Domain.Subscriptions.Features.Enrollments.Domain;
 
 public record Client
 {

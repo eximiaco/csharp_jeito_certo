@@ -1,8 +1,8 @@
 using CSharpFunctionalExtensions;
 using GymErp.Common;
-using GymErp.Domain.Subscriptions.Aggreates.Enrollments.States;
+using GymErp.Domain.Subscriptions.Features.Enrollments.Domain.States;
 
-namespace GymErp.Domain.Subscriptions.Aggreates.Enrollments;
+namespace GymErp.Domain.Subscriptions.Features.Enrollments.Domain;
 
 public sealed class Enrollment : Aggregate
 {

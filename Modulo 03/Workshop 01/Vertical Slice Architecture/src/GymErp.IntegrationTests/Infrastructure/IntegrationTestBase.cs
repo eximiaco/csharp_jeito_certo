@@ -1,6 +1,6 @@
 using GymErp.Common;
 using GymErp.Common.Infrastructure;
-using GymErp.Domain.Subscriptions.Aggreates.Enrollments;
+using GymErp.Domain.Subscriptions.Features.Enrollments.Domain;
 using GymErp.Domain.Subscriptions.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

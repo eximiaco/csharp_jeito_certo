@@ -1,5 +1,5 @@
 using GymErp.Domain.Financial.Features.ProcessCharging;
-using GymErp.Domain.Subscriptions.Aggreates.Enrollments;
+using GymErp.Domain.Subscriptions.Features.Enrollments.Domain;
 using GymErp.Domain.Subscriptions.Features.AddNewEnrollment;
 using GymErp.Domain.Subscriptions.Infrastructure;
 using GymErp.IntegrationTests.Infrastructure;

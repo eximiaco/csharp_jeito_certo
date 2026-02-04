@@ -2,7 +2,7 @@ using GymErp.Common;
 using GymErp.Domain.Subscriptions.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
-namespace GymErp.Domain.Subscriptions.Aggreates.Enrollments;
+namespace GymErp.Domain.Subscriptions.Features.Enrollments.Domain;
 
 public class EnrollmentRepository(IEfDbContextAccessor<SubscriptionsDbContext> context)
 {
@@ -25,4 +25,4 @@ public class EnrollmentRepository(IEfDbContextAccessor<SubscriptionsDbContext> c
         dbContext.Enrollments.Update(enrollment);
         await Task.CompletedTask;
     }
-} 
+}

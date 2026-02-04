@@ -1,7 +1,7 @@
 using FluentAssertions;
 using GymErp.Common;
 using GymErp.Domain.Subscriptions;
-using GymErp.Domain.Subscriptions.Aggreates.Enrollments;
+using GymErp.Domain.Subscriptions.Features.Enrollments.Domain;
 using GymErp.IntegrationTests.Infrastructure;
 using Xunit;
 
