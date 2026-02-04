@@ -1,4 +1,4 @@
-namespace GymErp.Domain.Financial.Infrastructure;
+namespace GymErp.Domain.Financial.Infrastructure.Persistencia;
 
 public interface IFinancialUnitOfWork
 {

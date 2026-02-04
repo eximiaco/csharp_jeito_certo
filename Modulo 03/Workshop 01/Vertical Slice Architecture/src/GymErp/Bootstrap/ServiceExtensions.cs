@@ -7,7 +7,7 @@ using Serilog;
 using GymErp.Common;
 using GymErp.Common.Kafka;
 using GymErp.Domain.Financial.Features.Payments.Application.ProcessCharging.Adapters;
-using GymErp.Domain.Financial.Infrastructure;
+using GymErp.Domain.Financial.Infrastructure.Persistencia;
 using GymErp.Domain.Subscriptions.Features.Enrollments.Domain;
 using Silverback.Messaging.Configuration;
 

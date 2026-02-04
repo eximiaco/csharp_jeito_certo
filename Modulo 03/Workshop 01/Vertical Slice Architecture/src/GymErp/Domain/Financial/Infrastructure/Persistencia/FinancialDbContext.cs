@@ -2,7 +2,7 @@ using GymErp.Common;
 using Microsoft.EntityFrameworkCore;
 using GymErp.Domain.Financial.Features.Payments.Domain;
 
-namespace GymErp.Domain.Financial.Infrastructure;
+namespace GymErp.Domain.Financial.Infrastructure.Persistencia;
 
 public sealed class FinancialDbContext : DbContext
 {
@@ -28,6 +28,7 @@ public sealed class FinancialDbContext : DbContext
             builder.Property(p => p.Currency).HasColumnName("Currency");
             builder.Property(p => p.Status).HasColumnName("Status");
             builder.Property(p => p.CreatedAt).HasColumnName("CreatedAt");
+            builder.Property(p => p.GatewayTransactionId).HasColumnName("GatewayTransactionId");
         });
     }
 

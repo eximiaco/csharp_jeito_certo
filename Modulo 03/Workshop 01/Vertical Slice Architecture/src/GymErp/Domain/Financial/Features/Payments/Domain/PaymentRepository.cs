@@ -1,4 +1,4 @@
-using GymErp.Domain.Financial.Infrastructure;
+using GymErp.Domain.Financial.Infrastructure.Persistencia;
 using Microsoft.EntityFrameworkCore;
 
 namespace GymErp.Domain.Financial.Features.Payments.Domain;

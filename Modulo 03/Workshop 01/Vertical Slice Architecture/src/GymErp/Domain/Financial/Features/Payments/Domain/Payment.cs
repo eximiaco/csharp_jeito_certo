@@ -7,7 +7,7 @@ public sealed class Payment : Aggregate
 {
     private Payment() { }
 
-    private Payment(Guid id, Guid enrollmentId, decimal amount, string currency, PaymentStatus status, DateTime createdAt)
+    private Payment(Guid id, Guid enrollmentId, decimal amount, string currency, PaymentStatus status, DateTime createdAt, string? gatewayTransactionId)
     {
         Id = id;
         EnrollmentId = enrollmentId;
@@ -15,6 +15,7 @@ public sealed class Payment : Aggregate
         Currency = currency;
         Status = status;
         CreatedAt = createdAt;
+        GatewayTransactionId = gatewayTransactionId;
     }
 
     public Guid Id { get; private set; }
@@ -23,6 +24,12 @@ public sealed class Payment : Aggregate
     public string Currency { get; private set; } = string.Empty;
     public PaymentStatus Status { get; private set; }
     public DateTime CreatedAt { get; private set; }
+    public string? GatewayTransactionId { get; private set; }
+
+    internal void SetGatewayTransactionId(string transactionId)
+    {
+        GatewayTransactionId = transactionId;
+    }
 
     public static Result<Payment> Process(Guid enrollmentId, decimal amount, string currency)
     {
@@ -38,7 +45,8 @@ public sealed class Payment : Aggregate
             amount,
             currency,
             PaymentStatus.Processed,
-            DateTime.UtcNow);
+            DateTime.UtcNow,
+            gatewayTransactionId: null);
 
         payment.AddDomainEvent(new PaymentProcessedEvent(payment.Id, payment.EnrollmentId, payment.CreatedAt));
 
