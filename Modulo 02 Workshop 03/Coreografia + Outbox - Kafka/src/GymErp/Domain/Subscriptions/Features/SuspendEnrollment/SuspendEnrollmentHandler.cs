@@ -3,7 +3,7 @@ using GymErp.Domain.Subscriptions.Aggreates.Enrollments;
 
 namespace GymErp.Domain.Subscriptions.Features.SuspendEnrollment;
 
-public class Handler(EnrollmentRepository repository, IUnitOfWork unitOfWork, CancellationToken cancellationToken)
+public class Handler(EnrollmentRepository repository, IUnitOfWork unitOfWork, CancellationToken cancellationToken, IServiceBus serviceBus)
 {
     public async Task<bool> HandleAsync(SuspendEnrollmentCommand request)
     {

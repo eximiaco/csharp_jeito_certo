@@ -67,7 +67,7 @@ public sealed class OutboxPublisherHostedService(
                                 }
 
                                 await serviceBus.PublishAsync(payload);
-
+                                
                                 context.OutboxMessages.Remove(message);
                                 await context.SaveChangesAsync(stoppingToken);
                             }
