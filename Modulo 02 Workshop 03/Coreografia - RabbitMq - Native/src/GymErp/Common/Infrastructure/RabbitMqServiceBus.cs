@@ -9,11 +9,10 @@ using RabbitMQ.Client;
 
 namespace GymErp.Common.Infrastructure;
 
-public class RabbitMqServiceBus : IServiceBus
+public class RabbitMqServiceBus(IConnection connection, IOptions<RabbitMqConfig> options) : IServiceBus
 {
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-    private readonly IConnection _connection;
-    private readonly RabbitMqConnectionConfig _config;
+    private readonly RabbitMqConnectionConfig _config = options.Value.Connection;
     private static readonly ConcurrentDictionary<Type, string> ExchangeByType = new();
 
     static RabbitMqServiceBus()
@@ -21,12 +20,6 @@ public class RabbitMqServiceBus : IServiceBus
         ExchangeByType[typeof(EnrollmentCreatedEvent)] = RabbitMqTopology.ExchangeEnrollmentEvents;
         ExchangeByType[typeof(ChargingProcessedEvent)] = RabbitMqTopology.ExchangeChargingProcessedEvents;
         ExchangeByType[typeof(CancelEnrollmentCommand)] = RabbitMqTopology.ExchangeCancelEnrollmentCommands;
-    }
-
-    public RabbitMqServiceBus(IConnection connection, IOptions<RabbitMqConfig> options)
-    {
-        _connection = connection;
-        _config = options.Value.Connection;
     }
 
     public async Task PublishAsync(object message)
@@ -39,8 +32,9 @@ public class RabbitMqServiceBus : IServiceBus
         IChannel? channel = null;
         try
         {
-            channel = await _connection.CreateChannelAsync(null, CancellationToken.None).ConfigureAwait(false);
-            await channel.BasicPublishAsync(exchange, routingKey: "", mandatory: false, new ReadOnlyMemory<byte>(body), CancellationToken.None).ConfigureAwait(false);
+            channel = await connection.CreateChannelAsync(null, CancellationToken.None).ConfigureAwait(false);
+            await channel.BasicPublishAsync(exchange, routingKey: "", mandatory: false, new ReadOnlyMemory<byte>(body), CancellationToken.None)
+                .ConfigureAwait(false);
         }
         finally
         {

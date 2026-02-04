@@ -3,8 +3,6 @@ using GymErp.Domain.Financial.Features.ProcessCharging.Consumers;
 using GymErp.Domain.Subscriptions.Features.CancelEnrollment.Consumers;
 using GymErp.Common.Infrastructure;
 using GymErp.Common.RabbitMq;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 
