@@ -25,36 +25,6 @@ public class CreateTransactionCategoryCommandHandler(
         CreateTransactionCategoryRequest request, 
         CancellationToken cancellationToken)
     {
-        var result = TransactionCategory.Create(
-            request.Name,
-            request.Description,
-            request.CategoryType
-        );
-
-        if(!result.TryGetValue(out TransactionCategory category))
-        {
-            return CommandResult<CreateTransactionCategoryResponse>.InvalidInput(result.Errors);
-        }
-
-        context.TransactionCategories.Add(category);
-
-        await context.SaveChangesAsync(cancellationToken);
-
-        await UpdateCacheAfterCreateAsync(category);
-
-        return new CreateTransactionCategoryResponse(
-            category.Id,
-            category.Name,
-            category.Description,
-            category.Type
-        );
-    }
-
-    private async Task UpdateCacheAfterCreateAsync(TransactionCategory category)
-    {
-        await cacheProvider.RemoveAsync(CacheKeyAll);
-        await cacheProvider.RemoveAsync($"{CacheKeyPrefix}:type:{category.Type}");
-        
         await cacheProvider.SetAsync(
             $"{CacheKeyPrefix}:{category.Id}",
             category,
