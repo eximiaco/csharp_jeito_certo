@@ -26,13 +26,13 @@ public class SendIntegrationEventService(IConfiguration configuration) : IServic
                     .WithOAuthBearerToken(token)
                     .PostJsonAsync(request, cancellationToken: context);
 
-                return DispatcherResult.Success(response.StatusCode, await response.GetStringAsync().WaitAsync(context));
+                return DispatcherResult.Success(response.StatusCode, await response.GetStringAsync());
             },
             cancellationToken: cancellationToken);
 
         if (result.Outcome != OutcomeType.Failure) return result.Result;
         if (result.FinalException is FlurlHttpException ex)
-            return DispatcherResult.Failure(string.Empty, ex.StatusCode ?? 0, await ex.GetResponseStringAsync().WaitAsync(cancellationToken));
+            return DispatcherResult.Failure(string.Empty, ex.StatusCode ?? 0, await ex.GetResponseStringAsync());
         return DispatcherResult.Failure(string.Empty, 999, result.FinalException.ToString());
     }
 
