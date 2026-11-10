@@ -27,12 +27,12 @@ Imagine um evento sendo entregue a um destino que leva 20 segundos para responde
 ```csharp
 catch (Exception ex)
 {
-    routeIntegrationEventTelemetry.CriticalFail(ex, command);
+    logger.Error(ex, "Integration event {IntegrationEventId} failed. | Error: {Error}", command.Id, ex.Message);
     throw new FailureDispatcherException(string.Empty, string.Empty, 0, ex.Message, ex);
 }
 ```
 
-Esse `catch` captura **também** a `OperationCanceledException`. Um shutdown virava "falha crítica de entrega" nos logs e na telemetria, e a exceção original ficava escondida dentro de outra.
+Esse `catch` captura **também** a `OperationCanceledException`. Um shutdown virava "falha crítica de entrega" nos logs, e a exceção original ficava escondida dentro de outra.
 
 ### 2. O fallback do Polly transformava o cancelamento em resultado de negócio
 
