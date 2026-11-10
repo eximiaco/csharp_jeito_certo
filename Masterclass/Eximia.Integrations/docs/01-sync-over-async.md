@@ -124,7 +124,7 @@ try
 finally { gate.Release(); }
 ```
 
-- É **singleton**: os semáforos precisam sobreviver entre as mensagens. Por isso foi registrado com `SingleInstance()` nos módulos do Autofac.
+- É **singleton**: os semáforos precisam sobreviver entre as mensagens. Por isso ele é registrado com `AddSingleton<TokenCache>()` no `DependencyInjection.cs`, enquanto quase todo o resto do roteamento é scoped.
 - O `TokenCache` e o provider já aceitam `CancellationToken`. Quem ainda não o repassa é o dispatcher: isso é assunto da próxima branch.
 
 ## Regras para levar
