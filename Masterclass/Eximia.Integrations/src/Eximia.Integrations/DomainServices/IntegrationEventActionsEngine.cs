@@ -6,7 +6,7 @@ using Eximia.Integrations.IntegrationEvents.Actions;
 
 namespace Eximia.Integrations.DomainServices;
 
-public class IntegrationEventActionsEngine : IService<IntegrationEventActionsEngine>
+public class IntegrationEventActionsEngine
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger _logger;

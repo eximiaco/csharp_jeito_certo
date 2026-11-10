@@ -2,7 +2,7 @@
 
 namespace Eximia.Integrations.HttpApi.Infrastructure;
 
-public sealed class IntegrationRequestHttpAdapter : IIntegrationRequest, IService<IIntegrationRequest>
+public sealed class IntegrationRequestHttpAdapter : IIntegrationRequest
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
 

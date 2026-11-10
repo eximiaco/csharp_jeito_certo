@@ -7,7 +7,7 @@ using Polly;
 
 namespace Eximia.Integrations.IntegrationEvents.Services;
 
-public class SendIntegrationEventService(IConfiguration configuration) : IService<SendIntegrationEventService>
+public class SendIntegrationEventService(IConfiguration configuration)
 {
     private readonly string _integrationApiUrl = configuration.GetValue<string>("IntegrationApiUrl")!;
 

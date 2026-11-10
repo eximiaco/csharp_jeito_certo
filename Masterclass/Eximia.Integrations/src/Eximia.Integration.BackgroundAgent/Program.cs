@@ -1,11 +1,11 @@
 ﻿using System.Reflection;
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using Hangfire;
 using Serilog;
 using Eximia.Integration.BackgroundAgent.Infrastructure;
 using Eximia.Integration.BackgroundAgent.Infrastructure.HangfireFilters;
 using Eximia.Integration.BackgroundAgent.Workers;
+using Eximia.Integrations;
+using Eximia.Integrations.Routing;
 
 var builder = WebApplication.CreateBuilder(args);
 var assemblyName = Assembly.GetExecutingAssembly().GetName();
@@ -33,14 +33,17 @@ try
         .AddOptions()
         .AddKafka(builder.Configuration)
         .AddEfDbContext(builder.Configuration)
+        .AddHttpContextAccessor()
+        .AddIntegrationsShared()
+        .AddScoped<RoutingDataAccess>()
         .AddHostedService<ReprocessStuckEventsWorker>()
         .AddControllers();
 
-    builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
     builder.Host.UseSerilog();
-    builder.Host.ConfigureContainer<ContainerBuilder>(builder =>
+    builder.Host.UseDefaultServiceProvider(options =>
     {
-        builder.RegisterModule(new ApplicationModule());
+        options.ValidateScopes = false;
+        options.ValidateOnBuild = false;
     });
 
     var app = builder.Build();

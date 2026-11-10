@@ -8,7 +8,7 @@ namespace Eximia.Integrations.Files.Services;
 public class UploadFileService(
     StorageClient storageClient,
     UrlSigner urlSigner,
-    IConfiguration configuration) : IService<UploadFileService>
+    IConfiguration configuration)
 {
     private readonly string _bucketName = configuration.GetValue<string>("GoogleStorage:bucket_name")!;
 

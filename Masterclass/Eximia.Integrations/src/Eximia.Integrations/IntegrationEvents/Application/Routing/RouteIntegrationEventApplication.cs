@@ -15,7 +15,6 @@ public class RouteIntegrationEventApplication(
     PublishPlataformEventService publishPlataformEventService,
     RoutingDataAccess routingDataAccess,
     ILogger logger)
-    : IService<RouteIntegrationEventApplication>
 {
     public async Task RouteAsync(
         KafkaOffset? kafkaMessage,

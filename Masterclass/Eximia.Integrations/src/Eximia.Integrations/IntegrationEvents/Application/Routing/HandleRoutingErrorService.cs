@@ -14,7 +14,7 @@ public class HandleRoutingErrorService(
     CheckIfErrorStatusCodeIsAllowedService checkIfErrorStatusCodeIsAllowedService,
     IPublisher publisher,
     PublishPlataformEventService publishPlataformEventService,
-    ILogger logger) : IService<HandleRoutingErrorService>
+    ILogger logger)
 {
     public async Task HandleAsync(
         RouteIntegrationEventRequestCommand command,

@@ -35,7 +35,7 @@ Origem ──POST /api/integrations──► HttpApi ──(evento + outbox na m
 | Token do destino | [TokenServiceProvider.cs](../src/Eximia.Integrations/Routing/Authentication/TokenServiceProvider.cs) |
 | Acesso a dados | [IntegrationEventsDataAccess.cs](../src/Eximia.Integrations/IntegrationEvents/IntegrationEventsDataAccess.cs) |
 | Callback de erro | [ProcessIntegrationEventCallbackApplication.cs](../src/Eximia.Integrations/IntegrationEvents/Application/ProcessIntegrationEventCallbackApplication.cs) |
-| Registro de dependências | `ApplicationModule.cs` de cada host (Autofac) |
+| Registro de dependências | [DependencyInjection.cs](../src/Eximia.Integrations/DependencyInjection.cs) e o `Program.cs` de cada host |
 | Hosts | `Program.cs` de cada projeto em [src/](../src/) |
 | Worker de reprocessamento | [ReprocessStuckEventsWorker.cs](../src/Eximia.Integration.BackgroundAgent/Workers/ReprocessStuckEventsWorker.cs) |
 

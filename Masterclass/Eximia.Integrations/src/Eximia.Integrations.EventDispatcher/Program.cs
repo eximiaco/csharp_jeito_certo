@@ -1,8 +1,8 @@
 using System.Reflection;
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Serilog;
+using Eximia.Integrations;
+using Eximia.Integrations.Shared;
 using Eximia.Integrations.Shared.Kafka;
 using Eximia.Integrations.EventDispatcher.Infrastructure;
 
@@ -34,14 +34,22 @@ try
         .AddCaching()
         .AddCustomOptions(builder.Configuration)
         .AddGoogleStorageAuth(builder.Configuration)
+        .AddHttpContextAccessor()
+        .AddSingleton<EximiaProblemDetailsFactory>()
+        .AddScoped<IIntegrationRequest, IntegrationRequestHttpAdapter>()
+        .AddIntegrationsShared()
+        .AddIntegrationsRouting()
+        .AddIntegrationsAuth()
+        .AddRouteIntegrationEvent()
+        .AddProcessIntegrationEventCallback()
         .AddControllers();
 
-    builder.Host.ConfigureContainer<ContainerBuilder>(builder =>
-    {
-        builder.RegisterModule(new ApplicationModule());
-    });
     builder.Host.UseSerilog();
-    builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+    builder.Host.UseDefaultServiceProvider(options =>
+    {
+        options.ValidateScopes = false;
+        options.ValidateOnBuild = false;
+    });
     
     var app = builder.Build();
 

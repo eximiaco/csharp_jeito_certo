@@ -22,7 +22,7 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
     PublishPlataformEventService publishPlataformEventService,
     RoutingRuleEngine routingRuleEngine,
     PayloadService uploadIntegrationEventPayloadService,
-    ILogger logger) : IService<RegisterMultipleRoutesIntegrationEventApplication>
+    ILogger logger)
 {
     public async Task<ResultAggregate> HandleV3(
         RegisterMultipleRoutesIntegrationEventCommand command,
