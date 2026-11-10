@@ -9,7 +9,7 @@ using Eximia.Integrations.Routing.Telemetry;
 namespace Eximia.Integrations.Routing.Dispatchers;
 
 public class HttpJsonDispatcher(IDispatcherEventTelemetry routeIntegrationEventTelemetry)
-    : IDestinationDispatcher, IService<HttpJsonDispatcher>
+    : IDestinationDispatcher
 {
     public async Task<DispatcherResult> SendAsync(
         IntegrationEvent integrationEvent,

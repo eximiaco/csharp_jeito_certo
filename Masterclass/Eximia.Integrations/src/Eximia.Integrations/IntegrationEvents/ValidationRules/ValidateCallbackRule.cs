@@ -3,7 +3,7 @@ using Eximia.Integrations.IntegrationEvents.Actions;
 
 namespace Eximia.Integrations.IntegrationEvents.ValidationRules;
 
-public class ValidateCallbackRule : IValidationRule, IService<ValidateCallbackRule>
+public class ValidateCallbackRule : IValidationRule
 {
     private readonly IntegrationEventsDataAccess _integrationEventsDataAccess;
 

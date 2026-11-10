@@ -12,7 +12,7 @@ namespace Eximia.Integrations.Routing.Dispatchers;
 public class HttpJsonWithJwtDispatcher(
     IDispatcherEventTelemetry routeIntegrationEventTelemetry,
     ClientCredentialsProvider clientCredentialsProvider)
-    : IDestinationDispatcher, IService<HttpJsonWithJwtDispatcher>
+    : IDestinationDispatcher
 {
     public async Task<DispatcherResult> SendAsync(
         IntegrationEvent integrationEvent,

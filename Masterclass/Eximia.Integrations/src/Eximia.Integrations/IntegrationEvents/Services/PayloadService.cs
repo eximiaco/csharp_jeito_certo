@@ -9,7 +9,7 @@ namespace Eximia.Integrations.IntegrationEvents.Services;
 
 public class PayloadService(
     UploadFileService uploadFileService,
-    IConfiguration configuration) : IService<PayloadService>
+    IConfiguration configuration)
 {
     private readonly string _bucketName = configuration.GetValue<string>("GoogleStorage:bucket_name")!;
 

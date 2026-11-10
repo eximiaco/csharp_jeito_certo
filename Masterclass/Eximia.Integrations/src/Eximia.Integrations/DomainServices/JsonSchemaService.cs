@@ -8,7 +8,7 @@ using Eximia.Integrations.Routing;
 
 namespace Eximia.Integrations.DomainServices;
 
-public class JsonSchemaService : IService<JsonSchemaService>
+public class JsonSchemaService
 {
     private readonly TopicNameFactoryPeerEnviroment _topicNameFactory;
 

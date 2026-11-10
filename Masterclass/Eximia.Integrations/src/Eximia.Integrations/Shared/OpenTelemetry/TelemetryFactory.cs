@@ -11,7 +11,7 @@ public interface ITelemetryFactory
     IOtelTelemetry GetFromActivity(Activity activity);
 }
 
-public class TelemetryFactory : ITelemetryFactory, IService<TelemetryFactory>
+public class TelemetryFactory : ITelemetryFactory
 {
     private readonly OtelTracingService _otelTracingService;
     private readonly ILogger _logger;

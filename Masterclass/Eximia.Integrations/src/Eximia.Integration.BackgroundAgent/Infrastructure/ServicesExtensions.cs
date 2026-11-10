@@ -59,7 +59,7 @@ internal static class ServicesExtensions
             settings = new TelemetrySettings(serviceName, serviceVersion,
                 new TelemetryExporter("console", ""));
         serviceCollection.AddSingleton(settings);
-        serviceCollection.AddScoped(sp => new OtelTracingService(sp.GetService<TelemetrySettings>()));
+        serviceCollection.AddSingleton(sp => new OtelTracingService(sp.GetService<TelemetrySettings>()));
         Action<ResourceBuilder> configureResource = r => r
             .AddService(
                 serviceName: settings.ServiceName,

@@ -12,7 +12,6 @@ namespace Eximia.Integrations.Outbox;
 ///     Lê os headers das mensagens pendentes no outbox do Silverback para alimentar as métricas de fila.
 /// </summary>
 public class OutboxMetricsReader(PostgresConnectionStringFactory connectionStringFactory)
-    : IService<OutboxMetricsReader>
 {
     private static readonly string Sql = $"SELECT headers FROM \"{OutboxDefaults.TableName}\"";
 

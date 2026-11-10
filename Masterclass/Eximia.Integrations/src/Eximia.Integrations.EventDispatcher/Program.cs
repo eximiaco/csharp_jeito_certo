@@ -1,8 +1,7 @@
 using System.Reflection;
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Serilog;
+using Eximia.Integrations;
 using Eximia.Integrations.Shared.Kafka;
 using Eximia.Integrations.EventDispatcher.Infrastructure;
 
@@ -37,14 +36,22 @@ try
         .AddCaching()
         .AddCustomOptions(builder.Configuration)
         .AddGoogleStorageAuth(builder.Configuration)
+        // Registro explícito: infraestrutura compartilhada + os casos de uso que este host executa.
+        .AddIntegrationsShared()
+        .AddIntegrationsRouting()
+        .AddIntegrationsAuth()
+        .AddRouteIntegrationEvent()
+        .AddProcessIntegrationEventCallback()
         .AddControllers();
 
-    builder.Host.ConfigureContainer<ContainerBuilder>(builder =>
-    {
-        builder.RegisterModule(new ApplicationModule());
-    });
     builder.Host.UseSerilog();
-    builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+    // Container nativo com validação LIGADA em todos os ambientes: captive dependency e dependência não
+    // registrada viram erro na subida, e não na primeira mensagem.
+    builder.Host.UseDefaultServiceProvider(options =>
+    {
+        options.ValidateScopes = true;
+        options.ValidateOnBuild = true;
+    });
     
     var app = builder.Build();
 

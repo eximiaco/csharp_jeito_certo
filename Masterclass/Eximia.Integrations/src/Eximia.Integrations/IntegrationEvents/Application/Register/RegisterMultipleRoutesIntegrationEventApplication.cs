@@ -26,7 +26,7 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
     PublishPlataformEventService publishPlataformEventService,
     RoutingRuleEngine routingRuleEngine,
     OtelVariables otelVariables,
-    PayloadService uploadIntegrationEventPayloadService) : IService<RegisterMultipleRoutesIntegrationEventApplication>
+    PayloadService uploadIntegrationEventPayloadService)
 {
     public async Task<ResultAggregate> HandleV3(
         RegisterMultipleRoutesIntegrationEventCommand command,

@@ -3,7 +3,7 @@ using Eximia.Integrations.Shared;
 
 namespace Eximia.Integrations.Routing.Rules.Engine;
 
-public class RoutingRuleEngine(IServiceProvider serviceProvider) : IService<RoutingRuleEngine>
+public class RoutingRuleEngine(IServiceProvider serviceProvider)
 {
     public async Task<IEnumerable<Route>> FilterApplicableRoutesAsync(
         IEnumerable<Route> routes,

@@ -6,7 +6,7 @@ using Eximia.Integrations.Shared.Postgres;
 
 namespace Eximia.Integrations.DispatchersTopics;
 
-public class DispatchersTopicsDataAccess(PostgresConnectionStringFactory connectionStringFactory) : IService<DispatchersTopicsDataAccess>
+public class DispatchersTopicsDataAccess(PostgresConnectionStringFactory connectionStringFactory)
 {
     public async Task<Maybe<DispatcherTopics>> GetFromTopicAsync(string topic)
     {

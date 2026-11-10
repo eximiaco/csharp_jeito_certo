@@ -5,7 +5,6 @@ namespace Eximia.Integrations.DestinationsErrorsConfiguration;
 
 public class CheckIfErrorStatusCodeIsAllowedService(
     IDestinationErrorConfigurationDataAccess destinationErrorConfigurationDataAccess)
-    : IService<CheckIfErrorStatusCodeIsAllowedService>
 {
     public async Task<bool> NeedRetryAsync(string destiny, string response, int statusCode, CancellationToken cancellationToken = default)
     {

@@ -47,7 +47,7 @@ internal static class ServicesExtensions
             settings = new TelemetrySettings(serviceName, serviceVersion,
                 new TelemetryExporter("console", ""));
         serviceCollection.AddSingleton(settings);
-        serviceCollection.AddScoped(sp => new OtelTracingService(sp.GetService<TelemetrySettings>()));
+        serviceCollection.AddSingleton(sp => new OtelTracingService(sp.GetService<TelemetrySettings>()));   // dono do ActivitySource: singleton
         Action<ResourceBuilder> configureResource = r => r
             .AddService(
                 serviceName: settings.ServiceName,
@@ -222,6 +222,12 @@ internal static class ServicesExtensions
     {
         var hcBuilder = services.AddHealthChecks();
         var connectionStringFactory = new PostgresConnectionStringFactory(configuration);
+
+        // O health check do outbox do Silverback depende de IOutboxReader, e o Silverback NÃO registra esse
+        // serviço no container. Sem esta linha o /health-check quebrava na primeira chamada: quem revelou foi a
+        // validação de container na subida.
+        services.AddSingleton<IOutboxReader>(_ => new PostgreSqlOutboxReader(
+            new PostgreSqlOutboxSettings(connectionStringFactory.CreateConnectionString().ConnectionString)));
 
         hcBuilder
             .AddNpgSql(

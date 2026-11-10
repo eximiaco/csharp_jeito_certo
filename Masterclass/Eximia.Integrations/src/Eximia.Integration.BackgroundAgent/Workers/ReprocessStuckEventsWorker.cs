@@ -10,53 +10,25 @@ namespace Eximia.Integration.BackgroundAgent.Workers;
 
 /// <summary>
 ///     Devolve para a fila os eventos que ficaram parados em Processing/InQueue por mais de 30 minutos.
+///     O worker é um singleton: ele só agenda. O trabalho, que usa o DbContext, roda num ESCOPO criado a cada
+///     iteração, para que o DbContext nasça e morra com a iteração.
 /// </summary>
-public class ReprocessStuckEventsWorker(
-    EximiaIntegrationDbContext dbContext,
-    RoutingDataAccess routingDataAccess,
-    IPublisher publisher,
-    ILogger logger) : BackgroundService
+public class ReprocessStuckEventsWorker(IServiceScopeFactory scopes, ILogger logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        dbContext.Database.ExecuteSqlRaw(
-            "CREATE INDEX IF NOT EXISTS ix_integration_events_status_start_time ON integration_events (status, start_time)");
+        using (var setup = scopes.CreateScope())
+        {
+            setup.ServiceProvider.GetRequiredService<EximiaIntegrationDbContext>().Database.ExecuteSqlRaw(
+                "CREATE INDEX IF NOT EXISTS ix_integration_events_status_start_time ON integration_events (status, start_time)");
+        }
 
         while (true)
         {
             try
             {
-                var limit = DateTime.UtcNow.AddMinutes(-30);
-
-                var stuckEvents = await dbContext.IntegrationEvents
-                    .Where(e => (e.Control.IntegrationStatus == EIntegrationStatus.Processing
-                                 || e.Control.IntegrationStatus == EIntegrationStatus.InQueue)
-                                && (e.Control.StartedAt ?? e.Control.CreatedAt) < limit)
-                    .OrderBy(e => e.Id)
-                    .Take(100)
-                    .ToListAsync();
-
-                foreach (var integrationEvent in stuckEvents)
-                {
-                    var route = await routingDataAccess.GetRoute(
-                        integrationEvent.Entity.Entity,
-                        integrationEvent.Entity.Destiny.Name!);
-                    if (route.HasNoValue)
-                        continue;
-
-                    integrationEvent.RegisterRetry("Reprocessed by background agent");
-
-                    await publisher.PublishAsync(
-                        RouteIntegrationEventRequestCommand.Create(
-                            integrationEvent,
-                            integrationEvent.Entity.Origin.Name!,
-                            integrationEvent.Entity.Destiny.Name!,
-                            integrationEvent.Entity.Entity,
-                            route.Value.Id));
-                }
-
-                await dbContext.SaveChangesAsync();
-                logger.Information("{Count} integration events reprocessed.", stuckEvents.Count);
+                await using var scope = scopes.CreateAsyncScope();
+                await scope.ServiceProvider.GetRequiredService<ReprocessStuckEvents>().RunAsync();
             }
             catch (Exception ex)
             {
@@ -65,5 +37,48 @@ public class ReprocessStuckEventsWorker(
 
             await Task.Delay(TimeSpan.FromMinutes(5));
         }
+    }
+}
+
+/// <summary>Uma rodada de reprocessamento. É scoped: recebe o DbContext da iteração.</summary>
+public class ReprocessStuckEvents(
+    EximiaIntegrationDbContext dbContext,
+    RoutingDataAccess routingDataAccess,
+    IPublisher publisher,
+    ILogger logger)
+{
+    public async Task RunAsync()
+    {
+        var limit = DateTime.UtcNow.AddMinutes(-30);
+
+        var stuckEvents = await dbContext.IntegrationEvents
+            .Where(e => (e.Control.IntegrationStatus == EIntegrationStatus.Processing
+                         || e.Control.IntegrationStatus == EIntegrationStatus.InQueue)
+                        && (e.Control.StartedAt ?? e.Control.CreatedAt) < limit)
+            .OrderBy(e => e.Id)
+            .Take(100)
+            .ToListAsync();
+
+        foreach (var integrationEvent in stuckEvents)
+        {
+            var route = await routingDataAccess.GetRoute(
+                integrationEvent.Entity.Entity,
+                integrationEvent.Entity.Destiny.Name!);
+            if (route.HasNoValue)
+                continue;
+
+            integrationEvent.RegisterRetry("Reprocessed by background agent");
+
+            await publisher.PublishAsync(
+                RouteIntegrationEventRequestCommand.Create(
+                    integrationEvent,
+                    integrationEvent.Entity.Origin.Name!,
+                    integrationEvent.Entity.Destiny.Name!,
+                    integrationEvent.Entity.Entity,
+                    route.Value.Id));
+        }
+
+        await dbContext.SaveChangesAsync();
+        logger.Information("{Count} integration events reprocessed.", stuckEvents.Count);
     }
 }

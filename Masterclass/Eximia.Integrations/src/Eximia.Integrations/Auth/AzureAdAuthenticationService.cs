@@ -7,7 +7,7 @@ using Eximia.Integrations.Routing.Dispatchers;
 
 namespace Eximia.Integrations.Auth;
 
-public class AzureAdAuthenticationService(IOptions<AuthSettings> authSettings) : IService<AzureAdAuthenticationService>
+public class AzureAdAuthenticationService(IOptions<AuthSettings> authSettings)
 {
     public async Task<Result<AuthenticationResult>> AuthenticateAsync(CancellationToken cancellationToken)
     {

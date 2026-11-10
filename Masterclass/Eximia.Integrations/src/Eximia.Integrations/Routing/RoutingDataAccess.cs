@@ -15,7 +15,6 @@ public class RoutingDataAccess(
     PostgresConnectionStringFactory connectionStringFactory,
     ITelemetryService telemetryService,
     IOptions<List<RouteAuthenticationSettings>> routeAuthenticationSettings)
-    : IService<RoutingDataAccess>
 {
     public async Task<Maybe<Route>> GetRoute(string entity, string destiny, CancellationToken cancellationToken = default)
     {

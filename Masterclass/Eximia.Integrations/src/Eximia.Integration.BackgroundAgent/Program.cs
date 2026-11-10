@@ -1,11 +1,11 @@
 ﻿using System.Reflection;
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using Hangfire;
 using Serilog;
 using Eximia.Integration.BackgroundAgent.Infrastructure;
 using Eximia.Integration.BackgroundAgent.Infrastructure.HangfireFilters;
 using Eximia.Integration.BackgroundAgent.Workers;
+using Eximia.Integrations;
+using Eximia.Integrations.Routing;
 
 var builder = WebApplication.CreateBuilder(args);
 var assemblyName = Assembly.GetExecutingAssembly().GetName();
@@ -36,14 +36,20 @@ try
         .AddOptions()
         .AddKafka(builder.Configuration)
         .AddEfDbContext(builder.Configuration)
+        // Registro explícito: só o que este host usa.
+        .AddIntegrationsShared()
+        .AddScoped<RoutingDataAccess>()
+        .AddScoped<ReprocessStuckEvents>()
         .AddHostedService<ReprocessStuckEventsWorker>()
         .AddControllers();
 
-    builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
     builder.Host.UseSerilog();
-    builder.Host.ConfigureContainer<ContainerBuilder>(builder =>
+    // Container nativo com validação LIGADA em todos os ambientes: captive dependency e dependência não
+    // registrada viram erro na subida, e não na primeira execução.
+    builder.Host.UseDefaultServiceProvider(options =>
     {
-        builder.RegisterModule(new ApplicationModule());
+        options.ValidateScopes = true;
+        options.ValidateOnBuild = true;
     });
 
     var app = builder.Build();

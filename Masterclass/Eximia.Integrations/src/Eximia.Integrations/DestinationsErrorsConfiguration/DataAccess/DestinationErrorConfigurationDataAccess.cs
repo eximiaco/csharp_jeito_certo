@@ -7,7 +7,7 @@ using Eximia.Integrations.DestinationsErrorsConfiguration.Strategies;
 
 namespace Eximia.Integrations.DestinationsErrorsConfiguration.DataAccess;
 
-public class DestinationErrorConfigurationDataAccess : IDestinationErrorConfigurationDataAccess //IService<DestinationErrorConfigurationDataAccess>
+public class DestinationErrorConfigurationDataAccess : IDestinationErrorConfigurationDataAccess
 {
     private readonly PostgresConnectionStringFactory _connectionStringFactory;
 

@@ -4,7 +4,7 @@ using Eximia.Integrations.Routing.Exceptions;
 
 namespace Eximia.Integrations.Routing.Dispatchers;
 
-public class DestinationDispatcherFactory : IService<DestinationDispatcherFactory>
+public class DestinationDispatcherFactory
 {
     private readonly IServiceProvider _serviceProvider;
     private Type[] _assemblyTypes = Assembly.GetExecutingAssembly().GetTypes();

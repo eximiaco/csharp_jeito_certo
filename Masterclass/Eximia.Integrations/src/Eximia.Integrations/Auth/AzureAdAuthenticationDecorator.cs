@@ -6,7 +6,7 @@ namespace Eximia.Integrations.Auth;
 
 public class AzureAdAuthenticationDecorator(
     AzureAdAuthenticationService azureAdAuthenticationService,
-    IMemoryCache memoryCache) : IService<AzureAdAuthenticationDecorator>
+    IMemoryCache memoryCache)
 {
     public async Task<Result<string>> AuthenticateAsync(CancellationToken cancellationToken = default)
     {
