@@ -16,21 +16,15 @@ namespace Eximia.Integrations.Outbox;
 public sealed class EximiaOutboxReader(
     IOutboxReader inner,
     NpgsqlDataSource dataSource,
-    OutboxMetricsReader outboxMetricsReader,
     OutboxMetrics outboxMetrics,
     ILogger logger) : IOutboxReader
 {
     private const string InQueueSql = @"UPDATE integration_events SET status = @InQueue
                                         WHERE unique_id = ANY(@UniqueIds) AND status = @InOutbox";
 
-    public async Task<IDisposableAsyncEnumerable<OutboxMessage>> GetAsync(int count)
-    {
-        // IOutboxReader.GetAsync não recebe token: não há de onde propagar.
-        var queue = await outboxMetricsReader.GetQueue(CancellationToken.None).ConfigureAwait(false);
-        outboxMetrics.UpdateTotalQueue(queue);
-
-        return await inner.GetAsync(count).ConfigureAwait(false);
-    }
+    // Este método roda a CADA poll do OutboxWorker (500 ms). Ele só lê o outbox: o cálculo das métricas de
+    // fila (varredura completa dos headers) mora no QueueMetricsWorker do BackgroundAgent.
+    public Task<IDisposableAsyncEnumerable<OutboxMessage>> GetAsync(int count) => inner.GetAsync(count);
 
     public async Task AcknowledgeAsync(IEnumerable<OutboxMessage> outboxMessages)
     {

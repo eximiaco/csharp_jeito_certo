@@ -4,6 +4,7 @@ using Eximia.Integrations.IntegrationEvents.Commands;
 using Eximia.Integrations.Outbox.EntityFramework;
 using Eximia.Integrations.Routing;
 using Eximia.Integrations.Shared;
+using Eximia.Integrations.Shared.Postgres;
 using ILogger = Serilog.ILogger;
 
 namespace Eximia.Integration.BackgroundAgent.Workers;
@@ -15,40 +16,47 @@ namespace Eximia.Integration.BackgroundAgent.Workers;
 /// </summary>
 public class ReprocessStuckEventsWorker(IServiceScopeFactory scopes, ILogger logger) : BackgroundService
 {
+    private static readonly TimeSpan Interval = TimeSpan.FromMinutes(5);
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        using (var setup = scopes.CreateScope())
-        {
-            setup.ServiceProvider.GetRequiredService<EximiaIntegrationDbContext>().Database.ExecuteSqlRaw(
-                "CREATE INDEX IF NOT EXISTS ix_integration_events_status_start_time ON integration_events (status, start_time)");
-        }
+        using var timer = new PeriodicTimer(Interval);
 
-        while (true)
+        while (await timer.WaitForNextTickAsync(stoppingToken))
         {
             try
             {
                 await using var scope = scopes.CreateAsyncScope();
-                await scope.ServiceProvider.GetRequiredService<ReprocessStuckEvents>().RunAsync();
+                await scope.ServiceProvider.GetRequiredService<ReprocessStuckEvents>().RunAsync(stoppingToken);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 logger.Error(ex, "Error reprocessing stuck integration events.");
             }
-
-            await Task.Delay(TimeSpan.FromMinutes(5));
         }
     }
 }
 
-/// <summary>Uma rodada de reprocessamento. É scoped: recebe o DbContext da iteração.</summary>
 public class ReprocessStuckEvents(
     EximiaIntegrationDbContext dbContext,
     RoutingDataAccess routingDataAccess,
     IPublisher publisher,
+    PostgresAdvisoryLock advisoryLock,
     ILogger logger)
 {
-    public async Task RunAsync()
+    private const string LockName = "eximia-reprocess-stuck-events";
+
+    public async Task RunAsync(CancellationToken cancellationToken)
     {
+        // Várias réplicas do agent podem estar de pé: só UMA trabalha por vez.
+        await using var lease = await advisoryLock.TryAcquireAsync(LockName, cancellationToken);
+        if (lease is null)
+            return;
+
+        await dbContext.Database.ExecuteSqlRawAsync(
+            "CREATE INDEX IF NOT EXISTS ix_integration_events_status_start_time ON integration_events (status, start_time)",
+            cancellationToken);
+
         var limit = DateTime.UtcNow.AddMinutes(-30);
 
         var stuckEvents = await dbContext.IntegrationEvents
@@ -57,13 +65,14 @@ public class ReprocessStuckEvents(
                         && (e.Control.StartedAt ?? e.Control.CreatedAt) < limit)
             .OrderBy(e => e.Id)
             .Take(100)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         foreach (var integrationEvent in stuckEvents)
         {
             var route = await routingDataAccess.GetRoute(
                 integrationEvent.Entity.Entity,
-                integrationEvent.Entity.Destiny.Name!);
+                integrationEvent.Entity.Destiny.Name!,
+                cancellationToken);
             if (route.HasNoValue)
                 continue;
 
@@ -78,7 +87,7 @@ public class ReprocessStuckEvents(
                     route.Value.Id));
         }
 
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
         logger.Information("{Count} integration events reprocessed.", stuckEvents.Count);
     }
 }

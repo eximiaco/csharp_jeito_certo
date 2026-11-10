@@ -48,20 +48,19 @@ public static class DependencyInjection
         // host, e as conexões ociosas são fechadas pelo protocolo do Postgres, e não cortadas quando o processo morre.
         services.AddSingleton(sp => NpgsqlDataSource.Create(
             sp.GetRequiredService<PostgresConnectionStringFactory>().CreateConnectionString()));
+        services.AddSingleton<PostgresAdvisoryLock>();
         services.AddSingleton<OtelVariables>();
         services.AddSingleton<SquadsSingleton>();
         services.AddSingleton<DatadogMetricsService>();
         services.AddSingleton<PlatformMetrics>();
         services.AddSingleton<OutboxMetrics>();
-        // Sem estado (só lê o banco). É singleton porque quem o usa, o leitor do outbox, também é: um
-        // scoped aqui seria resolvido pelo provider raiz, e o ValidateScopes acusaria isso em tempo de execução.
-        services.AddSingleton<OutboxMetricsReader>();
 
         // Scoped: carregam o span/atividade da operação corrente.
         services.AddScoped<ITelemetryFactory, TelemetryFactory>();
         services.AddScoped<ITelemetryService, TelemetryService>();
 
         services.AddScoped<IntegrationEventsDataAccess>();
+        services.AddScoped<OutboxMetricsReader>();
         services.AddScoped<PublishPlataformEventService>();
         return services;
     }

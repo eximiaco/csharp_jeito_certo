@@ -2,10 +2,11 @@ using System.Reflection;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Serilog;
 using Eximia.Integrations;
-using Eximia.Integrations.Shared.Kafka;
 using Eximia.Integrations.EventDispatcher.Infrastructure;
 
-var builder = WebApplication.CreateBuilder(args);
+// Este serviço CONSOME mensagens: não tem controllers, Swagger nem CORS. O host web mínimo existe só para os
+// probes de saúde que o Kubernetes precisa.
+var builder = WebApplication.CreateSlimBuilder(args);
 var assemblyName = Assembly.GetExecutingAssembly().GetName();
 var serviceName = assemblyName.Name;
 var serviceVersion = Environment.GetEnvironmentVariable("DD_VERSION") ?? 
@@ -26,12 +27,7 @@ try
     builder.Services
         .AddTelemetry(serviceName!, serviceVersion!, builder.Configuration)
         .AddKafka(builder.Configuration)
-        .AddEndpointsApiExplorer()
-        .AddSwaggerDoc()
-        .AddCustomCors()
         .AddHealth(builder.Configuration)
-        .AddHttpClients()
-        .AddWorkersServices(builder.Configuration)
         .AddOptions()
         .AddCaching()
         .AddCustomOptions(builder.Configuration)
@@ -41,8 +37,7 @@ try
         .AddIntegrationsRouting()
         .AddIntegrationsAuth()
         .AddRouteIntegrationEvent()
-        .AddProcessIntegrationEventCallback()
-        .AddControllers();
+        .AddProcessIntegrationEventCallback();
 
     builder.Host.UseSerilog();
     // Container nativo com validação LIGADA em todos os ambientes: captive dependency e dependência não
@@ -68,12 +63,6 @@ try
         Predicate = (check) => check.Tags.Contains("kafka-healthy")
     });
 
-    app.MapGet("/Topics", (KafkaConfig config) =>Results.Ok(new
-    {
-        config.Connection.GroupId,
-        config.Consumer.Inbounds 
-    }) );
-    app.MapControllers();
     app.Run();
     return 0;
 }

@@ -31,10 +31,7 @@
     <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
     <PackageReference Include="Silverback.Core" Version="5.8.0" />
     <PackageReference Include="Silverback.Integration.HealthChecks" Version="5.8.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
-    <PackageReference Include="Microsoft.Identity.Web" Version="3.16.0" />
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.14" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Eximia.Integrations\Eximia.Integrations.csproj" />

@@ -16,7 +16,7 @@ RUN dotnet restore Eximia.Integration.BackgroundAgent/
 RUN dotnet publish -c Release -o /app --no-restore Eximia.Integration.BackgroundAgent/Eximia.Integration.BackgroundAgent.csproj
 
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runner
+FROM mcr.microsoft.com/dotnet/runtime:10.0 AS runner
 
 COPY --from=build /app/ .
 ENTRYPOINT ["dotnet", "Eximia.Integration.BackgroundAgent.dll"]

@@ -1,11 +1,6 @@
 using Npgsql;
-using Hangfire;
-using Hangfire.Console;
 using Silverback.Configuration;
 using Silverback.Messaging.Configuration;
-using Hangfire.PostgreSql;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Mvc;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -18,7 +13,6 @@ using Eximia.Integrations.Shared.OpenTelemetry;
 using Eximia.Integrations.Shared.Postgres;
 using Eximia.Integrations.Auth;
 using Eximia.Integrations.Routing;
-using Eximia.Integrations.Jobs;
 using Eximia.Integrations.Shared;
 using Eximia.Integrations.Outbox.EntityFramework;
 using Microsoft.EntityFrameworkCore;
@@ -75,8 +69,7 @@ internal static class ServicesExtensions
                 builder
                     .ConfigureResource(configureResource)
                     .AddMeter(PlatformMetrics.MeterName)
-                    .AddRuntimeInstrumentation()
-                    .AddAspNetCoreInstrumentation();
+                    .AddRuntimeInstrumentation();
                 switch (settings.Exporter.Type.ToLower())
                 {
                     case "otlp":
@@ -97,60 +90,6 @@ internal static class ServicesExtensions
                     .AddSource(settings.ServiceName);
             });
         return serviceCollection;
-    }
-
-    public static IServiceCollection AddCustomCors(this IServiceCollection services)
-    {
-        services.AddCors(
-            o =>
-                o.AddPolicy(
-                    "default",
-                    builder =>
-                    {
-                        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
-                    }
-                )
-        );
-        return services;
-    }
-
-    public static IServiceCollection AddHealth(this IServiceCollection services, IConfiguration configuration)
-    {
-        var hcBuilder = services.AddHealthChecks();
-        return services;
-    }
-
-    internal static IServiceCollection AddHangfireJobs(this IServiceCollection services, IConfiguration configuration)
-    {
-        JobsHealth jobsHealth = new([]);
-        services.AddSingleton(jobsHealth);
-
-        services
-            .AddHangfire(config => config
-            .UsePostgreSqlStorage(c => c.UseNpgsqlConnection(new PostgresConnectionStringFactory(configuration)
-               .CreateConnectionString().ConnectionString), new PostgreSqlStorageOptions
-               {
-                   InvisibilityTimeout = TimeSpan.FromHours(12)
-               })
-           .UseConsole());
-
-        services.AddHangfireServer();
-
-        services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme);
-
-        services.AddAuthorization(options =>
-        {
-            options.AddPolicy("HangfirePolicy", builder =>
-            {
-                builder
-                 .AddAuthenticationSchemes(OpenIdConnectDefaults.AuthenticationScheme)
-                 .RequireAuthenticatedUser();
-
-            });
-        });
-
-        services.AddHostedService<JobsConfiguration>();
-        return services;
     }
 
     internal static IServiceCollection AddEfDbContext(this IServiceCollection services, IConfiguration configuration)
