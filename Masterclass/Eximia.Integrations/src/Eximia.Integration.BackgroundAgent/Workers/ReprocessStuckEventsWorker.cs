@@ -17,12 +17,6 @@ public class ReprocessStuckEventsWorker(IServiceScopeFactory scopes, ILogger log
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        using (var setup = scopes.CreateScope())
-        {
-            setup.ServiceProvider.GetRequiredService<EximiaIntegrationDbContext>().Database.ExecuteSqlRaw(
-                "CREATE INDEX IF NOT EXISTS ix_integration_events_status_start_time ON integration_events (status, start_time)");
-        }
-
         while (true)
         {
             try
