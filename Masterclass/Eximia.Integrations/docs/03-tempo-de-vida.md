@@ -7,7 +7,26 @@
 
 Em serviços persistentes (API, consumer, worker), as dependências vivem por muito tempo. Um erro de tempo de vida não aparece no primeiro teste: aparece depois de horas, como vazamento de memória, dado velho ou uma exceção que só acontece sob carga.
 
-### 1. Captive dependency: um `BackgroundService` prendendo o `DbContext`
+As dependências são registradas no container padrão do .NET, por caso de uso, em [DependencyInjection.cs](../src/Eximia.Integrations/DependencyInjection.cs). Os problemas estão em **quanto tempo cada coisa vive**.
+
+### 1. Singleton por conveniência: o handler que prende o `DbContext`
+
+```csharp
+// Usado em toda requisição da API: uma instância só.
+services.AddSingleton<RegisterMultipleRoutesIntegrationEventApplication>();
+```
+
+O raciocínio parece bom ("é usado em toda requisição, então uma instância só"), mas o handler **depende de serviços scoped**: o `EximiaIntegrationDbContext`, o `IPublisher` do Silverback e o `JsonSchemaService`. O container resolve as dependências de um singleton a partir do escopo raiz, então elas passam a viver o tempo do processo. Na prática, **todas as requisições da API compartilham o mesmo `DbContext`**:
+
+- **Concorrência.** O `DbContext` não é thread-safe. Duas requisições simultâneas usam o mesmo objeto, e o EF Core costuma acusar isso com "A second operation was started on this context instance".
+- **Estado misturado.** O *change tracker* e a transação do outbox ([OutboxTransaction](../src/Eximia.Integrations/Outbox/OutboxTransaction.cs)) são de uma requisição, e aqui são de todas. Os eventos de uma requisição podem ser gravados no `SaveChanges` de outra.
+- **A economia é falsa.** Criar o handler por requisição é barato. O que custa e tem estado é o `DbContext`, e o `AddDbContextPool` já torna a criação dele barata.
+
+O `PublishPlataformEventService` tem o mesmo defeito em menor escala: é registrado como singleton e recebe o `IPublisher`, que é scoped.
+
+Nada disso quebra um teste com uma requisição por vez. O sintoma aparece sob carga, como exceções intermitentes e dados trocados, que é o pior tipo de defeito para investigar.
+
+### 2. Captive dependency: um `BackgroundService` prendendo o `DbContext`
 
 O `ReprocessStuckEventsWorker` (um `BackgroundService`, ou seja, **singleton**) recebia o `DbContext` diretamente no construtor:
 
@@ -27,14 +46,46 @@ O `DbContext` foi projetado para uma unidade de trabalho curta. Preso ao singlet
 
 O mesmo vale para o `RoutingDataAccess` e para qualquer serviço scoped recebido no construtor de um `BackgroundService`.
 
-### 2. Autofac com varredura de assembly e sem validação
+### 3. A validação do container desligada
 
-Os três hosts usavam `RegisterAssemblyTypes(...).AsClosedTypesOf(typeof(IService<>))`: toda classe que implementa o marcador `IService<T>` era registrada automaticamente, com `InstancePerLifetimeScope`. Dois efeitos:
+Nos três hosts:
 
-- **Ninguém lê o que está registrado**, nem com qual tempo de vida. O marcador `IService<T>` é cerimônia que só serve à varredura.
-- **O container não avisa de erros de escopo.** O Autofac não detecta *captive dependency*: o problema 1 sobe sem nenhum aviso. Uma dependência não registrada também só falha no primeiro uso.
+```csharp
+builder.Host.UseDefaultServiceProvider(options =>
+{
+    options.ValidateScopes = false;
+    options.ValidateOnBuild = false;
+});
+```
+
+Por padrão, o container do .NET só valida em **Development**: `ValidateScopes` acusa um singleton que consome um serviço scoped, e `ValidateOnBuild` acusa uma dependência não registrada, ambos na subida. Fora do Development, nada disso é verificado. Desligar nos três hosts deixa os problemas 1 e 2 **passarem em silêncio em todos os ambientes**.
+
+Isso foi conferido: religando a validação na baseline, a API deixa de subir com `Cannot consume scoped service '...TopicNameFactoryPeerEnviroment' from singleton '...RegisterMultipleRoutesIntegrationEventApplication'`, e o agent acusa o worker.
+
+A mesma validação revelou um terceiro defeito, antigo e escondido:
+
+- **O health check do outbox nunca funcionou.** O `OutboxHealthCheckService` do Silverback exige um `IOutboxReader` que nada registra. O `/health-check` da API falharia na primeira chamada de verdade, e sem validação ninguém via.
+
+### 4. Sobras de Web API nos hosts sem HTTP
+
+O dispatcher e o agent registram `HttpContextAccessor`, `IntegrationRequestHttpAdapter`, `IIntegrationRequest` e `EximiaProblemDetailsFactory`: classes de Web API que um consumer e um worker não usam, já que não há `HttpContext` nenhum. Registrar o que ninguém usa engana quem lê (cada linha sugere que algo depende dela) e carrega dependências sem necessidade.
 
 ## A solução
+
+### Handler scoped, e a regra para decidir
+
+```csharp
+services.AddScoped<RegisterMultipleRoutesIntegrationEventApplication>();
+services.AddScoped<PublishPlataformEventService>();
+```
+
+A pergunta que decide o tempo de vida não é "quantas vezes esse objeto é usado?", e sim **"esse objeto guarda ou depende de algo de uma operação específica?"**. Se guarda ou depende, não pode ser singleton, por mais que seja usado.
+
+| Tempo de vida | Quando | Exemplos neste projeto |
+|---|---|---|
+| **Singleton** | Sem estado por operação, thread-safe, caro de criar ou dono de um recurso compartilhado | `TokenCache`, `PostgresConnectionStringFactory` |
+| **Scoped** | Uma unidade de trabalho (requisição ou **mensagem**), ou qualquer coisa que dependa dela | `DbContext`, `IPublisher`, acesso a dados, handlers dos casos de uso |
+| **Transient** | Barato e sem estado | (não houve necessidade) |
 
 ### Escopo por iteração no `BackgroundService`
 
@@ -45,7 +96,6 @@ public class ReprocessStuckEventsWorker(IServiceScopeFactory scopes, ILogger log
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        // ...
         while (true)
         {
             try
@@ -67,24 +117,6 @@ O `DbContext` agora nasce e morre com a iteração: o *change tracker* não cres
 
 > O `while (true)` e o `Task.Delay` sem token continuam aqui de propósito: o ciclo de vida do `BackgroundService` é assunto da branch `05-background-service`.
 
-### Registro explícito, com o tempo de vida certo
-
-[DependencyInjection.cs](../src/Eximia.Integrations/DependencyInjection.cs) lista o que existe, com o tempo de vida e o motivo.
-
-| Tempo de vida | Quando | Exemplos neste projeto |
-|---|---|---|
-| **Singleton** | Sem estado por mensagem, thread-safe, caro de criar ou dono de um recurso compartilhado | `TokenCache`, `PostgresConnectionStringFactory` |
-| **Scoped** | Uma unidade de trabalho (requisição ou **mensagem**), ou qualquer coisa que guarde estado dela | `DbContext`, acesso a dados, handlers dos casos de uso |
-| **Transient** | Barato e sem estado | (não houve necessidade) |
-
-A pergunta que decide não é "quantas vezes esse objeto é usado?", e sim **"esse objeto guarda algo de uma operação específica?"**. Se guarda, não pode ser singleton, por mais que seja usado.
-
-Saíram o Autofac, o marcador `IService<T>` e o `Ambient` que servia à varredura. Cada host registra só o que usa:
-
-- **API:** `AddIntegrationsShared()` + `AddIntegrationsRouting()` + `AddRegisterIntegrationEvent()`.
-- **Dispatcher:** os três acima + `AddIntegrationsAuth()` + `AddRouteIntegrationEvent()` + `AddProcessIntegrationEventCallback()`.
-- **Agent:** `AddIntegrationsShared()` + o acesso a rotas e a unidade de trabalho do worker.
-
 ### Validação de container ligada
 
 ```csharp
@@ -95,15 +127,13 @@ builder.Host.UseDefaultServiceProvider(options =>
 });
 ```
 
-Com isso, um singleton que dependa de um serviço scoped (por exemplo, o worker recebendo o `DbContext` no construtor) faz o host **não subir**: o container recusa a combinação, em vez de deixá-la vazar em silêncio.
+Com isso, um singleton que dependa de um serviço scoped (o handler da API, o worker recebendo o `DbContext`) faz o host **não subir**: o container recusa a combinação, em vez de deixá-la vazar em silêncio. É a diferença entre descobrir o problema ao subir ou às 3 da manhã, e vale em **todos** os ambientes, não só em Development.
 
-### O que a validação revelou
-
-- **O health check do outbox nunca funcionou.** Ao ligar `ValidateOnBuild`, a API parou de subir: o health check do Silverback (`OutboxHealthCheckService`) exige um `IOutboxReader` que nada registrava. O `/health-check` da API falharia na primeira chamada de verdade, e o Autofac escondia isso. A correção está no `AddHealth` da API ([ServicesExtensions.cs](../src/Eximia.Integrations.HttpApi/Infrastructure/ServicesExtensions.cs)).
+A correção do health check está no `AddHealth` da API ([ServicesExtensions.cs](../src/Eximia.Integrations.HttpApi/Infrastructure/ServicesExtensions.cs)): o `IOutboxReader` passa a ser registrado.
 
 ### Limpeza do que era sobra
 
-O dispatcher registrava `EximiaProblemDetailsFactory`, `IntegrationRequestHttpAdapter` e `HttpContextAccessor`, classes de Web API que um consumer não usa, e a interface `IIntegrationRequest` não tinha mais nenhum uso. Saíram.
+Saíram do dispatcher e do agent o `HttpContextAccessor`, o `IntegrationRequestHttpAdapter`, o `IIntegrationRequest` e o `EximiaProblemDetailsFactory`.
 
 ## O que sobrou de service locator, de propósito
 
@@ -112,10 +142,10 @@ O dispatcher registrava `EximiaProblemDetailsFactory`, `IntegrationRequestHttpAd
 
 ## Regras para levar
 
-- **Singleton é para o que não guarda estado de uma operação**, e não para o que é muito usado.
+- **Singleton é para o que não guarda nem depende do estado de uma operação**, e não para o que é muito usado.
 - **Singleton não recebe serviço scoped.** Em um serviço de background, crie um escopo por iteração com `IServiceScopeFactory.CreateAsyncScope()`.
-- **Ligue `ValidateScopes` e `ValidateOnBuild` em todos os ambientes**, não só em desenvolvimento. É a diferença entre descobrir o problema ao subir ou às 3 da manhã.
-- **Registro explícito vale mais que varredura**: quem lê sabe o que existe e com qual tempo de vida.
+- **Ligue `ValidateScopes` e `ValidateOnBuild` em todos os ambientes**, não só em Development. Desligá-los para "calar o erro" esconde o defeito em vez de corrigi-lo.
+- **Registre só o que o host usa**, e nada por conveniência: cada registro é uma afirmação de que alguém depende daquilo.
 
 ## Próxima branch
 
