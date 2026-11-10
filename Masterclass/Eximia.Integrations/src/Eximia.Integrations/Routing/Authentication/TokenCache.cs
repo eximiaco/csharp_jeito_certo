@@ -5,7 +5,7 @@ namespace Eximia.Integrations.Routing.Authentication;
 /// <summary>
 ///     Cache de tokens por destino com renovação single-flight: sob carga, N mensagens simultâneas geram UMA
 ///     chamada ao provedor de identidade. Deve ser SINGLETON, porque os semáforos precisam sobreviver entre
-///     as mensagens (ver Erros 1 e 5).
+///     as mensagens (ver Erros 1 e 3).
 /// </summary>
 public sealed class TokenCache
 {
