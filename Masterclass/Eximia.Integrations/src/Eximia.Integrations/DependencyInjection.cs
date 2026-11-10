@@ -12,7 +12,6 @@ using Eximia.Integrations.IntegrationEvents.Application;
 using Eximia.Integrations.IntegrationEvents.Application.Register;
 using Eximia.Integrations.IntegrationEvents.Application.Routing;
 using Eximia.Integrations.IntegrationEvents.Services;
-using Eximia.Integrations.IntegrationEvents.ValidationRules;
 using Eximia.Integrations.Outbox;
 using Eximia.Integrations.Routing;
 using Eximia.Integrations.Routing.Authentication;
@@ -90,11 +89,9 @@ public static class DependencyInjection
         services.AddScoped<RegisterMultipleRoutesIntegrationEventApplication>();
         services.AddScoped<JsonSchemaService>();
 
-        // As regras de validação e as ações pós-registro são resolvidas por tipo pelos engines
-        // (IServiceProvider.GetRequiredService), então precisam estar registradas aqui.
-        services.AddScoped<IntegrationEventPolicyEngine>();
+        // As ações pós-registro são resolvidas por tipo pelo engine (IServiceProvider.GetRequiredService),
+        // então precisam estar registradas aqui.
         services.AddScoped<IntegrationEventActionsEngine>();
-        services.AddScoped<ValidateCallbackRule>();
         services.AddScoped<CallbackFinalizeOriginalIntegrationEvent>();
         return services;
     }
