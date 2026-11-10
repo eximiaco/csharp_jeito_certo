@@ -11,7 +11,7 @@ O código evolui **por branches**. Cada branch é o sistema completo num momento
 | `masterclass/dotnet-producao/00-baseline` | O sistema como foi entregue, com todos os problemas |
 | `masterclass/dotnet-producao/01-sync-over-async` | Código assíncrono bloqueado: `.Result`, `.Wait()` e ThreadPool starvation |
 | `masterclass/dotnet-producao/02-cancellation-token` | O token que não chega às queries, às chamadas HTTP e às operações filhas |
-| `masterclass/dotnet-producao/03-tempo-de-vida` | Singleton desnecessário e `DbContext` preso em serviço persistente |
+| `masterclass/dotnet-producao/03-tempo-de-vida` | `DbContext` preso em serviço persistente e container sem validação |
 | `masterclass/dotnet-producao/04-shutdown` | Encerramento: cancelamento não é falha, e conexões fechadas do jeito certo |
 | `masterclass/dotnet-producao/05-background-service` | `BackgroundService` não é um `while(true)`: ciclo de vida e escolha do host |
 | `masterclass/dotnet-producao/06-tasks-soltas` | `Task.Run` solto, `async void` e exceções que desaparecem |
