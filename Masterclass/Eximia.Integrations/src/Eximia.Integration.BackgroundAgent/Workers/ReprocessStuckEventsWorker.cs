@@ -53,10 +53,6 @@ public class ReprocessStuckEvents(
         if (lease is null)
             return;
 
-        await dbContext.Database.ExecuteSqlRawAsync(
-            "CREATE INDEX IF NOT EXISTS ix_integration_events_status_start_time ON integration_events (status, start_time)",
-            cancellationToken);
-
         var limit = DateTime.UtcNow.AddMinutes(-30);
 
         var stuckEvents = await dbContext.IntegrationEvents
