@@ -16,7 +16,7 @@ public class RoutingService(
         Route route,
         CancellationToken cancellationToken)
     {
-        var payload = await payloadService.DownloadAsync(integrationEvent, route.SendPayloadAsLink, cancellationToken);
+        var payload = payloadService.DownloadAsync(integrationEvent, route.SendPayloadAsLink, cancellationToken).Result;
         if (payload.IsFailure)
             return DispatcherResult.Failure(payload.Error);
         

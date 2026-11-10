@@ -33,7 +33,7 @@ public class HttpJsonWithJwtDispatcher(ClientCredentialsProvider clientCredentia
             action: async context =>
             {
                 var tokenJwt = string.Empty;
-                var authToken = await clientCredentialsProvider.GetTokenAsync(route);
+                var authToken = clientCredentialsProvider.GetTokenAsync(route).GetAwaiter().GetResult();
 
                 if (authToken != null)
                     tokenJwt = string.IsNullOrEmpty(authToken.access_token) ? "" : $"Bearer {authToken.access_token}";

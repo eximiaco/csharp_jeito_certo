@@ -29,9 +29,9 @@ public class HandleRoutingErrorService(
             "Error dispatching integration event {IntegrationEventId} to {Destiny}. | StatusCode: {StatusCode}. Body: {Body}",
             integrationEvent.Id, integrationEvent.Entity.Destiny.Name, dispatcherResult.StatusCode, dispatcherResult.Body);
 
-        var needRetry = await checkIfErrorStatusCodeIsAllowedService
+        var needRetry = checkIfErrorStatusCodeIsAllowedService
             .NeedRetryAsync(command.Destiny, dispatcherResult.Body, dispatcherResult.StatusCode, cancellationToken)
-            .ConfigureAwait(false);
+            .GetAwaiter().GetResult();
 
         if (needRetry)
         {

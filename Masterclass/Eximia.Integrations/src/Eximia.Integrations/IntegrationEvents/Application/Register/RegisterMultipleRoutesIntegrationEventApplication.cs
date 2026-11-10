@@ -31,10 +31,10 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
         try
         {
             // 1. Buscar TODAS as rotas para origem + entidade
-            var allRoutes = await routingDataAccess.GetRoutesByOriginAndEntityAsync(
+            var allRoutes = routingDataAccess.GetRoutesByOriginAndEntityAsync(
                 command.Origin,
                 command.Entity,
-                cancellationToken);
+                cancellationToken).GetAwaiter().GetResult();
 
             var allRoutesList = allRoutes.ToList();
             if (allRoutesList.Count == 0)
@@ -57,10 +57,10 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
             var payload = command.Payload.ToStringJson();
             var payloadFileId = Guid.NewGuid();
 
-            var uploadResult = await uploadIntegrationEventPayloadService.UploadAsync(
+            var uploadResult = uploadIntegrationEventPayloadService.UploadAsync(
                 payload,
                 payloadFileId,
-                cancellationToken);
+                cancellationToken).Result;
 
             var payloadFile = uploadResult.FileName;
 

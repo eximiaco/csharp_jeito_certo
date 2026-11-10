@@ -44,7 +44,7 @@ public sealed class EximiaOutboxReader(
         }
 
         if (uniqueIds.Count > 0)
-            await MarkAsInQueueAsync(uniqueIds).ConfigureAwait(false);
+            MarkAsInQueueAsync(uniqueIds).GetAwaiter().GetResult();
     }
 
     public Task<int> GetLengthAsync() => inner.GetLengthAsync();
