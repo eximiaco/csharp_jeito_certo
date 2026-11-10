@@ -31,20 +31,22 @@ public class HttpJsonDispatcher(IDispatcherEventTelemetry routeIntegrationEventT
             .WrapAsync(PolicyFactory.CreateRetryPolicy(route.MaxRetry, destinationErrorConfiguration));
         
         var result = await policy.ExecuteAsync(
-            action: async context =>
+            // O token entra na POLÍTICA: é ela que o entrega a cada tentativa (token) e o usa nas esperas entre elas.
+            action: async (context, token) =>
             {
                 routeIntegrationEventTelemetry.MakingCallToDestiny();
                 using var response = await uri
                     .WithHeader("Content-Type", route.ContentType)
                     .WithHeader("x-eximia-correlation-id", integrationEvent.ControlCode)
                     .WithTimeout(TimeSpan.FromSeconds(route.TimeOut))
-                    .PostStringAsync(payload);
+                    .PostStringAsync(payload, cancellationToken: token);
                 routeIntegrationEventTelemetry.RequestFinished();
                 return integrationEvent.Control.IsSync
                     ? DispatcherResult.Success(response.StatusCode, await response.GetStringAsync())
                     : DispatcherResult.DefaultSuccess;
             },
-            contextWithTelemetry);
+            contextWithTelemetry,
+            cancellationToken);
         
         return result;
     }

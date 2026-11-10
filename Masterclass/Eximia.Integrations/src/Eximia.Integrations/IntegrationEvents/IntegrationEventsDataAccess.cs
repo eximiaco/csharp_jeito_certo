@@ -101,7 +101,8 @@ public sealed class IntegrationEventsDataAccess(PostgresConnectionStringFactory 
         param.Add("@StatusCode", integrationEvent.StatusCode, DbType.Int32, ParameterDirection.Input);
 
         await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
-        var result = await connection.ExecuteScalarAsync<int>(sql, param);
+        var result = await connection.ExecuteScalarAsync<int>(
+            new CommandDefinition(sql, param, cancellationToken: cancellationToken));
         integrationEvent.SetDatabaseId(result);
     }
 
@@ -146,16 +147,15 @@ public sealed class IntegrationEventsDataAccess(PostgresConnectionStringFactory 
 
         // Um único comando: marca o evento como Processing e devolve a linha já atualizada.
         await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
-        var dto = await connection
-            .QueryFirstOrDefaultAsync<EventDto>(
-                $@"UPDATE public.integration_events
-                      SET
-                          status = @Status,
-                          start_time = @StartTime
-                      WHERE unique_id = @uniqueId
-                      RETURNING {_eventColumns};",
-                param)
-            .WaitAsync(cancellationToken);
+        var dto = await connection.QueryFirstOrDefaultAsync<EventDto>(new CommandDefinition(
+            $@"UPDATE public.integration_events
+                  SET
+                      status = @Status,
+                      start_time = @StartTime
+                  WHERE unique_id = @uniqueId
+                  RETURNING {_eventColumns};",
+            param,
+            cancellationToken: cancellationToken));
 
         if (dto == null)
             return Maybe<IntegrationEvent>.None;
@@ -198,7 +198,7 @@ public sealed class IntegrationEventsDataAccess(PostgresConnectionStringFactory 
             dto.SapQueryAction,
             dto.StatusCode);
 
-    public async Task UpdateIntegrationProcess(IntegrationEvent integrationEvent)
+    public async Task UpdateIntegrationProcess(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         const string sql = @"UPDATE public.integration_events SET
                                 status = @Status,
@@ -216,7 +216,7 @@ public sealed class IntegrationEventsDataAccess(PostgresConnectionStringFactory 
         param.Add("@LastError", integrationEvent.Retry.LastError, DbType.AnsiString, ParameterDirection.Input);
 
         await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
-        await connection.ExecuteScalarAsync<int>(sql, param);
+        await connection.ExecuteAsync(new CommandDefinition(sql, param, cancellationToken: cancellationToken));
     }
 
     public async Task FinalizeOriginalIntegrationEventsForCallback(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
@@ -228,32 +228,32 @@ public sealed class IntegrationEventsDataAccess(PostgresConnectionStringFactory 
         param.Add("@Status", EIntegrationStatus.WaitingCallback, DbType.Int16, ParameterDirection.Input);
         param.Add("@ControlCode", integrationEvent.ControlCode, DbType.AnsiString, ParameterDirection.Input);
         await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
-        await connection.ExecuteAsync(sql, param);
+        await connection.ExecuteAsync(new CommandDefinition(sql, param, cancellationToken: cancellationToken));
     }
 
-    public async Task<bool> AnyEventWaitingCallback(IntegrationEvent integrationEvent)
+    public async Task<bool> AnyEventWaitingCallback(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
-        var query = await connection.QueryAsync<int>(
+        var query = await connection.QueryAsync<int>(new CommandDefinition(
             @$"SELECT
                         id as Id
                       FROM 
                           public.integration_events 
                       WHERE control_code = @ControlCode AND status = @status AND is_callback = false;",
-            new { integrationEvent.ControlCode, status = EIntegrationStatus.WaitingCallback });
+            new { integrationEvent.ControlCode, status = EIntegrationStatus.WaitingCallback },
+            cancellationToken: cancellationToken));
         return query.Any();
     }
 
     public async Task<Maybe<IntegrationEvent>> GetAsync(int id, CancellationToken cancellationToken)
     {
         await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
-        var dto = await connection
-            .QueryFirstOrDefaultAsync<EventDto>(
-                $@"SELECT {_eventColumns}
-                    FROM public.integration_events
-                    WHERE id = @id;",
-                new { id })
-            .WaitAsync(cancellationToken);
+        var dto = await connection.QueryFirstOrDefaultAsync<EventDto>(new CommandDefinition(
+            $@"SELECT {_eventColumns}
+                FROM public.integration_events
+                WHERE id = @id;",
+            new { id },
+            cancellationToken: cancellationToken));
 
         if (dto == null)
             return Maybe<IntegrationEvent>.None;
@@ -261,7 +261,7 @@ public sealed class IntegrationEventsDataAccess(PostgresConnectionStringFactory 
         return ToIntegrationEvent(dto);
     }
 
-    public async Task UpdateKafkaOffsetAsync(Guid uniqueId, long queueOffset, int queuePartition)
+    public async Task UpdateKafkaOffsetAsync(Guid uniqueId, long queueOffset, int queuePartition, CancellationToken cancellationToken)
     {
         var sql = @"UPDATE integration_events SET queue_offset = @queueOffset, queue_partition = @queuePartition
                     WHERE unique_id = @uniqueId";
@@ -272,7 +272,7 @@ public sealed class IntegrationEventsDataAccess(PostgresConnectionStringFactory 
         param.Add("queuePartition", queuePartition, DbType.Int32, ParameterDirection.Input);
 
         await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
-        await connection.ExecuteAsync(sql, param).ConfigureAwait(false);
+        await connection.ExecuteAsync(new CommandDefinition(sql, param, cancellationToken: cancellationToken));
     }
 
     public async Task UpdatePayloadAsync(
@@ -295,7 +295,7 @@ public sealed class IntegrationEventsDataAccess(PostgresConnectionStringFactory 
         param.Add("payloadFileId", payloadFileId, DbType.Guid);
 
         await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
-        await connection.ExecuteAsync(sql, param);
+        await connection.ExecuteAsync(new CommandDefinition(sql, param, cancellationToken: cancellationToken));
     }
 
     public async Task<Maybe<string>> GetDestinyAsync(int id, CancellationToken cancellationToken)
@@ -308,7 +308,8 @@ public sealed class IntegrationEventsDataAccess(PostgresConnectionStringFactory 
         param.Add("id", id, DbType.Int32);
         
         await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
-        var destiny = await connection.QueryFirstOrDefaultAsync<string>(sql, param).WaitAsync(cancellationToken);
+        var destiny = await connection.QueryFirstOrDefaultAsync<string>(
+            new CommandDefinition(sql, param, cancellationToken: cancellationToken));
         
         return string.IsNullOrEmpty(destiny) ? Maybe.None : destiny;
     }

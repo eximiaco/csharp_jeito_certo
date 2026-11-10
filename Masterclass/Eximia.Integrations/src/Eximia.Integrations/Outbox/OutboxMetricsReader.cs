@@ -16,10 +16,10 @@ public class OutboxMetricsReader(PostgresConnectionStringFactory connectionStrin
 {
     private static readonly string Sql = $"SELECT headers FROM \"{OutboxDefaults.TableName}\"";
 
-    public async Task<IEnumerable<OutboxMeasurement>> GetQueue()
+    public async Task<IEnumerable<OutboxMeasurement>> GetQueue(CancellationToken cancellationToken)
     {
         await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
-        var rows = (await connection.QueryAsync<object?>(Sql).ConfigureAwait(false)).ToList();
+        var rows = (await connection.QueryAsync<object?>(new CommandDefinition(Sql, cancellationToken: cancellationToken))).ToList();
 
         var queue = rows.Select(raw =>
         {

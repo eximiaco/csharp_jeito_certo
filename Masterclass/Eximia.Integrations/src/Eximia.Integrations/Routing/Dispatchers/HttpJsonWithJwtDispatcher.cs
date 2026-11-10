@@ -36,11 +36,12 @@ public class HttpJsonWithJwtDispatcher(
         var uri = integrationEvent.Control.IsCallbackError ? route.CallbackErrorUri : route.Uri;
 
         var result = await policy.ExecuteAsync(
-            action: async context =>
+            // O token entra na POLÍTICA: é ela que o entrega a cada tentativa (token) e o usa nas esperas entre elas.
+            action: async (context, token) =>
             {
                 routeIntegrationEventTelemetry.MakingCallToDestiny();
                 var tokenJwt = string.Empty;
-                var authToken = await clientCredentialsProvider.GetTokenAsync(route, integrationEvent.ControlCode);
+                var authToken = await clientCredentialsProvider.GetTokenAsync(route, integrationEvent.ControlCode, token);
 
                 if (authToken != null)
                     tokenJwt = string.IsNullOrEmpty(authToken.access_token) ? "" : $"Bearer {authToken.access_token}";
@@ -50,14 +51,15 @@ public class HttpJsonWithJwtDispatcher(
                     .WithHeader("x-eximia-correlation-id", integrationEvent.ControlCode)
                     .WithHeader("Authorization", tokenJwt)
                     .WithTimeout(TimeSpan.FromSeconds(route.TimeOut))
-                    .PostStringAsync(payload);
+                    .PostStringAsync(payload, cancellationToken: token);
 
                 routeIntegrationEventTelemetry.RequestFinished();
                 return integrationEvent.Control.IsSync
                     ? DispatcherResult.Success(response.StatusCode, await response.GetStringAsync())
                     : DispatcherResult.DefaultSuccess;
             },
-            contextWithTelemetry);
+            contextWithTelemetry,
+            cancellationToken);
         
         return result;
     }

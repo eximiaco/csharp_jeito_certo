@@ -50,10 +50,11 @@ public class RouteIntegrationEventApplication(
                 await integrationEventsDataAccess.UpdateKafkaOffsetAsync(
                     integrationEvent.Value.UniqueId,
                     kafkaMessage.Offset.Value,
-                    kafkaMessage.TopicPartition.Partition.Value);
+                    kafkaMessage.TopicPartition.Partition.Value,
+                    cancellationToken);
             }
 
-            var route = await routingDataAccess.GetRouteWithoutRules(command.RouteId);
+            var route = await routingDataAccess.GetRouteWithoutRules(command.RouteId, cancellationToken);
             if (route.HasNoValue)
             {
                 routeIntegrationEventTelemetry.FailOnRetrieveRoute(command);
@@ -71,7 +72,7 @@ public class RouteIntegrationEventApplication(
             if (dispatcherResult.IsRetry)
             {
                 integrationEvent.Value.RegisterRetry(dispatcherResult.Message);
-                await integrationEventsDataAccess.UpdateIntegrationProcess(integrationEvent.Value);
+                await integrationEventsDataAccess.UpdateIntegrationProcess(integrationEvent.Value, cancellationToken);
                 routeIntegrationEventTelemetry.DispatcherNeedsRetry(integrationEvent.Value, dispatcherResult.Message);
                 throw new RetryDispatcherException(
                     integrationEvent.Value.Entity.Destiny.Name!,
@@ -82,7 +83,11 @@ public class RouteIntegrationEventApplication(
             integrationEvent.Value.RegisterSuccessOnDispatching();
             using var statusLog = LogContext.PushProperty(otelVariables.Status, integrationEvent.Value.Control.IntegrationStatus);
 
-            await integrationEventsDataAccess.UpdateIntegrationProcess(integrationEvent.Value);
+            // O destino JÁ recebeu o evento. Gravar o resultado com o token do consumer faria um cancelamento
+            // (shutdown) deixar o evento "não confirmado" e a reentrega duplicaria a entrega: por isso, aqui, um
+            // token PRÓPRIO e curto, e não o do chamador.
+            using var persist = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            await integrationEventsDataAccess.UpdateIntegrationProcess(integrationEvent.Value, persist.Token);
             await publishPlataformEventService.PublishIntegrationEventSentAsync(
                 integrationEvent.Value.ControlCode,
                 integrationEvent.Value.Control.IsCallback,

@@ -25,7 +25,8 @@ public sealed class EximiaOutboxReader(
 
     public async Task<IDisposableAsyncEnumerable<OutboxMessage>> GetAsync(int count)
     {
-        var queue = await outboxMetricsReader.GetQueue().ConfigureAwait(false);
+        // IOutboxReader.GetAsync não recebe token: não há de onde propagar.
+        var queue = await outboxMetricsReader.GetQueue(CancellationToken.None).ConfigureAwait(false);
         outboxMetrics.UpdateTotalQueue(queue);
 
         return await inner.GetAsync(count).ConfigureAwait(false);

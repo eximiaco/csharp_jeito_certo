@@ -23,7 +23,7 @@ public class HandleRoutingErrorService(
         CancellationToken cancellationToken)
     {
         integrationEvent.RegisterFailure(dispatcherResult.Body);
-        await integrationEventsDataAccess.UpdateIntegrationProcess(integrationEvent);
+        await integrationEventsDataAccess.UpdateIntegrationProcess(integrationEvent, cancellationToken);
         await publishPlataformEventService.PublishIntegrationEventErrorAsync(integrationEvent);
         routeIntegrationEventTelemetry.ErrorOnDispatcher(integrationEvent, dispatcherResult);
 

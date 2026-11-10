@@ -20,7 +20,7 @@ public class ValidateCallbackRule : IValidationRule, IService<ValidateCallbackRu
         if(integrationEvent.Control.IsDev())
             return ResultAggregate.Success();
         
-        var anyEvent = await _integrationEventsDataAccess.AnyEventWaitingCallback(integrationEvent);
+        var anyEvent = await _integrationEventsDataAccess.AnyEventWaitingCallback(integrationEvent, cancellationToken);
         return !anyEvent 
             ? ResultAggregate.Failure("isCallback", "Any integration event waiting callback") 
             : ResultAggregate.Success();

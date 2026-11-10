@@ -17,7 +17,7 @@ public class RoutingDataAccess(
     IOptions<List<RouteAuthenticationSettings>> routeAuthenticationSettings)
     : IService<RoutingDataAccess>
 {
-    public async Task<Maybe<Route>> GetRoute(string entity, string destiny)
+    public async Task<Maybe<Route>> GetRoute(string entity, string destiny, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -30,8 +30,7 @@ public class RoutingDataAccess(
                     cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(20);
                     cacheEntry.Size = 500;
                     await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
-                    var dto = await connection
-                        .QueryFirstOrDefaultAsync<RouteDto>(
+                    var dto = await connection.QueryFirstOrDefaultAsync<RouteDto>(new CommandDefinition(
                             @"SELECT id,
                                         origin,
                                         destination,
@@ -50,7 +49,8 @@ public class RoutingDataAccess(
                                 FROM destination_routes
                                 WHERE destination = @destiny
                                     AND entity = @entity",
-                            new { entity, destiny });
+                            new { entity, destiny },
+                            cancellationToken: cancellationToken));
 
                     if (dto == null)
                     {
@@ -90,7 +90,7 @@ public class RoutingDataAccess(
         }
     }
 
-    public async Task<Maybe<Route>> GetRoute(long id)
+    public async Task<Maybe<Route>> GetRoute(long id, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -103,8 +103,7 @@ public class RoutingDataAccess(
                     cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(20);
                     cacheEntry.Size = 500;
                     await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
-                    var dto = await connection
-                        .QueryFirstOrDefaultAsync<RouteDto>(
+                    var dto = await connection.QueryFirstOrDefaultAsync<RouteDto>(new CommandDefinition(
                             @"SELECT id,
                                         origin,
                                         destination,
@@ -122,7 +121,8 @@ public class RoutingDataAccess(
                                         routing_rule AS RoutingRule
                                 FROM destination_routes
                                 WHERE id = @id",
-                            new { id });
+                            new { id },
+                            cancellationToken: cancellationToken));
 
                     if (dto == null)
                     {
@@ -162,7 +162,7 @@ public class RoutingDataAccess(
         }
     }
 
-    public async Task<Maybe<Route>> GetRouteWithoutRules(long id)
+    public async Task<Maybe<Route>> GetRouteWithoutRules(long id, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -175,8 +175,7 @@ public class RoutingDataAccess(
                     cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(20);
                     cacheEntry.Size = 500;
                     await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
-                    var dto = await connection
-                        .QueryFirstOrDefaultAsync<RouteWithoutRulesDto>(
+                    var dto = await connection.QueryFirstOrDefaultAsync<RouteWithoutRulesDto>(new CommandDefinition(
                             @"SELECT id,
                                         origin,
                                         destination,
@@ -193,7 +192,8 @@ public class RoutingDataAccess(
                                         send_payload_as_link AS SendPayloadAsLink
                                 FROM destination_routes
                                 WHERE id = @id",
-                            new { id });
+                            new { id },
+                            cancellationToken: cancellationToken));
 
                     if (dto == null)
                     {
@@ -247,7 +247,7 @@ public class RoutingDataAccess(
 
                     await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
 
-                    var results = await connection.QueryAsync<RouteDto>(
+                    var results = await connection.QueryAsync<RouteDto>(new CommandDefinition(
                         @"SELECT r.id, r.origin, r.destination, r.entity, r.topic_name AS TopicName,
                              r.callback_required AS CallbackRequired, r.uri, r.content_type AS ContentType,
                              r.max_retry AS MaxRetry, r.time_out AS TimeOut, r.classname, r.mode AS Mode,
@@ -255,7 +255,8 @@ public class RoutingDataAccess(
                              r.routing_rule AS RoutingRule
                           FROM destination_routes r
                           WHERE r.origin = @origin AND r.entity = @entity AND r.is_active = true",
-                        new { origin, entity });
+                        new { origin, entity },
+                        cancellationToken: cancellationToken));
 
                     return results.Select(routeDto =>
                     {
