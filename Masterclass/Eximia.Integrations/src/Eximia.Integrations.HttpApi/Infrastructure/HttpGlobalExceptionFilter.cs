@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Serilog;
-using Eximia.Integrations.Shared.OpenTelemetry;
 using ILogger = Serilog.ILogger;
 
 namespace Eximia.Integrations.HttpApi.Infrastructure;
@@ -10,20 +9,16 @@ namespace Eximia.Integrations.HttpApi.Infrastructure;
 public class HttpGlobalExceptionFilter : IExceptionFilter
 {
     private readonly IWebHostEnvironment _env;
-    private readonly ITelemetryFactory _telemetryFactory;
     private readonly ILogger _logger;
 
-    public HttpGlobalExceptionFilter(IWebHostEnvironment env, ITelemetryFactory telemetryFactory, ILogger logger)
+    public HttpGlobalExceptionFilter(IWebHostEnvironment env, ILogger logger)
     {
         this._env = env;
-        _telemetryFactory = telemetryFactory;
         _logger = logger;
     }
 
     public void OnException(ExceptionContext context)
     {
-        var activity = _telemetryFactory.GetCurrentActivity();
-        activity.AddExceptionAndEvent(context.Exception.Message, context.Exception);
         _logger.Fatal(context.Exception.Message, context.Exception.Message);
 
         var json = new JsonErrorResponse

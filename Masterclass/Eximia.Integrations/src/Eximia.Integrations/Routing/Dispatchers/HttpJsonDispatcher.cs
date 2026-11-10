@@ -4,11 +4,10 @@ using Polly;
 using Eximia.Integrations.Shared;
 using Eximia.Integrations.DestinationsErrorsConfiguration;
 using Eximia.Integrations.IntegrationEvents;
-using Eximia.Integrations.Routing.Telemetry;
 
 namespace Eximia.Integrations.Routing.Dispatchers;
 
-public class HttpJsonDispatcher(IDispatcherEventTelemetry routeIntegrationEventTelemetry)
+public class HttpJsonDispatcher
     : IDestinationDispatcher, IService<HttpJsonDispatcher>
 {
     public async Task<DispatcherResult> SendAsync(
@@ -18,11 +17,7 @@ public class HttpJsonDispatcher(IDispatcherEventTelemetry routeIntegrationEventT
         string payload,
         CancellationToken cancellationToken)
     {
-        routeIntegrationEventTelemetry.IntegrationEventLoaded(nameof(HttpJsonDispatcher.SendAsync), integrationEvent, route);
-
-        var contextWithTelemetry = new Context()
-            .WithOpenTelemetry(routeIntegrationEventTelemetry)
-            .WithIntegrationId(integrationEvent.Id);
+        var policyContext = new Context();
 
         var uri = integrationEvent.Control.IsCallbackError ? route.CallbackErrorUri : route.Uri;
 
@@ -33,18 +28,16 @@ public class HttpJsonDispatcher(IDispatcherEventTelemetry routeIntegrationEventT
         var result = await policy.ExecuteAsync(
             action: async context =>
             {
-                routeIntegrationEventTelemetry.MakingCallToDestiny();
                 using var response = await uri
                     .WithHeader("Content-Type", route.ContentType)
                     .WithHeader("x-eximia-correlation-id", integrationEvent.ControlCode)
                     .WithTimeout(TimeSpan.FromSeconds(route.TimeOut))
                     .PostStringAsync(payload);
-                routeIntegrationEventTelemetry.RequestFinished();
                 return integrationEvent.Control.IsSync
                     ? DispatcherResult.Success(response.StatusCode, await response.GetStringAsync())
                     : DispatcherResult.DefaultSuccess;
             },
-            contextWithTelemetry);
+            policyContext);
         
         return result;
     }

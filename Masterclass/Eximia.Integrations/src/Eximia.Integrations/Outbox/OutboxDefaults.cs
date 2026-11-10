@@ -9,7 +9,4 @@ public static class OutboxDefaults
     public const string LockName = "eximia-outbox-worker";
 
     public const string HeaderIntegrationId = "x-integration-id";
-    public const string HeaderOrigin = "x-integration-origin";
-    public const string HeaderDestiny = "x-integration-destiny";
-    public const string HeaderEntity = "x-integration-entity";
 }
