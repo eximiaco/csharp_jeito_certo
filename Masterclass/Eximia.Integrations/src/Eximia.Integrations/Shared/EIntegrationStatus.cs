@@ -6,7 +6,6 @@ public enum EIntegrationStatus
     Processing = 1,
     WaitingCallback = 2,
     Processed = 3,
-    InQueue = 4,
     Restarted = 5,
     Reprocessed = 6,
     Error = 9
