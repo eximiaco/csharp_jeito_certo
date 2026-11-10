@@ -89,7 +89,8 @@ public static class DependencyInjection
     /// <summary>Caso de uso: devolver o callback de erro à origem, usado pelo consumidor.</summary>
     public static IServiceCollection AddProcessIntegrationEventCallback(this IServiceCollection services)
     {
-        services.AddScoped<SendIntegrationEventService>();
+        // Só lê uma configuração e faz um POST: uma instância basta para todo o processo.
+        services.AddSingleton<SendIntegrationEventService>();
         // O handler (subscriber do Silverback) é registrado no host, com AddScopedSubscriber.
         return services;
     }
