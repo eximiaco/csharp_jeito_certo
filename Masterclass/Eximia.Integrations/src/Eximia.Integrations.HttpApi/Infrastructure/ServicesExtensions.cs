@@ -55,9 +55,6 @@ internal static class ServicesExtensions
                     .ProcessOutbox(outbox => outbox.UsePostgreSql(connectionString))))
             .AddBrokerClientsConfigurator<KafkaClientsConfigurator>();
 
-        // Faz o OutboxWorker padrão ler o outbox pelo EximiaOutboxReader (status InQueue + métricas).
-        services.UseEximiaOutboxReader();
-
         return services;
     }
 
