@@ -8,13 +8,11 @@ namespace Eximia.Integrations.Events;
 public class PublishPlataformEventService : IService<PublishPlataformEventService>
 {
     private readonly IPublisher _publisher;
-    private readonly SquadsSingleton _squadsSingleton;
     private readonly ILogger _logger;
 
-    public PublishPlataformEventService(IPublisher publisher, SquadsSingleton squadsSingleton, ILogger logger)
+    public PublishPlataformEventService(IPublisher publisher, ILogger logger)
     {
         _publisher = publisher;
-        _squadsSingleton = squadsSingleton;
         _logger = logger;
     }
 
@@ -28,7 +26,6 @@ public class PublishPlataformEventService : IService<PublishPlataformEventServic
                 DateTime.UtcNow,
                 new IntegrationEventReceivedEvent(
                     integrationEvent.Entity.Entity,
-                    _squadsSingleton.GetByEntity(integrationEvent.Entity.Entity),
                     integrationEvent.Entity.Origin.Name,
                     integrationEvent.Entity.Destiny.Name,
                     integrationEvent.Entity.Origin.Key,
@@ -38,10 +35,10 @@ public class PublishPlataformEventService : IService<PublishPlataformEventServic
         }
         catch (Exception ex)
         {
-            _logger.Error(ex, "Failure publishing platform event. | Event: {plataformEvent}. Entity: {entity}. Squad: {squad}. " +
+            _logger.Error(ex, "Failure publishing platform event. | Event: {plataformEvent}. Entity: {entity}. " +
                 "Origin: {origin}. OriginKey: {originKey}. Destiny: {destiny}. DestinyKey: {destinyKey}. Method: {method}. CallbackRequired: {callbackRequired}.",
                 PlataformEventType.IntegrationEventReceived, integrationEvent.ControlCode, integrationEvent.Entity.Entity,
-                _squadsSingleton.GetByEntity(integrationEvent.Entity.Entity), integrationEvent.Entity.Origin.Name, integrationEvent.Entity.Origin.Key,
+                integrationEvent.Entity.Origin.Name, integrationEvent.Entity.Origin.Key,
                 integrationEvent.Entity.Destiny.Name, integrationEvent.Entity.Destiny.Key, integrationEvent.Entity.Method, integrationEvent.Entity.CallbackRequired);
             throw;
         }

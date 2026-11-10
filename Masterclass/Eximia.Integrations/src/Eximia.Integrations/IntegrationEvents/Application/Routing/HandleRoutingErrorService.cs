@@ -1,9 +1,9 @@
-﻿using Silverback.Messaging.Publishing;
+﻿using Serilog;
+using Silverback.Messaging.Publishing;
 using Eximia.Integrations.Shared;
 using Eximia.Integrations.DestinationsErrorsConfiguration;
 using Eximia.Integrations.Events;
 using Eximia.Integrations.IntegrationEvents.Commands;
-using Eximia.Integrations.IntegrationEvents.Telemetry;
 using Eximia.Integrations.Routing;
 using Eximia.Integrations.Routing.Exceptions;
 
@@ -11,10 +11,10 @@ namespace Eximia.Integrations.IntegrationEvents.Application.Routing;
 
 public class HandleRoutingErrorService(
     IntegrationEventsDataAccess integrationEventsDataAccess,
-    IRouteIntegrationEventTelemetry routeIntegrationEventTelemetry,
     CheckIfErrorStatusCodeIsAllowedService checkIfErrorStatusCodeIsAllowedService,
     IPublisher publisher,
-    PublishPlataformEventService publishPlataformEventService) : IService<HandleRoutingErrorService>
+    PublishPlataformEventService publishPlataformEventService,
+    ILogger logger) : IService<HandleRoutingErrorService>
 {
     public async Task HandleAsync(
         RouteIntegrationEventRequestCommand command,
@@ -25,7 +25,9 @@ public class HandleRoutingErrorService(
         integrationEvent.RegisterFailure(dispatcherResult.Body);
         await integrationEventsDataAccess.UpdateIntegrationProcess(integrationEvent);
         await publishPlataformEventService.PublishIntegrationEventErrorAsync(integrationEvent);
-        routeIntegrationEventTelemetry.ErrorOnDispatcher(integrationEvent, dispatcherResult);
+        logger.Error(
+            "Error dispatching integration event {IntegrationEventId} to {Destiny}. | StatusCode: {StatusCode}. Body: {Body}",
+            integrationEvent.Id, integrationEvent.Entity.Destiny.Name, dispatcherResult.StatusCode, dispatcherResult.Body);
 
         var needRetry = await checkIfErrorStatusCodeIsAllowedService
             .NeedRetryAsync(command.Destiny, dispatcherResult.Body, dispatcherResult.StatusCode, cancellationToken)

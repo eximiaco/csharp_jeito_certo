@@ -3,9 +3,9 @@ using CSharpFunctionalExtensions;
 using Flurl.Http;
 using Polly;
 using Polly.Retry;
+using Serilog;
 using Eximia.Integrations.DestinationsErrorsConfiguration;
 using Eximia.Integrations.Routing.Authentication;
-using Eximia.Integrations.Routing.Telemetry;
 
 namespace Eximia.Integrations.Routing.Dispatchers;
 
@@ -17,12 +17,11 @@ public static class PolicyFactory
             .RetryAsync(
                 onRetry: (result, retry, context) =>
                 {
-                    var telemetry = context.GetOpenTelemetryService();
                     var error = result.Exception.Message;
                     if (result.Exception is FlurlHttpException flurlException)
                         error = flurlException.GetResponseStringAsync().Result;
 
-                    telemetry!.UnAuthorizeCall();
+                    Log.Warning("Destination {Destination} returned 401, renewing the token. | Error: {Error}", route.Destination, error);
                     provider.GetTokenAsync(route, correlationId).GetAwaiter().GetResult();
                 });
 
@@ -34,7 +33,6 @@ public static class PolicyFactory
                 retry => TimeSpan.FromSeconds(Math.Pow(2, retry)),
                 onRetryAsync: async (result, span, retryCount, context) =>
                 {
-                    var telemetry = context.GetOpenTelemetryService();
                     var error = result.Exception.Message;
                     var statusCode = 999;
 
@@ -46,7 +44,7 @@ public static class PolicyFactory
                         if (!NeedRetry(flurlException, destinationErrorConfiguration, error))
                             throw flurlException;
                     }
-                    telemetry!.MakeRetry(retryCount, result.Exception, error, statusCode);
+                    Log.Error(result.Exception, "Retry {RetryCount}. | StatusCode: {StatusCode}. Body: {Body}", retryCount, statusCode, error);
                 });
 
     public static IAsyncPolicy<DispatcherResult> CreateRetryPolicy() =>
@@ -55,15 +53,8 @@ public static class PolicyFactory
             .Or<FlurlHttpTimeoutException>()
             .WaitAndRetryAsync(retryCount: 5,
                 retry => TimeSpan.FromSeconds(Math.Pow(2, retry)),
-                onRetryAsync: async (result, span, retryCount, context) =>
-                {
-                    // TODO: Log com telemetria
-                    //var telemetry = context.GetOpenTelemetryService();
-                    //var error = result.Exception.Message;
-                    //if (result.Exception is FlurlHttpException flurlException)
-                    //    error = await flurlException.GetResponseStringAsync();
-                    //telemetry!.MakeRetry(result.Exception, error);
-                });
+                onRetryAsync: (result, span, retryCount, context) =>
+                    Task.CompletedTask);
 
     public static IAsyncPolicy<DispatcherResult> CreateFallbackPolicy() =>
         Policy<DispatcherResult>
@@ -82,7 +73,6 @@ public static class PolicyFactory
                  },
                 onFallbackAsync: async (result, context) =>
                 {
-                    var telemetry = context.GetOpenTelemetryService();
                     var error = result.Exception?.Message ?? "Error";
                     var statusCode = 999;
                     
@@ -92,7 +82,7 @@ public static class PolicyFactory
                         statusCode = flurlException.StatusCode ?? 999;
                     }
 
-                    telemetry!.RequestFailed(result.Exception!, error, statusCode);
+                    Log.Error(result.Exception, "Request failed. | StatusCode: {StatusCode}. Body: {Body}", statusCode, error);
                 });
 
     public static AsyncRetryPolicy CreateDefaultPolicy()
