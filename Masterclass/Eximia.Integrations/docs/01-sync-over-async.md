@@ -59,7 +59,7 @@ Além disso não havia proteção de concorrência: sob carga, N mensagens simul
 
 ### 3. O mesmo padrão em outros pontos do fluxo
 
-Bloquear a thread à espera de I/O não ficou só na renovação do token. Está em mais seis pontos, todos em caminhos que rodam **por mensagem** ou **por requisição**:
+Bloquear a thread à espera de I/O não ficou só na renovação do token. Está em mais cinco pontos, todos em caminhos que rodam **por mensagem** ou **por requisição**:
 
 | Onde | O que bloqueia | Quando pesa |
 |---|---|---|
@@ -68,7 +68,6 @@ Bloquear a thread à espera de I/O não ficou só na renovação do token. Está
 | `IntegrationEvents/Application/Routing/HandleRoutingErrorService.cs` | `NeedRetryAsync(...).GetAwaiter().GetResult()`, que consulta a configuração de erro do destino no banco | Quando o destino falha: é justamente o momento em que **todas** as mensagens caem nesse caminho ao mesmo tempo |
 | `IntegrationEvents/Services/SendIntegrationEventService.cs` | `response.GetStringAsync().Result` e `ex.GetResponseStringAsync().Result`, a leitura do corpo da resposta | No callback de erro devolvido à origem |
 | `IntegrationEvents/Application/Register/RegisterMultipleRoutesIntegrationEventApplication.cs` | `GetRoutesByOriginAndEntityAsync(...).GetAwaiter().GetResult()` (banco) e `UploadAsync(...).Result` (storage) | Em **toda requisição** da API: segura a thread do Kestrel durante duas idas a serviços externos |
-| `Outbox/EximiaOutboxReader.cs` | `MarkAsInQueueAsync(...).GetAwaiter().GetResult()`, o `UPDATE` que marca os eventos como `InQueue` | A cada lote publicado pelo `OutboxWorker` |
 
 Em todos eles o método que chama **já é `async`**. O `.Result` ali não evita nada: só troca a liberação da thread por um bloqueio, e o código fica com a aparência de assíncrono sem o comportamento.
 
