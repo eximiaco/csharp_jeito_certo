@@ -4,7 +4,7 @@ using Eximia.Integrations.Shared;
 
 namespace Eximia.Integrations.Routing.Authentication.Providers;
 
-public class ClientCredentialsProvider : TokenServiceProvider, IService<ClientCredentialsProvider>
+public class ClientCredentialsProvider : TokenServiceProvider
 {
     public ClientCredentialsProvider(IMemoryCache memoryCache) : base(memoryCache)
     { }

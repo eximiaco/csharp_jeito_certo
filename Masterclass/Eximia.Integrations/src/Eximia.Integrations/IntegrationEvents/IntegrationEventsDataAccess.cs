@@ -9,7 +9,6 @@ using Eximia.Integrations.Shared.Postgres;
 namespace Eximia.Integrations.IntegrationEvents;
 
 public sealed class IntegrationEventsDataAccess(PostgresConnectionStringFactory connectionStringFactory)
-    : IService<IntegrationEventsDataAccess>
 {
     public async Task InsertAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {

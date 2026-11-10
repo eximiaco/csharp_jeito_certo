@@ -8,7 +8,7 @@ using Eximia.Integrations.IntegrationEvents;
 namespace Eximia.Integrations.Routing.Dispatchers;
 
 public class HttpJsonDispatcher
-    : IDestinationDispatcher, IService<HttpJsonDispatcher>
+    : IDestinationDispatcher
 {
     public async Task<DispatcherResult> SendAsync(
         IntegrationEvent integrationEvent,

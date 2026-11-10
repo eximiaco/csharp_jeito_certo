@@ -3,7 +3,7 @@ using Eximia.Integrations.Shared;
 
 namespace Eximia.Integrations.IntegrationEvents.Actions;
 
-public class CallbackFinalizeOriginalIntegrationEvent : IAction, IService<CallbackFinalizeOriginalIntegrationEvent>
+public class CallbackFinalizeOriginalIntegrationEvent : IAction
 {
     private readonly IntegrationEventsDataAccess _integrationEventsDataAccess;
 

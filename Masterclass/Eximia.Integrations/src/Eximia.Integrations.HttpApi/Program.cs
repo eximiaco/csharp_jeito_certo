@@ -1,10 +1,9 @@
 using System.Reflection;
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Serilog;
 using Eximia.Integrations.HttpApi.Infrastructure;
-using Eximia.Integrations.HttpApi.Infrastructure.AutofacModules;
+using Eximia.Integrations;
+using Eximia.Integrations.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 var assemblyName = Assembly.GetExecutingAssembly().GetName();
@@ -34,18 +33,23 @@ try
         .AddHttpContextAccessor()
         .AddEfDbContext(builder.Configuration)
         .AddGoogleStorageAuth(builder.Configuration)
+        .AddSingleton<EximiaProblemDetailsFactory>()
+        .AddScoped<IIntegrationRequest, IntegrationRequestHttpAdapter>()
+        .AddIntegrationsShared()
+        .AddIntegrationsRouting()
+        .AddRegisterIntegrationEvent()
         .AddControllers(o =>
         {
             o.InputFormatters.Insert(0, new JsonNodeInputFormatter(Log.Logger));
             o.Filters.Add(typeof(HttpGlobalExceptionFilter));
         });
     
-    builder.Host.ConfigureContainer<ContainerBuilder>(builder =>
-    {
-        builder.RegisterModule(new ApplicationModule());
-    });
     builder.Host.UseSerilog();
-    builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+    builder.Host.UseDefaultServiceProvider(options =>
+    {
+        options.ValidateScopes = false;
+        options.ValidateOnBuild = false;
+    });
     
     var app = builder.Build();
 

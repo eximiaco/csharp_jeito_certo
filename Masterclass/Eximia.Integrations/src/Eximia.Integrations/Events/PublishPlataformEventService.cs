@@ -5,7 +5,7 @@ using Eximia.Integrations.IntegrationEvents;
 
 namespace Eximia.Integrations.Events;
 
-public class PublishPlataformEventService : IService<PublishPlataformEventService>
+public class PublishPlataformEventService
 {
     private readonly IPublisher _publisher;
     private readonly ILogger _logger;

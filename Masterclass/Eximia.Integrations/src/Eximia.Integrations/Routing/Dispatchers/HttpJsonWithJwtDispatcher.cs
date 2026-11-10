@@ -9,7 +9,7 @@ using Eximia.Integrations.Routing.Authentication.Providers;
 namespace Eximia.Integrations.Routing.Dispatchers;
 
 public class HttpJsonWithJwtDispatcher(ClientCredentialsProvider clientCredentialsProvider)
-    : IDestinationDispatcher, IService<HttpJsonWithJwtDispatcher>
+    : IDestinationDispatcher
 {
     public async Task<DispatcherResult> SendAsync(
         IntegrationEvent integrationEvent,
