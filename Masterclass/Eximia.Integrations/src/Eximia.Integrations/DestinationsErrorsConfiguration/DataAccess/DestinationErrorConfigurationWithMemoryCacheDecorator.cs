@@ -25,6 +25,6 @@ public class DestinationErrorConfigurationWithMemoryCacheDecorator
                 cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1);
 
                 return await _destinationErrorConfigurationDataAccess.GetAsync(id, cancellationToken).ConfigureAwait(false);
-            }).WaitAsync(cancellationToken).ConfigureAwait(false);
+            }).ConfigureAwait(false);
     }
 }
