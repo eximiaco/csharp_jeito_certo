@@ -165,7 +165,8 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
                         command.Entity,
                         route.Id));
 
-                _ = publishPlataformEventService.PublishIntegrationEventReceivedAsync(integrationEvent.Value);
+                // Telemetria da plataforma: roda em paralelo para não atrasar a resposta à origem.
+                _ = Task.Run(() => publishPlataformEventService.PublishIntegrationEventReceivedAsync(integrationEvent.Value));
             }
 
             await eximiaIntegrationDbContext.SaveChangesAsync(cancellationToken);

@@ -31,21 +31,20 @@ public class HttpJsonDispatcher(IDispatcherEventTelemetry routeIntegrationEventT
             .WrapAsync(PolicyFactory.CreateRetryPolicy(route.MaxRetry, destinationErrorConfiguration));
         
         var result = await policy.ExecuteAsync(
-            action: async (context, token) =>
+            action: async context =>
             {
                 routeIntegrationEventTelemetry.MakingCallToDestiny();
                 using var response = await uri
                     .WithHeader("Content-Type", route.ContentType)
                     .WithHeader("x-eximia-correlation-id", integrationEvent.ControlCode)
                     .WithTimeout(TimeSpan.FromSeconds(route.TimeOut))
-                    .PostStringAsync(payload, cancellationToken: token);
+                    .PostStringAsync(payload);
                 routeIntegrationEventTelemetry.RequestFinished();
                 return integrationEvent.Control.IsSync
                     ? DispatcherResult.Success(response.StatusCode, await response.GetStringAsync())
                     : DispatcherResult.DefaultSuccess;
             },
-            contextWithTelemetry,
-            cancellationToken);
+            contextWithTelemetry);
         
         return result;
     }

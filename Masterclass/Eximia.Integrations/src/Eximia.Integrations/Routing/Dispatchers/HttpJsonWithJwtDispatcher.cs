@@ -36,7 +36,7 @@ public class HttpJsonWithJwtDispatcher(
         var uri = integrationEvent.Control.IsCallbackError ? route.CallbackErrorUri : route.Uri;
 
         var result = await policy.ExecuteAsync(
-            action: async (context, token) =>
+            action: async context =>
             {
                 routeIntegrationEventTelemetry.MakingCallToDestiny();
                 var tokenJwt = string.Empty;
@@ -50,15 +50,14 @@ public class HttpJsonWithJwtDispatcher(
                     .WithHeader("x-eximia-correlation-id", integrationEvent.ControlCode)
                     .WithHeader("Authorization", tokenJwt)
                     .WithTimeout(TimeSpan.FromSeconds(route.TimeOut))
-                    .PostStringAsync(payload, cancellationToken: token);
+                    .PostStringAsync(payload);
 
                 routeIntegrationEventTelemetry.RequestFinished();
                 return integrationEvent.Control.IsSync
                     ? DispatcherResult.Success(response.StatusCode, await response.GetStringAsync())
                     : DispatcherResult.DefaultSuccess;
             },
-            contextWithTelemetry,
-            cancellationToken);
+            contextWithTelemetry);
         
         return result;
     }

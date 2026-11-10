@@ -1,6 +1,6 @@
 # 00 · Baseline: o sistema como foi entregue
 
-Esta branch é o ponto de partida. O sistema funciona no dia a dia, mas carrega sete decisões que comprometem a confiabilidade em produção. Cada branch seguinte corrige uma delas.
+Esta branch é o ponto de partida. O sistema funciona no dia a dia, mas carrega decisões que comprometem a confiabilidade em produção. Cada branch seguinte corrige uma delas.
 
 ## O fluxo de uma integração
 
@@ -35,9 +35,12 @@ Origem ──POST /api/integrations──► HttpApi ──(evento + outbox na m
 | Token do destino | [TokenServiceProvider.cs](../src/Eximia.Integrations/Routing/Authentication/TokenServiceProvider.cs) |
 | Acesso a dados | [IntegrationEventsDataAccess.cs](../src/Eximia.Integrations/IntegrationEvents/IntegrationEventsDataAccess.cs) |
 | Callback de erro | [ProcessIntegrationEventCallbackApplication.cs](../src/Eximia.Integrations/IntegrationEvents/Application/ProcessIntegrationEventCallbackApplication.cs) |
+| Registro de dependências | `ApplicationModule.cs` de cada host (Autofac) |
 | Hosts | `Program.cs` de cada projeto em [src/](../src/) |
 | Worker de reprocessamento | [ReprocessStuckEventsWorker.cs](../src/Eximia.Integration.BackgroundAgent/Workers/ReprocessStuckEventsWorker.cs) |
 
 ## O que vem a seguir
 
 Os problemas estão espalhados pelo fluxo acima, onde aconteceriam num sistema real. Antes de trocar de branch, vale ler os arquivos da tabela e tentar encontrá-los.
+
+O sistema também tem defeitos de **mensageria** (consumidor não idempotente, retry sem limite, republicação fora do outbox). Eles ficam fora deste material, de propósito.

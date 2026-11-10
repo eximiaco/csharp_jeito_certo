@@ -24,7 +24,8 @@ public class ApplicationModule : Autofac.Module
         builder.RegisterType<TelemetryFactory>().As<ITelemetryFactory>().InstancePerLifetimeScope();
         builder.RegisterType<PostgresConnectionStringFactory>().SingleInstance();
         builder.RegisterType<RegisterNewIntegrationEventOtelTelemetry>().As<IRegisterNewIntegrationEventTelemetry>().InstancePerLifetimeScope();
-        builder.RegisterType<RouteIntegrationEventOtelTelemetry>().As<IRouteIntegrationEventTelemetry>().InstancePerLifetimeScope();
+        // A telemetria de roteamento é usada em TODA mensagem consumida: uma instância só, em vez de uma por mensagem.
+        builder.RegisterType<RouteIntegrationEventOtelTelemetry>().As<IRouteIntegrationEventTelemetry>().SingleInstance();
         builder.RegisterType<DispatcherEventTelemetry>().As<IDispatcherEventTelemetry>().InstancePerLifetimeScope();
         builder.RegisterType<ClientCredentialsProviderTelemetry>().As<IClientCredentialsProviderTelemetry>().InstancePerLifetimeScope();
         builder.RegisterType<CallbackEventTelemetry>().As<ICallbackEventTelemetry>().InstancePerLifetimeScope();
