@@ -108,7 +108,7 @@ O dispatcher registrava `EximiaProblemDetailsFactory`, `IntegrationRequestHttpAd
 ## O que sobrou de service locator, de propósito
 
 - **`DestinationDispatcherFactory`**: o dispatcher é escolhido pelo **nome da classe gravado na rota** (no banco). A resolução em tempo de execução é o ponto de extensão, e por isso todo dispatcher possível precisa estar registrado em `AddIntegrationsRouting`.
-- **`IntegrationEventPolicyEngine` e `IntegrationEventActionsEngine`**: resolvem regras por tipo via `IServiceProvider`, e por isso essas regras precisam estar registradas explicitamente.
+- **`IntegrationEventActionsEngine`**: resolve as ações pós-registro por tipo via `IServiceProvider`, e por isso essas ações precisam estar registradas explicitamente.
 
 ## Regras para levar
 

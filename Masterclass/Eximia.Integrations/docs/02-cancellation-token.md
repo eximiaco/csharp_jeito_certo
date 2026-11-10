@@ -32,7 +32,7 @@ Isto é **pior** do que não ter o token: dá a falsa impressão de que o métod
 
 ### 3. Métodos que nem recebem o token
 
-`UpdateIntegrationProcess`, `UpdateKafkaOffsetAsync` e `AnyEventWaitingCallback` nem tinham o parâmetro. O mesmo valia para as consultas de rota (`RoutingDataAccess`), e `GetRoutesByOriginAndEntityAsync` recebia o token na assinatura sem usá-lo.
+`UpdateIntegrationProcess` e `UpdateKafkaOffsetAsync` nem tinham o parâmetro. O mesmo valia para as consultas de rota (`RoutingDataAccess`), e `GetRoutesByOriginAndEntityAsync` recebia o token na assinatura sem usá-lo.
 
 ### 4. A política de resiliência executada sem o token: HTTP e retries que não param
 
@@ -75,7 +75,7 @@ var dto = await connection.QueryFirstOrDefaultAsync<EventDto>(new CommandDefinit
     cancellationToken: cancellationToken));
 ```
 
-`CommandDefinition` (Dapper) leva o token para o Npgsql, que envia o cancelamento ao servidor: a query **realmente para** e a conexão volta ao pool. Todos os métodos de acesso a dados passaram a receber e repassar o token: `InsertAsync`, `GetAndSetEventToDispatch`, `UpdateIntegrationProcess`, `FinalizeOriginalIntegrationEventsForCallback`, `AnyEventWaitingCallback`, `GetAsync`, `UpdateKafkaOffsetAsync`, `UpdatePayloadAsync`, `GetDestinyAsync`, as consultas de rota e a configuração de erro por destino. Os chamadores (`RouteIntegrationEventApplication`, `HandleRoutingErrorService`, `ValidateCallbackRule`) foram ajustados para repassá-lo.
+`CommandDefinition` (Dapper) leva o token para o Npgsql, que envia o cancelamento ao servidor: a query **realmente para** e a conexão volta ao pool. Todos os métodos de acesso a dados passaram a receber e repassar o token: `InsertAsync`, `GetAndSetEventToDispatch`, `UpdateIntegrationProcess`, `FinalizeOriginalIntegrationEventsForCallback`, `GetAsync`, `UpdateKafkaOffsetAsync`, `UpdatePayloadAsync`, `GetDestinyAsync`, as consultas de rota e a configuração de erro por destino. Os chamadores (`RouteIntegrationEventApplication` e `HandleRoutingErrorService`) foram ajustados para repassá-lo.
 
 ### O token entra na política, e a política o entrega a cada tentativa
 

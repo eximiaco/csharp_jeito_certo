@@ -230,20 +230,6 @@ public sealed class IntegrationEventsDataAccess(NpgsqlDataSource dataSource)
         await connection.ExecuteAsync(new CommandDefinition(sql, param, cancellationToken: cancellationToken));
     }
 
-    public async Task<bool> AnyEventWaitingCallback(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
-    {
-        await using var connection = dataSource.CreateConnection();
-        var query = await connection.QueryAsync<int>(new CommandDefinition(
-            @$"SELECT
-                        id as Id
-                      FROM 
-                          public.integration_events 
-                      WHERE control_code = @ControlCode AND status = @status AND is_callback = false;",
-            new { integrationEvent.ControlCode, status = EIntegrationStatus.WaitingCallback },
-            cancellationToken: cancellationToken));
-        return query.Any();
-    }
-
     public async Task<Maybe<IntegrationEvent>> GetAsync(int id, CancellationToken cancellationToken)
     {
         await using var connection = dataSource.CreateConnection();

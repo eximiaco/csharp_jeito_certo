@@ -9,14 +9,12 @@ using Eximia.Integrations.IntegrationEvents.Services;
 using Eximia.Integrations.Outbox;
 using Eximia.Integrations.Outbox.EntityFramework;
 using Eximia.Integrations.Routing;
-using Eximia.Integrations.Routing.Rules;
 using Eximia.Integrations.Routing.Rules.Engine;
 
 namespace Eximia.Integrations.IntegrationEvents.Application.Register;
 
 public class RegisterMultipleRoutesIntegrationEventApplication(
     JsonSchemaService jsonSchemaService,
-    IntegrationEventPolicyEngine integrationEventPolicyEngine,
     RoutingDataAccess routingDataAccess,
     IntegrationEventActionsEngine integrationEventActionsEngine,
     IPublisher publisher,
@@ -64,15 +62,13 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
                 payloadFileId,
                 cancellationToken);
 
-            payload = uploadResult.NewPayload;
             var payloadFile = uploadResult.FileName;
 
             // 3. Processar cada rota aplicável
             var processedEvents = new List<IntegrationEvent>();
 
             // Integration events + mensagens do outbox do Silverback são confirmados na mesma transação.
-            await using (var outboxTransaction = await OutboxTransaction.BeginAsync(eximiaIntegrationDbContext, publisher, cancellationToken))
-            {
+            await using var outboxTransaction = await OutboxTransaction.BeginAsync(eximiaIntegrationDbContext, publisher, cancellationToken);
             foreach (var route in applicableRoutesList)
             {
                 var integrationEvent = jsonSchemaService.CreateFrom(
@@ -82,11 +78,6 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
                     payloadFileId);
 
                 if (integrationEvent.IsFailure)
-                    continue;
-
-                // Validação
-                var validationResult = await integrationEventPolicyEngine.Execute(integrationEvent.Value, cancellationToken);
-                if (validationResult.IsFailure)
                     continue;
 
                 // Salvar no banco
@@ -107,7 +98,6 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
 
             await eximiaIntegrationDbContext.SaveChangesAsync(cancellationToken);
             await outboxTransaction.CommitAsync(cancellationToken);
-            }
 
             // Executar ações pós-registro para cada evento
             foreach (var integrationEvent in processedEvents)
@@ -117,7 +107,8 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
         }
         catch (Exception ex)
         {
-            logger.Fatal(ex, "Fatal error registering integration event for origin {Origin} and entity {Entity}.", command.Origin, command.Entity);
+            logger.Fatal(ex, "Fatal error registering integration event for origin {Origin} and entity {Entity}.",
+                command.Origin, command.Entity);
             throw;
         }
     }
