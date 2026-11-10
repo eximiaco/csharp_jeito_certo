@@ -13,220 +13,195 @@ namespace Eximia.Integrations.Routing;
 public class RoutingDataAccess(
     IMemoryCache memoryCache,
     PostgresConnectionStringFactory connectionStringFactory,
-    ITelemetryService telemetryService,
     IOptions<List<RouteAuthenticationSettings>> routeAuthenticationSettings)
     : IService<RoutingDataAccess>
 {
     public async Task<Maybe<Route>> GetRoute(string entity, string destiny, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var key = $"{destiny}.{entity}";
-            var cachedValue = await memoryCache.GetOrCreateAsync(
-                key,
-                async cacheEntry =>
+        var key = $"{destiny}.{entity}";
+        var cachedValue = await memoryCache.GetOrCreateAsync(
+            key,
+            async cacheEntry =>
+            {
+                cacheEntry.SlidingExpiration = TimeSpan.FromSeconds(3);
+                cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(20);
+                cacheEntry.Size = 500;
+                await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
+                var dto = await connection.QueryFirstOrDefaultAsync<RouteDto>(new CommandDefinition(
+                        @"SELECT id,
+                                    origin,
+                                    destination,
+                                    entity,
+                                    topic_name AS TopicName,
+                                    callback_required AS CallbackRequired,
+                                    uri,
+                                    content_type AS ContentType,
+                                    max_retry AS MaxRetry,
+                                    time_out AS TimeOut,
+                                    classname,
+                                    mode AS Mode,
+                                    callback_error_uri AS CallbackErrorUri,
+                                    send_payload_as_link AS SendPayloadAsLink,
+                                    routing_rule AS RoutingRule
+                            FROM destination_routes
+                            WHERE destination = @destiny
+                                AND entity = @entity",
+                        new { entity, destiny },
+                        cancellationToken: cancellationToken));
+
+                if (dto == null)
                 {
-                    cacheEntry.SlidingExpiration = TimeSpan.FromSeconds(3);
-                    cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(20);
-                    cacheEntry.Size = 500;
-                    await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
-                    var dto = await connection.QueryFirstOrDefaultAsync<RouteDto>(new CommandDefinition(
-                            @"SELECT id,
-                                        origin,
-                                        destination,
-                                        entity,
-                                        topic_name AS TopicName,
-                                        callback_required AS CallbackRequired,
-                                        uri,
-                                        content_type AS ContentType,
-                                        max_retry AS MaxRetry,
-                                        time_out AS TimeOut,
-                                        classname,
-                                        mode AS Mode,
-                                        callback_error_uri AS CallbackErrorUri,
-                                        send_payload_as_link AS SendPayloadAsLink,
-                                        routing_rule AS RoutingRule
-                                FROM destination_routes
-                                WHERE destination = @destiny
-                                    AND entity = @entity",
-                            new { entity, destiny },
-                            cancellationToken: cancellationToken));
+                    cacheEntry.Dispose();
+                    return Maybe.None;
+                }
 
-                    if (dto == null)
-                    {
-                        cacheEntry.Dispose();
-                        return Maybe.None;
-                    }
+                IEnumerable<RoutingRule> rules = [];
+                if (!string.IsNullOrEmpty(dto.RoutingRule))
+                    rules = dto.RoutingRule.ToNameTypeObject<IEnumerable<RoutingRule>>();
 
-                    IEnumerable<RoutingRule> rules = [];
-                    if (!string.IsNullOrEmpty(dto.RoutingRule))
-                        rules = dto.RoutingRule.ToNameTypeObject<IEnumerable<RoutingRule>>();
-
-                    return Maybe<Route>.From(
-                        new Route(
-                            dto.Id,
-                            dto.Origin,
-                            dto.Destination,
-                            dto.Entity,
-                            dto.TopicName,
-                            dto.CallbackRequired,
-                            dto.Uri,
-                            dto.ContentType,
-                            dto.MaxRetry,
-                            dto.TimeOut,
-                            dto.ClassName,
-                            (EMode)dto.Mode,
-                            ResolveAuthentication(dto.Destination),
-                            dto.CallbackErrorUri,
-                            dto.SendPayloadAsLink,
-                            rules));
-                });
-            return cachedValue;
-        }
-        catch (Exception ex)
-        {
-            telemetryService.ExceptionFailure(ex, "Error loading route");
-            throw;
-        }
+                return Maybe<Route>.From(
+                    new Route(
+                        dto.Id,
+                        dto.Origin,
+                        dto.Destination,
+                        dto.Entity,
+                        dto.TopicName,
+                        dto.CallbackRequired,
+                        dto.Uri,
+                        dto.ContentType,
+                        dto.MaxRetry,
+                        dto.TimeOut,
+                        dto.ClassName,
+                        (EMode)dto.Mode,
+                        ResolveAuthentication(dto.Destination),
+                        dto.CallbackErrorUri,
+                        dto.SendPayloadAsLink,
+                        rules));
+            });
+        return cachedValue;
     }
 
     public async Task<Maybe<Route>> GetRoute(long id, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var key = $"route:{id}";
-            var cachedValue = await memoryCache.GetOrCreateAsync(
-                key,
-                async cacheEntry =>
+        var key = $"route:{id}";
+        var cachedValue = await memoryCache.GetOrCreateAsync(
+            key,
+            async cacheEntry =>
+            {
+                cacheEntry.SlidingExpiration = TimeSpan.FromSeconds(3);
+                cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(20);
+                cacheEntry.Size = 500;
+                await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
+                var dto = await connection.QueryFirstOrDefaultAsync<RouteDto>(new CommandDefinition(
+                        @"SELECT id,
+                                    origin,
+                                    destination,
+                                    entity,
+                                    topic_name AS TopicName,
+                                    callback_required AS CallbackRequired,
+                                    uri,
+                                    content_type AS ContentType,
+                                    max_retry AS MaxRetry,
+                                    time_out AS TimeOut,
+                                    classname,
+                                    mode AS Mode,
+                                    callback_error_uri AS CallbackErrorUri,
+                                    send_payload_as_link AS SendPayloadAsLink,
+                                    routing_rule AS RoutingRule
+                            FROM destination_routes
+                            WHERE id = @id",
+                        new { id },
+                        cancellationToken: cancellationToken));
+
+                if (dto == null)
                 {
-                    cacheEntry.SlidingExpiration = TimeSpan.FromSeconds(3);
-                    cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(20);
-                    cacheEntry.Size = 500;
-                    await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
-                    var dto = await connection.QueryFirstOrDefaultAsync<RouteDto>(new CommandDefinition(
-                            @"SELECT id,
-                                        origin,
-                                        destination,
-                                        entity,
-                                        topic_name AS TopicName,
-                                        callback_required AS CallbackRequired,
-                                        uri,
-                                        content_type AS ContentType,
-                                        max_retry AS MaxRetry,
-                                        time_out AS TimeOut,
-                                        classname,
-                                        mode AS Mode,
-                                        callback_error_uri AS CallbackErrorUri,
-                                        send_payload_as_link AS SendPayloadAsLink,
-                                        routing_rule AS RoutingRule
-                                FROM destination_routes
-                                WHERE id = @id",
-                            new { id },
-                            cancellationToken: cancellationToken));
+                    cacheEntry.Dispose();
+                    return Maybe.None;
+                }
 
-                    if (dto == null)
-                    {
-                        cacheEntry.Dispose();
-                        return Maybe.None;
-                    }
+                IEnumerable<RoutingRule> rules = [];
+                if (!string.IsNullOrEmpty(dto.RoutingRule))
+                    rules = dto.RoutingRule.ToNameTypeObject<IEnumerable<RoutingRule>>();
 
-                    IEnumerable<RoutingRule> rules = [];
-                    if (!string.IsNullOrEmpty(dto.RoutingRule))
-                        rules = dto.RoutingRule.ToNameTypeObject<IEnumerable<RoutingRule>>();
-
-                    return Maybe<Route>.From(
-                        new Route(
-                            dto.Id,
-                            dto.Origin,
-                            dto.Destination,
-                            dto.Entity,
-                            dto.TopicName,
-                            dto.CallbackRequired,
-                            dto.Uri,
-                            dto.ContentType,
-                            dto.MaxRetry,
-                            dto.TimeOut,
-                            dto.ClassName,
-                            (EMode)dto.Mode,
-                            ResolveAuthentication(dto.Destination),
-                            dto.CallbackErrorUri,
-                            dto.SendPayloadAsLink,
-                            rules));
-                });
-            return cachedValue;
-        }
-        catch (Exception ex)
-        {
-            telemetryService.ExceptionFailure(ex, "Error loading route");
-            throw;
-        }
+                return Maybe<Route>.From(
+                    new Route(
+                        dto.Id,
+                        dto.Origin,
+                        dto.Destination,
+                        dto.Entity,
+                        dto.TopicName,
+                        dto.CallbackRequired,
+                        dto.Uri,
+                        dto.ContentType,
+                        dto.MaxRetry,
+                        dto.TimeOut,
+                        dto.ClassName,
+                        (EMode)dto.Mode,
+                        ResolveAuthentication(dto.Destination),
+                        dto.CallbackErrorUri,
+                        dto.SendPayloadAsLink,
+                        rules));
+            });
+        return cachedValue;
     }
 
     public async Task<Maybe<Route>> GetRouteWithoutRules(long id, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var key = $"route:{id}";
-            var cachedValue = await memoryCache.GetOrCreateAsync(
-                key,
-                async cacheEntry =>
+        var key = $"route:{id}";
+        var cachedValue = await memoryCache.GetOrCreateAsync(
+            key,
+            async cacheEntry =>
+            {
+                cacheEntry.SlidingExpiration = TimeSpan.FromSeconds(3);
+                cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(20);
+                cacheEntry.Size = 500;
+                await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
+                var dto = await connection.QueryFirstOrDefaultAsync<RouteWithoutRulesDto>(new CommandDefinition(
+                        @"SELECT id,
+                                    origin,
+                                    destination,
+                                    entity,
+                                    topic_name AS TopicName,
+                                    callback_required AS CallbackRequired,
+                                    uri,
+                                    content_type AS ContentType,
+                                    max_retry AS MaxRetry,
+                                    time_out AS TimeOut,
+                                    classname,
+                                    mode AS Mode,
+                                    callback_error_uri AS CallbackErrorUri,
+                                    send_payload_as_link AS SendPayloadAsLink
+                            FROM destination_routes
+                            WHERE id = @id",
+                        new { id },
+                        cancellationToken: cancellationToken));
+
+                if (dto == null)
                 {
-                    cacheEntry.SlidingExpiration = TimeSpan.FromSeconds(3);
-                    cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(20);
-                    cacheEntry.Size = 500;
-                    await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
-                    var dto = await connection.QueryFirstOrDefaultAsync<RouteWithoutRulesDto>(new CommandDefinition(
-                            @"SELECT id,
-                                        origin,
-                                        destination,
-                                        entity,
-                                        topic_name AS TopicName,
-                                        callback_required AS CallbackRequired,
-                                        uri,
-                                        content_type AS ContentType,
-                                        max_retry AS MaxRetry,
-                                        time_out AS TimeOut,
-                                        classname,
-                                        mode AS Mode,
-                                        callback_error_uri AS CallbackErrorUri,
-                                        send_payload_as_link AS SendPayloadAsLink
-                                FROM destination_routes
-                                WHERE id = @id",
-                            new { id },
-                            cancellationToken: cancellationToken));
+                    cacheEntry.Dispose();
+                    return Maybe.None;
+                }
 
-                    if (dto == null)
-                    {
-                        cacheEntry.Dispose();
-                        return Maybe.None;
-                    }
-
-                    return Maybe<Route>.From(
-                        new Route(
-                            dto.Id,
-                            dto.Origin,
-                            dto.Destination,
-                            dto.Entity,
-                            dto.TopicName,
-                            dto.CallbackRequired,
-                            dto.Uri,
-                            dto.ContentType,
-                            dto.MaxRetry,
-                            dto.TimeOut,
-                            dto.ClassName,
-                            (EMode)dto.Mode,
-                            ResolveAuthentication(dto.Destination),
-                            dto.CallbackErrorUri,
-                            dto.SendPayloadAsLink,
-                            []));
-                });
-            return cachedValue;
-        }
-        catch (Exception ex)
-        {
-            telemetryService.ExceptionFailure(ex, "Error loading route");
-            throw;
-        }
+                return Maybe<Route>.From(
+                    new Route(
+                        dto.Id,
+                        dto.Origin,
+                        dto.Destination,
+                        dto.Entity,
+                        dto.TopicName,
+                        dto.CallbackRequired,
+                        dto.Uri,
+                        dto.ContentType,
+                        dto.MaxRetry,
+                        dto.TimeOut,
+                        dto.ClassName,
+                        (EMode)dto.Mode,
+                        ResolveAuthentication(dto.Destination),
+                        dto.CallbackErrorUri,
+                        dto.SendPayloadAsLink,
+                        []));
+            });
+        return cachedValue;
     }
 
     public async Task<IEnumerable<Route>> GetRoutesByOriginAndEntityAsync(
@@ -234,62 +209,54 @@ public class RoutingDataAccess(
         string entity,
         CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var key = $"routes:{origin}:{entity}";
-            var cachedValue = await memoryCache.GetOrCreateAsync(
-                key,
-                async cacheEntry =>
+        var key = $"routes:{origin}:{entity}";
+        var cachedValue = await memoryCache.GetOrCreateAsync(
+            key,
+            async cacheEntry =>
+            {
+                cacheEntry.SlidingExpiration = TimeSpan.FromSeconds(3);
+                cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(20);
+                cacheEntry.Size = 500;
+
+                await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
+
+                var results = await connection.QueryAsync<RouteDto>(new CommandDefinition(
+                    @"SELECT r.id, r.origin, r.destination, r.entity, r.topic_name AS TopicName,
+                         r.callback_required AS CallbackRequired, r.uri, r.content_type AS ContentType,
+                         r.max_retry AS MaxRetry, r.time_out AS TimeOut, r.classname, r.mode AS Mode,
+                         r.callback_error_uri AS CallbackErrorUri, r.send_payload_as_link AS SendPayloadAsLink,
+                         r.routing_rule AS RoutingRule
+                      FROM destination_routes r
+                      WHERE r.origin = @origin AND r.entity = @entity AND r.is_active = true",
+                    new { origin, entity },
+                    cancellationToken: cancellationToken));
+
+                return results.Select(routeDto =>
                 {
-                    cacheEntry.SlidingExpiration = TimeSpan.FromSeconds(3);
-                    cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(20);
-                    cacheEntry.Size = 500;
+                    IEnumerable<RoutingRule> routingRule = string.IsNullOrEmpty(routeDto.RoutingRule)
+                        ? []
+                        : routeDto.RoutingRule.ToNameTypeObject<IEnumerable<RoutingRule>>();
 
-                    await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
-
-                    var results = await connection.QueryAsync<RouteDto>(new CommandDefinition(
-                        @"SELECT r.id, r.origin, r.destination, r.entity, r.topic_name AS TopicName,
-                             r.callback_required AS CallbackRequired, r.uri, r.content_type AS ContentType,
-                             r.max_retry AS MaxRetry, r.time_out AS TimeOut, r.classname, r.mode AS Mode,
-                             r.callback_error_uri AS CallbackErrorUri, r.send_payload_as_link AS SendPayloadAsLink,
-                             r.routing_rule AS RoutingRule
-                          FROM destination_routes r
-                          WHERE r.origin = @origin AND r.entity = @entity AND r.is_active = true",
-                        new { origin, entity },
-                        cancellationToken: cancellationToken));
-
-                    return results.Select(routeDto =>
-                    {
-                        IEnumerable<RoutingRule> routingRule = string.IsNullOrEmpty(routeDto.RoutingRule)
-                            ? []
-                            : routeDto.RoutingRule.ToNameTypeObject<IEnumerable<RoutingRule>>();
-
-                        return new Route(
-                            routeDto.Id,
-                            routeDto.Origin,
-                            routeDto.Destination,
-                            routeDto.Entity,
-                            routeDto.TopicName,
-                            routeDto.CallbackRequired,
-                            routeDto.Uri,
-                            routeDto.ContentType,
-                            routeDto.MaxRetry,
-                            routeDto.TimeOut,
-                            routeDto.ClassName,
-                            (EMode)routeDto.Mode,
-                            ResolveAuthentication(routeDto.Destination),
-                            routeDto.CallbackErrorUri,
-                            routeDto.SendPayloadAsLink,
-                            routingRule);
-                    }).ToList();
-                });
-            return cachedValue ?? Enumerable.Empty<Route>();
-        }
-        catch (Exception ex)
-        {
-            telemetryService.ExceptionFailure(ex, "Error loading routes");
-            throw;
-        }
+                    return new Route(
+                        routeDto.Id,
+                        routeDto.Origin,
+                        routeDto.Destination,
+                        routeDto.Entity,
+                        routeDto.TopicName,
+                        routeDto.CallbackRequired,
+                        routeDto.Uri,
+                        routeDto.ContentType,
+                        routeDto.MaxRetry,
+                        routeDto.TimeOut,
+                        routeDto.ClassName,
+                        (EMode)routeDto.Mode,
+                        ResolveAuthentication(routeDto.Destination),
+                        routeDto.CallbackErrorUri,
+                        routeDto.SendPayloadAsLink,
+                        routingRule);
+                }).ToList();
+            });
+        return cachedValue ?? Enumerable.Empty<Route>();
     }
 
     private AuthenticationConfig ResolveAuthentication(string destination)

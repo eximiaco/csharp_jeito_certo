@@ -5,15 +5,10 @@ using Silverback.Messaging.Configuration;
 using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Mvc;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
 using Serilog;
-using Serilog.Enrichers.Datadog.OpenTelemetry;
 using Serilog.Exceptions;
 using Serilog.Filters;
 using Eximia.Integrations.Shared.Kafka;
-using Eximia.Integrations.Shared.OpenTelemetry;
 using Eximia.Integrations.Shared.Postgres;
 using Eximia.Integrations.Auth;
 using Eximia.Integrations.Routing;
@@ -47,56 +42,6 @@ internal static class ServicesExtensions
         return services;
     }
 
-    internal static IServiceCollection AddTelemetry(this IServiceCollection serviceCollection, string serviceName,
-        string serviceVersion, IConfiguration configuration)
-    {
-        var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
-        TelemetrySettings settings;
-        if (configuration.GetSection("OpenTelemetry") is var section && section.Exists())
-            settings = new TelemetrySettings(serviceName, serviceVersion,
-                new TelemetryExporter(section["Type"] ?? string.Empty, section["Endpoint"] ?? string.Empty));
-        else
-            settings = new TelemetrySettings(serviceName, serviceVersion,
-                new TelemetryExporter("console", ""));
-        serviceCollection.AddSingleton(settings);
-        serviceCollection.AddScoped(sp => new OtelTracingService(sp.GetService<TelemetrySettings>()));
-        Action<ResourceBuilder> configureResource = r => r
-            .AddService(
-                serviceName: settings.ServiceName,
-                serviceVersion: settings.ServiceVersion,
-                serviceInstanceId: Environment.MachineName)
-            .AddAttributes(new Dictionary<string, object> { ["deployment.environment"] = environmentName });
-        serviceCollection
-            .AddOpenTelemetry()
-            .ConfigureResource(configureResource)
-            .WithMetrics(builder =>
-            {
-                builder
-                    .ConfigureResource(configureResource)
-                    .AddMeter(PlatformMetrics.MeterName)
-                    .AddRuntimeInstrumentation()
-                    .AddAspNetCoreInstrumentation();
-                switch (settings.Exporter.Type.ToLower())
-                {
-                    case "otlp":
-                        builder.AddOtlpExporter(config =>
-                        {
-                            config.Endpoint = new Uri(settings.Exporter.Endpoint ?? string.Empty);
-                        });
-                        break;
-                    default:
-                        builder.AddConsoleExporter();
-                        break;
-                }
-            })
-            .WithTracing(builder =>
-            {
-                builder
-                    .SetSampler(new AlwaysOnSampler())
-                    .AddSource(settings.ServiceName);
-            });
-        return serviceCollection;
-    }
 
     public static IServiceCollection AddCustomCors(this IServiceCollection services)
     {
@@ -172,10 +117,7 @@ internal static class ServicesExtensions
     {
         Log.Logger = new LoggerConfiguration()
             .ReadFrom.Configuration(configuration)
-            .Enrich.FromLogContext()
             .Enrich.WithThreadId()
-            .Enrich.WithDatadogTraceId()
-            .Enrich.WithDatadogSpanId()
             .Enrich.WithExceptionDetails()
             .Filter.ByExcluding(
                 Matching.FromSource("Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager")

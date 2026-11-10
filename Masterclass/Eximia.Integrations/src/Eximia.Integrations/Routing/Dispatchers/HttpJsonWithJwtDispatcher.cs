@@ -5,13 +5,10 @@ using Eximia.Integrations.Shared;
 using Eximia.Integrations.DestinationsErrorsConfiguration;
 using Eximia.Integrations.IntegrationEvents;
 using Eximia.Integrations.Routing.Authentication.Providers;
-using Eximia.Integrations.Routing.Telemetry;
 
 namespace Eximia.Integrations.Routing.Dispatchers;
 
-public class HttpJsonWithJwtDispatcher(
-    IDispatcherEventTelemetry routeIntegrationEventTelemetry,
-    ClientCredentialsProvider clientCredentialsProvider)
+public class HttpJsonWithJwtDispatcher(ClientCredentialsProvider clientCredentialsProvider)
     : IDestinationDispatcher, IService<HttpJsonWithJwtDispatcher>
 {
     public async Task<DispatcherResult> SendAsync(
@@ -21,10 +18,7 @@ public class HttpJsonWithJwtDispatcher(
         string payload,
         CancellationToken cancellationToken)
     {
-        routeIntegrationEventTelemetry.IntegrationEventLoaded(nameof(HttpJsonWithJwtDispatcher.SendAsync), integrationEvent, route);
-        var contextWithTelemetry = new Context()
-            .WithOpenTelemetry(routeIntegrationEventTelemetry)
-            .WithIntegrationId(integrationEvent.Id);
+        var policyContext = new Context();
 
         var policy = PolicyFactory
             .CreateFallbackPolicy()
@@ -39,7 +33,6 @@ public class HttpJsonWithJwtDispatcher(
             // O token entra na POLÍTICA: é ela que o entrega a cada tentativa (token) e o usa nas esperas entre elas.
             action: async (context, token) =>
             {
-                routeIntegrationEventTelemetry.MakingCallToDestiny();
                 var tokenJwt = string.Empty;
                 var authToken = await clientCredentialsProvider.GetTokenAsync(route, integrationEvent.ControlCode, token);
 
@@ -53,12 +46,11 @@ public class HttpJsonWithJwtDispatcher(
                     .WithTimeout(TimeSpan.FromSeconds(route.TimeOut))
                     .PostStringAsync(payload, cancellationToken: token);
 
-                routeIntegrationEventTelemetry.RequestFinished();
                 return integrationEvent.Control.IsSync
                     ? DispatcherResult.Success(response.StatusCode, await response.GetStringAsync())
                     : DispatcherResult.DefaultSuccess;
             },
-            contextWithTelemetry,
+            policyContext,
             cancellationToken);
         
         return result;
