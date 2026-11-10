@@ -160,13 +160,6 @@ public sealed class IntegrationEvent : DomainEntity, IAggregateRoot
         Control.EndedAt = DateTime.UtcNow;
     }
 
-    public ValidationPolicy GetValidationPolicy()
-    {
-        return Control.IsCallback
-            ? ValidationPolicy.CreateCallbackPolicy()
-            : ValidationPolicy.CreateEmpty();
-    }
-
     public PosRegisterIntegrationEventActions GetActionsForPosRegister()
     {
         return Control.IsCallback
