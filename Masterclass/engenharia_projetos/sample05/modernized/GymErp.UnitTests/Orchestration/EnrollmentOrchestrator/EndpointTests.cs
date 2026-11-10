@@ -13,11 +13,13 @@ namespace GymErp.UnitTests.Orchestration.EnrollmentOrchestrator;
 public class EndpointTests
 {
     private readonly Mock<IOptions<LegacyApiConfiguration>> _mockConfiguration;
+    private readonly Mock<IOptions<SubscriptionsApiConfiguration>> _mockSubscriptionsConfiguration;
     private readonly Mock<IWorkflowHost> _mockWorkflowHost;
 
     public EndpointTests()
     {
         _mockConfiguration = new Mock<IOptions<LegacyApiConfiguration>>();
+        _mockSubscriptionsConfiguration = new Mock<IOptions<SubscriptionsApiConfiguration>>();
         _mockWorkflowHost = new Mock<IWorkflowHost>();
 
         var configuration = new LegacyApiConfiguration
@@ -27,7 +29,14 @@ public class EndpointTests
             RetryAttempts = 3
         };
 
+        var subscriptionsConfiguration = new SubscriptionsApiConfiguration
+        {
+            BaseUrl = "http://localhost:6000",
+            TimeoutSeconds = 30
+        };
+
         _mockConfiguration.Setup(x => x.Value).Returns(configuration);
+        _mockSubscriptionsConfiguration.Setup(x => x.Value).Returns(subscriptionsConfiguration);
     }
 
     [Fact]
@@ -36,7 +45,8 @@ public class EndpointTests
         // Arrange
         var legacyAdapter = new LegacyAdapter(_mockConfiguration.Object);
         var modernizedAdapter = new ModernizedAdapter(_mockWorkflowHost.Object);
-        var handler = new Handler(legacyAdapter, modernizedAdapter);
+        var planService = new PlanService(_mockSubscriptionsConfiguration.Object);
+        var handler = new Handler(legacyAdapter, modernizedAdapter, planService);
 
         // Act
         var endpoint = new Endpoint(handler);
@@ -51,7 +61,8 @@ public class EndpointTests
         // Arrange
         var legacyAdapter = new LegacyAdapter(_mockConfiguration.Object);
         var modernizedAdapter = new ModernizedAdapter(_mockWorkflowHost.Object);
-        var handler = new Handler(legacyAdapter, modernizedAdapter);
+        var planService = new PlanService(_mockSubscriptionsConfiguration.Object);
+        var handler = new Handler(legacyAdapter, modernizedAdapter, planService);
         var endpoint = new Endpoint(handler);
 
         // Act & Assert

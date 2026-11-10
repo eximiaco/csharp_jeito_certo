@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <!-- Adaptador de condução HTTP e configurador (Program.cs): o único projeto que conhece todos os adaptadores. -->
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
+        <ProjectReference Include="..\GymErp.Core\GymErp.Core.csproj" />
+        <ProjectReference Include="..\GymErp.Adapters.Postgres\GymErp.Adapters.Postgres.csproj" />
+        <ProjectReference Include="..\GymErp.Adapters.InMemory\GymErp.Adapters.InMemory.csproj" />
+        <ProjectReference Include="..\GymErp.Adapters.NoOpNotifications\GymErp.Adapters.NoOpNotifications.csproj" />
+    </ItemGroup>
+
+</Project>

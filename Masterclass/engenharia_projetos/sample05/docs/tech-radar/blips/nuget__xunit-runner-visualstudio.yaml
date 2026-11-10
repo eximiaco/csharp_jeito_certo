@@ -1,0 +1,92 @@
+name: xunit.runner.visualstudio
+slug: nuget__xunit-runner-visualstudio
+description: null
+blip_type: package
+ecosystem: nuget
+quadrant: languages_and_frameworks
+active: true
+proposed_ring: trial
+proposed_confidence: medium
+proposed_rationale: "Presença em 4 projetos, com 3 versões observadas; ampliar o uso somente após revisar a padronização e os sinais externos não medidos."
+proposal_evidence: [signals.project_count, signals.version_spread, signals.freshness.latest_stable_version, signals.license_risk]
+decision_status: proposed
+ring: null
+decided_by: null
+decided_at: null
+decision_rationale: null
+reviewer_note: null
+needs_review: false
+facts_hash: e77c930d6c0caf70fdedd5a36c0dfe4c63e6a52417bd176f4e884a819c8c72a0
+occurrences:
+  - repo_id: sample05
+    source_file: legacy/Gymerp.IntegrationTests/Gymerp.IntegrationTests.csproj
+    version: "3.1.4"
+    is_dev: false
+  - repo_id: sample05
+    source_file: modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj
+    version: "2.8.2"
+    is_dev: false
+  - repo_id: sample05
+    source_file: modernized/GymErp.IntegrationTests/Masterclass/sample04/src/GymErp.UnitTests/GymErp.UnitTests.csproj
+    version: "2.5.3"
+    is_dev: false
+  - repo_id: sample05
+    source_file: modernized/GymErp.UnitTests/GymErp.UnitTests.csproj
+    version: "2.8.2"
+    is_dev: false
+versions:
+  - version: "2.5.3"
+    repos: [sample05]
+    source_files:
+      - "sample05:modernized/GymErp.IntegrationTests/Masterclass/sample04/src/GymErp.UnitTests/GymErp.UnitTests.csproj"
+    occurrence_count: 1
+    is_deprecated: null
+    licenses: null
+    license_risk: unknown
+    versions_behind: null
+    days_behind_latest: null
+    advisories: []
+  - version: "2.8.2"
+    repos: [sample05]
+    source_files:
+      - "sample05:modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj"
+      - "sample05:modernized/GymErp.UnitTests/GymErp.UnitTests.csproj"
+    occurrence_count: 2
+    is_deprecated: null
+    licenses: null
+    license_risk: unknown
+    versions_behind: null
+    days_behind_latest: null
+    advisories: []
+  - version: "3.1.4"
+    repos: [sample05]
+    source_files:
+      - "sample05:legacy/Gymerp.IntegrationTests/Gymerp.IntegrationTests.csproj"
+    occurrence_count: 1
+    is_deprecated: null
+    licenses: null
+    license_risk: unknown
+    versions_behind: null
+    days_behind_latest: null
+    advisories: []
+signals:
+  repo_count: 1
+  project_count: 4
+  occurrence_count: 4
+  version_spread: 3
+  last_seen: "2026-07-21T15:08:36.181Z"
+  coverage:
+    scanned_repos: 1
+    pending_repos: 0
+  advisory:
+    count: 0
+    max_severity: none
+  is_deprecated: false
+  freshness:
+    latest_stable_version: null
+    max_versions_behind: null
+    max_days_behind_latest: null
+  last_published_at: null
+  dependents_count: null
+  licenses: []
+  license_risk: unknown

@@ -1,0 +1,62 @@
+name: Npgsql.EntityFrameworkCore.PostgreSQL
+slug: nuget__npgsql-entityframeworkcore-postgresql
+description: null
+blip_type: package
+ecosystem: nuget
+quadrant: languages_and_frameworks
+active: true
+proposed_ring: trial
+proposed_confidence: medium
+proposed_rationale: "Presença consistente em 2 projetos, mas sinais externos permanecem não medidos; considerar uso controlado antes de padronizar."
+proposal_evidence: [signals.project_count, occurrences[0].source_file, signals.freshness.latest_stable_version, signals.license_risk]
+decision_status: proposed
+ring: null
+decided_by: null
+decided_at: null
+decision_rationale: null
+reviewer_note: null
+needs_review: false
+facts_hash: "315a6bfdb523c35a851d0b7b676402f4eba575457fc37a8123f4ccd9d97d5ed6"
+occurrences:
+  - repo_id: sample05
+    source_file: legacy/Gymerp.Infrastructure/Gymerp.Infrastructure.csproj
+    version: "9.0.4"
+    is_dev: false
+  - repo_id: sample05
+    source_file: modernized/GymErp/GymErp.csproj
+    version: "9.0.4"
+    is_dev: false
+versions:
+  - version: "9.0.4"
+    repos: [sample05]
+    source_files:
+      - "sample05:legacy/Gymerp.Infrastructure/Gymerp.Infrastructure.csproj"
+      - "sample05:modernized/GymErp/GymErp.csproj"
+    occurrence_count: 2
+    is_deprecated: null
+    licenses: null
+    license_risk: unknown
+    versions_behind: null
+    days_behind_latest: null
+    advisories: []
+signals:
+  repo_count: 1
+  project_count: 2
+  occurrence_count: 2
+  version_spread: 1
+  last_seen: "2026-07-21T15:08:36.181Z"
+  coverage:
+    scanned_repos: 1
+    pending_repos: 0
+  advisory:
+    count: 0
+    max_severity: none
+  is_deprecated: false
+  freshness:
+    latest_stable_version: null
+    max_versions_behind: null
+    max_days_behind_latest: null
+  last_published_at: null
+  dependents_count: null
+  licenses: []
+  license_risk: unknown

@@ -1,0 +1,3665 @@
+schema_version: 1
+title: "Tech Radar — GymErp Sample 05"
+generated_at: "2026-07-21T15:11:20.212Z"
+last_run:
+  at: "2026-07-21T15:11:20.212Z"
+  repos_scanned: [sample05]
+repos:
+  - id: sample05
+    path: "/Users/gabrielkohlrausch/Documents/dev/csharp_jeito_certo/Masterclass/engenharia_projetos/sample05"
+    last_scanned_at: "2026-07-21T15:08:36.181Z"
+    status: scanned
+inventory:
+  sample05:
+    scanned_at: "2026-07-21T15:08:36.181Z"
+    warnings: []
+    dependencies:
+      - name: Autofac
+        ecosystem: nuget
+        blip_type: package
+        version: "8.3.0"
+        is_dev: false
+        source_file: modernized/GymErp/GymErp.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Autofac.Extensions.DependencyInjection
+        ecosystem: nuget
+        blip_type: package
+        version: "10.0.0"
+        is_dev: false
+        source_file: modernized/GymErp/GymErp.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: coverlet.collector
+        ecosystem: nuget
+        blip_type: package
+        version: "6.0.4"
+        is_dev: false
+        source_file: legacy/Gymerp.IntegrationTests/Gymerp.IntegrationTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: coverlet.collector
+        ecosystem: nuget
+        blip_type: package
+        version: "6.0.2"
+        is_dev: false
+        source_file: modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: coverlet.collector
+        ecosystem: nuget
+        blip_type: package
+        version: "6.0.0"
+        is_dev: false
+        source_file: modernized/GymErp.IntegrationTests/Masterclass/sample04/src/GymErp.UnitTests/GymErp.UnitTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: coverlet.collector
+        ecosystem: nuget
+        blip_type: package
+        version: "6.0.2"
+        is_dev: false
+        source_file: modernized/GymErp.UnitTests/GymErp.UnitTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: CSharpFunctionalExtensions
+        ecosystem: nuget
+        blip_type: package
+        version: "3.6.0"
+        is_dev: false
+        source_file: modernized/GymErp/GymErp.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Dapper
+        ecosystem: nuget
+        blip_type: package
+        version: "2.1.66"
+        is_dev: false
+        source_file: modernized/GymErp/GymErp.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: FastEndpoints
+        ecosystem: nuget
+        blip_type: package
+        version: "6.1.0"
+        is_dev: false
+        source_file: modernized/GymErp/GymErp.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: FastEndpoints.Swagger
+        ecosystem: nuget
+        blip_type: package
+        version: "6.1.0"
+        is_dev: false
+        source_file: modernized/GymErp/GymErp.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: FastEndpoints.Testing
+        ecosystem: nuget
+        blip_type: package
+        version: "5.21.0"
+        is_dev: false
+        source_file: modernized/GymErp.UnitTests/GymErp.UnitTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: FluentAssertions
+        ecosystem: nuget
+        blip_type: package
+        version: "6.12.2"
+        is_dev: false
+        source_file: modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: FluentAssertions
+        ecosystem: nuget
+        blip_type: package
+        version: "6.12.2"
+        is_dev: false
+        source_file: modernized/GymErp.UnitTests/GymErp.UnitTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Flurl
+        ecosystem: nuget
+        blip_type: package
+        version: "4.0.0"
+        is_dev: false
+        source_file: modernized/GymErp/GymErp.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Flurl.Http
+        ecosystem: nuget
+        blip_type: package
+        version: "4.0.2"
+        is_dev: false
+        source_file: modernized/GymErp/GymErp.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Flurl.Http
+        ecosystem: nuget
+        blip_type: package
+        version: "4.0.2"
+        is_dev: false
+        source_file: modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Flurl.Http
+        ecosystem: nuget
+        blip_type: package
+        version: "4.0.2"
+        is_dev: false
+        source_file: modernized/GymErp.UnitTests/GymErp.UnitTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Microsoft.AspNetCore.OpenApi
+        ecosystem: nuget
+        blip_type: package
+        version: "9.0.9"
+        is_dev: false
+        source_file: legacy/Gymerp.Api/Gymerp.Api.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Microsoft.AspNetCore.OpenApi
+        ecosystem: nuget
+        blip_type: package
+        version: "9.0.9"
+        is_dev: false
+        source_file: legacy/Gymerp.QueueConsumer/Gymerp.QueueConsumer.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Microsoft.AspNetCore.OpenApi
+        ecosystem: nuget
+        blip_type: package
+        version: "9.0.0"
+        is_dev: false
+        source_file: modernized/GymErp/GymErp.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Microsoft.EntityFrameworkCore
+        ecosystem: nuget
+        blip_type: package
+        version: "9.0.9"
+        is_dev: false
+        source_file: legacy/Gymerp.Infrastructure/Gymerp.Infrastructure.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Microsoft.EntityFrameworkCore
+        ecosystem: nuget
+        blip_type: package
+        version: "9.0.9"
+        is_dev: false
+        source_file: legacy/Gymerp.Worker/Gymerp.Worker.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Microsoft.EntityFrameworkCore
+        ecosystem: nuget
+        blip_type: package
+        version: "9.0.5"
+        is_dev: false
+        source_file: modernized/GymErp/GymErp.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Microsoft.EntityFrameworkCore.Design
+        ecosystem: nuget
+        blip_type: package
+        version: "9.0.9"
+        is_dev: false
+        source_file: legacy/Gymerp.Api/Gymerp.Api.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Microsoft.EntityFrameworkCore.Design
+        ecosystem: nuget
+        blip_type: package
+        version: "9.0.9"
+        is_dev: false
+        source_file: legacy/Gymerp.Infrastructure/Gymerp.Infrastructure.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Microsoft.EntityFrameworkCore.Relational
+        ecosystem: nuget
+        blip_type: package
+        version: "9.0.9"
+        is_dev: false
+        source_file: legacy/Gymerp.Worker/Gymerp.Worker.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Microsoft.EntityFrameworkCore.SqlServer
+        ecosystem: nuget
+        blip_type: package
+        version: "9.0.9"
+        is_dev: false
+        source_file: legacy/Gymerp.IntegrationTests/Gymerp.IntegrationTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Microsoft.Extensions.Hosting
+        ecosystem: nuget
+        blip_type: package
+        version: "9.0.9"
+        is_dev: false
+        source_file: legacy/Gymerp.Worker/Gymerp.Worker.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Microsoft.Extensions.Logging.Abstractions
+        ecosystem: nuget
+        blip_type: package
+        version: "9.0.9"
+        is_dev: false
+        source_file: legacy/Gymerp.Application/Gymerp.Application.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Microsoft.NET.Test.Sdk
+        ecosystem: nuget
+        blip_type: package
+        version: "17.14.1"
+        is_dev: false
+        source_file: legacy/Gymerp.IntegrationTests/Gymerp.IntegrationTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Microsoft.NET.Test.Sdk
+        ecosystem: nuget
+        blip_type: package
+        version: "17.12.0"
+        is_dev: false
+        source_file: modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Microsoft.NET.Test.Sdk
+        ecosystem: nuget
+        blip_type: package
+        version: "17.8.0"
+        is_dev: false
+        source_file: modernized/GymErp.IntegrationTests/Masterclass/sample04/src/GymErp.UnitTests/GymErp.UnitTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Microsoft.NET.Test.Sdk
+        ecosystem: nuget
+        blip_type: package
+        version: "17.12.0"
+        is_dev: false
+        source_file: modernized/GymErp.UnitTests/GymErp.UnitTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Moq
+        ecosystem: nuget
+        blip_type: package
+        version: "4.20.72"
+        is_dev: false
+        source_file: legacy/Gymerp.IntegrationTests/Gymerp.IntegrationTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Moq
+        ecosystem: nuget
+        blip_type: package
+        version: "4.20.72"
+        is_dev: false
+        source_file: modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Moq
+        ecosystem: nuget
+        blip_type: package
+        version: "4.20.72"
+        is_dev: false
+        source_file: modernized/GymErp.UnitTests/GymErp.UnitTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Npgsql
+        ecosystem: nuget
+        blip_type: package
+        version: "9.0.3"
+        is_dev: false
+        source_file: modernized/GymErp/GymErp.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Npgsql.EntityFrameworkCore.PostgreSQL
+        ecosystem: nuget
+        blip_type: package
+        version: "9.0.4"
+        is_dev: false
+        source_file: legacy/Gymerp.Infrastructure/Gymerp.Infrastructure.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Npgsql.EntityFrameworkCore.PostgreSQL
+        ecosystem: nuget
+        blip_type: package
+        version: "9.0.4"
+        is_dev: false
+        source_file: modernized/GymErp/GymErp.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Polly
+        ecosystem: nuget
+        blip_type: package
+        version: "8.5.2"
+        is_dev: false
+        source_file: modernized/GymErp/GymErp.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Serilog.AspNetCore
+        ecosystem: nuget
+        blip_type: package
+        version: "9.0.0"
+        is_dev: false
+        source_file: modernized/GymErp/GymErp.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Serilog.Enrichers.Thread
+        ecosystem: nuget
+        blip_type: package
+        version: "4.0.0"
+        is_dev: false
+        source_file: modernized/GymErp/GymErp.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Serilog.Extensions.Hosting
+        ecosystem: nuget
+        blip_type: package
+        version: "9.0.0"
+        is_dev: false
+        source_file: modernized/GymErp/GymErp.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Silverback.Integration
+        ecosystem: nuget
+        blip_type: package
+        version: "4.5.0"
+        is_dev: false
+        source_file: modernized/GymErp/GymErp.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Silverback.Integration.Kafka
+        ecosystem: nuget
+        blip_type: package
+        version: "4.5.0"
+        is_dev: false
+        source_file: modernized/GymErp/GymErp.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Silverback.Integration.Testing
+        ecosystem: nuget
+        blip_type: package
+        version: "4.5.0"
+        is_dev: false
+        source_file: modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Swashbuckle.AspNetCore
+        ecosystem: nuget
+        blip_type: package
+        version: "9.0.4"
+        is_dev: false
+        source_file: legacy/Gymerp.Api/Gymerp.Api.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Swashbuckle.AspNetCore
+        ecosystem: nuget
+        blip_type: package
+        version: "9.0.4"
+        is_dev: false
+        source_file: legacy/Gymerp.QueueConsumer/Gymerp.QueueConsumer.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Swashbuckle.AspNetCore
+        ecosystem: nuget
+        blip_type: package
+        version: "7.2.0"
+        is_dev: false
+        source_file: modernized/GymErp/GymErp.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Testcontainers
+        ecosystem: nuget
+        blip_type: package
+        version: "4.0.0"
+        is_dev: false
+        source_file: modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Testcontainers.Kafka
+        ecosystem: nuget
+        blip_type: package
+        version: "4.0.0"
+        is_dev: false
+        source_file: modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Testcontainers.MsSql
+        ecosystem: nuget
+        blip_type: package
+        version: "4.7.0"
+        is_dev: false
+        source_file: legacy/Gymerp.IntegrationTests/Gymerp.IntegrationTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: Testcontainers.PostgreSql
+        ecosystem: nuget
+        blip_type: package
+        version: "4.0.0"
+        is_dev: false
+        source_file: modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: WorkflowCore
+        ecosystem: nuget
+        blip_type: package
+        version: "3.13.0"
+        is_dev: false
+        source_file: modernized/GymErp/GymErp.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: xunit
+        ecosystem: nuget
+        blip_type: package
+        version: "2.9.3"
+        is_dev: false
+        source_file: legacy/Gymerp.IntegrationTests/Gymerp.IntegrationTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: xunit
+        ecosystem: nuget
+        blip_type: package
+        version: "2.9.2"
+        is_dev: false
+        source_file: modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: xunit
+        ecosystem: nuget
+        blip_type: package
+        version: "2.5.3"
+        is_dev: false
+        source_file: modernized/GymErp.IntegrationTests/Masterclass/sample04/src/GymErp.UnitTests/GymErp.UnitTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: xunit
+        ecosystem: nuget
+        blip_type: package
+        version: "2.9.2"
+        is_dev: false
+        source_file: modernized/GymErp.UnitTests/GymErp.UnitTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: xunit.runner.visualstudio
+        ecosystem: nuget
+        blip_type: package
+        version: "3.1.4"
+        is_dev: false
+        source_file: legacy/Gymerp.IntegrationTests/Gymerp.IntegrationTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: xunit.runner.visualstudio
+        ecosystem: nuget
+        blip_type: package
+        version: "2.8.2"
+        is_dev: false
+        source_file: modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: xunit.runner.visualstudio
+        ecosystem: nuget
+        blip_type: package
+        version: "2.5.3"
+        is_dev: false
+        source_file: modernized/GymErp.IntegrationTests/Masterclass/sample04/src/GymErp.UnitTests/GymErp.UnitTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+      - name: xunit.runner.visualstudio
+        ecosystem: nuget
+        blip_type: package
+        version: "2.8.2"
+        is_dev: false
+        source_file: modernized/GymErp.UnitTests/GymErp.UnitTests.csproj
+        description: null
+        usage_count: null
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        latest_stable_version: null
+        versions_behind: null
+        days_behind_latest: null
+        last_published_at: null
+        dependents_count: null
+        advisories: []
+        first_introduced_at: null
+        ecosystem_downloads: null
+blips:
+  - name: Autofac.Extensions.DependencyInjection
+    slug: nuget__autofac-extensions-dependencyinjection
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: assess
+    proposed_confidence: low
+    proposed_rationale: "Uso observado em apenas 1 projeto e sinais externos não medidos; manter em avaliação antes de ampliar a adoção."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: "01120fb395578a9bb93f5f31bd14acb9a7522f0f638fa39846f954572392b9b7"
+    occurrences:
+      - repo_id: sample05
+        source_file: modernized/GymErp/GymErp.csproj
+        version: "10.0.0"
+        is_dev: false
+    versions:
+      - version: "10.0.0"
+        repos: [sample05]
+        source_files: ["sample05:modernized/GymErp/GymErp.csproj"]
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 1
+      occurrence_count: 1
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Autofac
+    slug: nuget__autofac
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: assess
+    proposed_confidence: low
+    proposed_rationale: "Uso observado em apenas 1 projeto e sinais externos não medidos; manter em avaliação antes de ampliar a adoção."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: "5dbe6fef3334d9e16deb6bb015541881a22f35437386be7e55881fcb8e43e0ca"
+    occurrences:
+      - repo_id: sample05
+        source_file: modernized/GymErp/GymErp.csproj
+        version: "8.3.0"
+        is_dev: false
+    versions:
+      - version: "8.3.0"
+        repos: [sample05]
+        source_files: ["sample05:modernized/GymErp/GymErp.csproj"]
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 1
+      occurrence_count: 1
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: coverlet.collector
+    slug: nuget__coverlet-collector
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: trial
+    proposed_confidence: medium
+    proposed_rationale: "Presença em 4 projetos, com 3 versões observadas; ampliar o uso somente após revisar a padronização e os sinais externos não medidos."
+    proposal_evidence:
+      - signals.project_count
+      - signals.version_spread
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: "504e0c9423e22e4e1eff1ab325891d9d1ccb6b0f09ed4887f11620911cae2320"
+    occurrences:
+      - repo_id: sample05
+        source_file: legacy/Gymerp.IntegrationTests/Gymerp.IntegrationTests.csproj
+        version: "6.0.4"
+        is_dev: false
+      - repo_id: sample05
+        source_file: modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj
+        version: "6.0.2"
+        is_dev: false
+      - repo_id: sample05
+        source_file: modernized/GymErp.IntegrationTests/Masterclass/sample04/src/GymErp.UnitTests/GymErp.UnitTests.csproj
+        version: "6.0.0"
+        is_dev: false
+      - repo_id: sample05
+        source_file: modernized/GymErp.UnitTests/GymErp.UnitTests.csproj
+        version: "6.0.2"
+        is_dev: false
+    versions:
+      - version: "6.0.0"
+        repos: [sample05]
+        source_files:
+          - "sample05:modernized/GymErp.IntegrationTests/Masterclass/sample04/src/GymErp.UnitTests/GymErp.UnitTests.csproj"
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+      - version: "6.0.2"
+        repos: [sample05]
+        source_files:
+          - "sample05:modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj"
+          - "sample05:modernized/GymErp.UnitTests/GymErp.UnitTests.csproj"
+        occurrence_count: 2
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+      - version: "6.0.4"
+        repos: [sample05]
+        source_files:
+          - "sample05:legacy/Gymerp.IntegrationTests/Gymerp.IntegrationTests.csproj"
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 4
+      occurrence_count: 4
+      version_spread: 3
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: CSharpFunctionalExtensions
+    slug: nuget__csharpfunctionalextensions
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: assess
+    proposed_confidence: low
+    proposed_rationale: "Uso observado em apenas 1 projeto e sinais externos não medidos; manter em avaliação antes de ampliar a adoção."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: "13a9fb34bcfef274b639da6d2fafc65b8af47d93b653f26af675447a193a684c"
+    occurrences:
+      - repo_id: sample05
+        source_file: modernized/GymErp/GymErp.csproj
+        version: "3.6.0"
+        is_dev: false
+    versions:
+      - version: "3.6.0"
+        repos: [sample05]
+        source_files: ["sample05:modernized/GymErp/GymErp.csproj"]
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 1
+      occurrence_count: 1
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Dapper
+    slug: nuget__dapper
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: assess
+    proposed_confidence: low
+    proposed_rationale: "Uso observado em apenas 1 projeto e sinais externos não medidos; manter em avaliação antes de ampliar a adoção."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: da3ca73d9bf54f71b768ec55fe08e90dfbe8a7341244192ca32c71ac571416f4
+    occurrences:
+      - repo_id: sample05
+        source_file: modernized/GymErp/GymErp.csproj
+        version: "2.1.66"
+        is_dev: false
+    versions:
+      - version: "2.1.66"
+        repos: [sample05]
+        source_files: ["sample05:modernized/GymErp/GymErp.csproj"]
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 1
+      occurrence_count: 1
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: FastEndpoints.Swagger
+    slug: nuget__fastendpoints-swagger
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: assess
+    proposed_confidence: low
+    proposed_rationale: "Uso observado em apenas 1 projeto e sinais externos não medidos; manter em avaliação antes de ampliar a adoção."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: "99b46f778480a7b5f2c4c3dcc6b6019930cc0c5f499545ef609c9f84cb7087c7"
+    occurrences:
+      - repo_id: sample05
+        source_file: modernized/GymErp/GymErp.csproj
+        version: "6.1.0"
+        is_dev: false
+    versions:
+      - version: "6.1.0"
+        repos: [sample05]
+        source_files: ["sample05:modernized/GymErp/GymErp.csproj"]
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 1
+      occurrence_count: 1
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: FastEndpoints.Testing
+    slug: nuget__fastendpoints-testing
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: assess
+    proposed_confidence: low
+    proposed_rationale: "Uso observado em apenas 1 projeto e sinais externos não medidos; manter em avaliação antes de ampliar a adoção."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: ecfd959907c4c15a2cdc651c87899c3b73a2f30bd9b779cfe5cf5bb1192c1efd
+    occurrences:
+      - repo_id: sample05
+        source_file: modernized/GymErp.UnitTests/GymErp.UnitTests.csproj
+        version: "5.21.0"
+        is_dev: false
+    versions:
+      - version: "5.21.0"
+        repos: [sample05]
+        source_files: ["sample05:modernized/GymErp.UnitTests/GymErp.UnitTests.csproj"]
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 1
+      occurrence_count: 1
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: FastEndpoints
+    slug: nuget__fastendpoints
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: assess
+    proposed_confidence: low
+    proposed_rationale: "Uso observado em apenas 1 projeto e sinais externos não medidos; manter em avaliação antes de ampliar a adoção."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: "99b46f778480a7b5f2c4c3dcc6b6019930cc0c5f499545ef609c9f84cb7087c7"
+    occurrences:
+      - repo_id: sample05
+        source_file: modernized/GymErp/GymErp.csproj
+        version: "6.1.0"
+        is_dev: false
+    versions:
+      - version: "6.1.0"
+        repos: [sample05]
+        source_files: ["sample05:modernized/GymErp/GymErp.csproj"]
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 1
+      occurrence_count: 1
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: FluentAssertions
+    slug: nuget__fluentassertions
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: trial
+    proposed_confidence: medium
+    proposed_rationale: "Presença consistente em 2 projetos, mas sinais externos permanecem não medidos; considerar uso controlado antes de padronizar."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: "2dbb644cd67a825168aed0814e1705daab01ef17b24a866dedf76a2bc029ec3d"
+    occurrences:
+      - repo_id: sample05
+        source_file: modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj
+        version: "6.12.2"
+        is_dev: false
+      - repo_id: sample05
+        source_file: modernized/GymErp.UnitTests/GymErp.UnitTests.csproj
+        version: "6.12.2"
+        is_dev: false
+    versions:
+      - version: "6.12.2"
+        repos: [sample05]
+        source_files:
+          - "sample05:modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj"
+          - "sample05:modernized/GymErp.UnitTests/GymErp.UnitTests.csproj"
+        occurrence_count: 2
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 2
+      occurrence_count: 2
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Flurl.Http
+    slug: nuget__flurl-http
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: trial
+    proposed_confidence: medium
+    proposed_rationale: "Presença consistente em 3 projetos, mas sinais externos permanecem não medidos; considerar uso controlado antes de padronizar."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: "1453a71f46fffefddf98af574f0ce41623f616e902691d92ec16e527dfaa9413"
+    occurrences:
+      - repo_id: sample05
+        source_file: modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj
+        version: "4.0.2"
+        is_dev: false
+      - repo_id: sample05
+        source_file: modernized/GymErp.UnitTests/GymErp.UnitTests.csproj
+        version: "4.0.2"
+        is_dev: false
+      - repo_id: sample05
+        source_file: modernized/GymErp/GymErp.csproj
+        version: "4.0.2"
+        is_dev: false
+    versions:
+      - version: "4.0.2"
+        repos: [sample05]
+        source_files:
+          - "sample05:modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj"
+          - "sample05:modernized/GymErp.UnitTests/GymErp.UnitTests.csproj"
+          - "sample05:modernized/GymErp/GymErp.csproj"
+        occurrence_count: 3
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 3
+      occurrence_count: 3
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Flurl
+    slug: nuget__flurl
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: assess
+    proposed_confidence: low
+    proposed_rationale: "Uso observado em apenas 1 projeto e sinais externos não medidos; manter em avaliação antes de ampliar a adoção."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: "409f42ddef39463caef66b1f6f71f23b0484e596908d5767610f312a9e199250"
+    occurrences:
+      - repo_id: sample05
+        source_file: modernized/GymErp/GymErp.csproj
+        version: "4.0.0"
+        is_dev: false
+    versions:
+      - version: "4.0.0"
+        repos: [sample05]
+        source_files: ["sample05:modernized/GymErp/GymErp.csproj"]
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 1
+      occurrence_count: 1
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Microsoft.AspNetCore.OpenApi
+    slug: nuget__microsoft-aspnetcore-openapi
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: trial
+    proposed_confidence: medium
+    proposed_rationale: "Presença em 3 projetos, com 2 versões observadas; ampliar o uso somente após revisar a padronização e os sinais externos não medidos."
+    proposal_evidence:
+      - signals.project_count
+      - signals.version_spread
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: b99a2ee8b329488c04922c37e53fe8985d5c1f6ea19ec4a11aa79de6dc9320bf
+    occurrences:
+      - repo_id: sample05
+        source_file: legacy/Gymerp.Api/Gymerp.Api.csproj
+        version: "9.0.9"
+        is_dev: false
+      - repo_id: sample05
+        source_file: legacy/Gymerp.QueueConsumer/Gymerp.QueueConsumer.csproj
+        version: "9.0.9"
+        is_dev: false
+      - repo_id: sample05
+        source_file: modernized/GymErp/GymErp.csproj
+        version: "9.0.0"
+        is_dev: false
+    versions:
+      - version: "9.0.0"
+        repos: [sample05]
+        source_files: ["sample05:modernized/GymErp/GymErp.csproj"]
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+      - version: "9.0.9"
+        repos: [sample05]
+        source_files:
+          - "sample05:legacy/Gymerp.Api/Gymerp.Api.csproj"
+          - "sample05:legacy/Gymerp.QueueConsumer/Gymerp.QueueConsumer.csproj"
+        occurrence_count: 2
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 3
+      occurrence_count: 3
+      version_spread: 2
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Microsoft.EntityFrameworkCore.Design
+    slug: nuget__microsoft-entityframeworkcore-design
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: trial
+    proposed_confidence: medium
+    proposed_rationale: "Presença consistente em 2 projetos, mas sinais externos permanecem não medidos; considerar uso controlado antes de padronizar."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: "13a0bb60e373df651d9c5998659b220c13f2f68ad7f796ab1ce1571c3fe1f82b"
+    occurrences:
+      - repo_id: sample05
+        source_file: legacy/Gymerp.Api/Gymerp.Api.csproj
+        version: "9.0.9"
+        is_dev: false
+      - repo_id: sample05
+        source_file: legacy/Gymerp.Infrastructure/Gymerp.Infrastructure.csproj
+        version: "9.0.9"
+        is_dev: false
+    versions:
+      - version: "9.0.9"
+        repos: [sample05]
+        source_files:
+          - "sample05:legacy/Gymerp.Api/Gymerp.Api.csproj"
+          - "sample05:legacy/Gymerp.Infrastructure/Gymerp.Infrastructure.csproj"
+        occurrence_count: 2
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 2
+      occurrence_count: 2
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Microsoft.EntityFrameworkCore.Relational
+    slug: nuget__microsoft-entityframeworkcore-relational
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: assess
+    proposed_confidence: low
+    proposed_rationale: "Uso observado em apenas 1 projeto e sinais externos não medidos; manter em avaliação antes de ampliar a adoção."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: "73fd0974e0632fd614b0c822176e77f9619a24a4180f4553b991f08bdcda97ff"
+    occurrences:
+      - repo_id: sample05
+        source_file: legacy/Gymerp.Worker/Gymerp.Worker.csproj
+        version: "9.0.9"
+        is_dev: false
+    versions:
+      - version: "9.0.9"
+        repos: [sample05]
+        source_files: ["sample05:legacy/Gymerp.Worker/Gymerp.Worker.csproj"]
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 1
+      occurrence_count: 1
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Microsoft.EntityFrameworkCore.SqlServer
+    slug: nuget__microsoft-entityframeworkcore-sqlserver
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: assess
+    proposed_confidence: low
+    proposed_rationale: "Uso observado em apenas 1 projeto e sinais externos não medidos; manter em avaliação antes de ampliar a adoção."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: "09e1962518020af7915105e926863f0f36a96f01c8ecf8ae4bb462f71a9edf4b"
+    occurrences:
+      - repo_id: sample05
+        source_file: legacy/Gymerp.IntegrationTests/Gymerp.IntegrationTests.csproj
+        version: "9.0.9"
+        is_dev: false
+    versions:
+      - version: "9.0.9"
+        repos: [sample05]
+        source_files:
+          - "sample05:legacy/Gymerp.IntegrationTests/Gymerp.IntegrationTests.csproj"
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 1
+      occurrence_count: 1
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Microsoft.EntityFrameworkCore
+    slug: nuget__microsoft-entityframeworkcore
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: trial
+    proposed_confidence: medium
+    proposed_rationale: "Presença em 3 projetos, com 2 versões observadas; ampliar o uso somente após revisar a padronização e os sinais externos não medidos."
+    proposal_evidence:
+      - signals.project_count
+      - signals.version_spread
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: "8620439bef2a9cdbf429291021b9d78153d62630102a0d3ba3cf991df1ac2f43"
+    occurrences:
+      - repo_id: sample05
+        source_file: legacy/Gymerp.Infrastructure/Gymerp.Infrastructure.csproj
+        version: "9.0.9"
+        is_dev: false
+      - repo_id: sample05
+        source_file: legacy/Gymerp.Worker/Gymerp.Worker.csproj
+        version: "9.0.9"
+        is_dev: false
+      - repo_id: sample05
+        source_file: modernized/GymErp/GymErp.csproj
+        version: "9.0.5"
+        is_dev: false
+    versions:
+      - version: "9.0.5"
+        repos: [sample05]
+        source_files: ["sample05:modernized/GymErp/GymErp.csproj"]
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+      - version: "9.0.9"
+        repos: [sample05]
+        source_files:
+          - "sample05:legacy/Gymerp.Infrastructure/Gymerp.Infrastructure.csproj"
+          - "sample05:legacy/Gymerp.Worker/Gymerp.Worker.csproj"
+        occurrence_count: 2
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 3
+      occurrence_count: 3
+      version_spread: 2
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Microsoft.Extensions.Hosting
+    slug: nuget__microsoft-extensions-hosting
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: assess
+    proposed_confidence: low
+    proposed_rationale: "Uso observado em apenas 1 projeto e sinais externos não medidos; manter em avaliação antes de ampliar a adoção."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: "73fd0974e0632fd614b0c822176e77f9619a24a4180f4553b991f08bdcda97ff"
+    occurrences:
+      - repo_id: sample05
+        source_file: legacy/Gymerp.Worker/Gymerp.Worker.csproj
+        version: "9.0.9"
+        is_dev: false
+    versions:
+      - version: "9.0.9"
+        repos: [sample05]
+        source_files: ["sample05:legacy/Gymerp.Worker/Gymerp.Worker.csproj"]
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 1
+      occurrence_count: 1
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Microsoft.Extensions.Logging.Abstractions
+    slug: nuget__microsoft-extensions-logging-abstractions
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: assess
+    proposed_confidence: low
+    proposed_rationale: "Uso observado em apenas 1 projeto e sinais externos não medidos; manter em avaliação antes de ampliar a adoção."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: fd6c3cce929505d623f36001aaf740c916ef275fe90f8793a5d40a53a896d416
+    occurrences:
+      - repo_id: sample05
+        source_file: legacy/Gymerp.Application/Gymerp.Application.csproj
+        version: "9.0.9"
+        is_dev: false
+    versions:
+      - version: "9.0.9"
+        repos: [sample05]
+        source_files: ["sample05:legacy/Gymerp.Application/Gymerp.Application.csproj"]
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 1
+      occurrence_count: 1
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Microsoft.NET.Test.Sdk
+    slug: nuget__microsoft-net-test-sdk
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: trial
+    proposed_confidence: medium
+    proposed_rationale: "Presença em 4 projetos, com 3 versões observadas; ampliar o uso somente após revisar a padronização e os sinais externos não medidos."
+    proposal_evidence:
+      - signals.project_count
+      - signals.version_spread
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: b8eed1042c7dc99892f05cf5ea3950e0c77c9c4dc149b59f6766d34092b37bce
+    occurrences:
+      - repo_id: sample05
+        source_file: legacy/Gymerp.IntegrationTests/Gymerp.IntegrationTests.csproj
+        version: "17.14.1"
+        is_dev: false
+      - repo_id: sample05
+        source_file: modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj
+        version: "17.12.0"
+        is_dev: false
+      - repo_id: sample05
+        source_file: modernized/GymErp.IntegrationTests/Masterclass/sample04/src/GymErp.UnitTests/GymErp.UnitTests.csproj
+        version: "17.8.0"
+        is_dev: false
+      - repo_id: sample05
+        source_file: modernized/GymErp.UnitTests/GymErp.UnitTests.csproj
+        version: "17.12.0"
+        is_dev: false
+    versions:
+      - version: "17.12.0"
+        repos: [sample05]
+        source_files:
+          - "sample05:modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj"
+          - "sample05:modernized/GymErp.UnitTests/GymErp.UnitTests.csproj"
+        occurrence_count: 2
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+      - version: "17.14.1"
+        repos: [sample05]
+        source_files:
+          - "sample05:legacy/Gymerp.IntegrationTests/Gymerp.IntegrationTests.csproj"
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+      - version: "17.8.0"
+        repos: [sample05]
+        source_files:
+          - "sample05:modernized/GymErp.IntegrationTests/Masterclass/sample04/src/GymErp.UnitTests/GymErp.UnitTests.csproj"
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 4
+      occurrence_count: 4
+      version_spread: 3
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Moq
+    slug: nuget__moq
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: trial
+    proposed_confidence: medium
+    proposed_rationale: "Presença consistente em 3 projetos, mas sinais externos permanecem não medidos; considerar uso controlado antes de padronizar."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: "5d52a12c51a61809b3546c71ea3282e23d499277ec7020cc1da5327f88ca87a3"
+    occurrences:
+      - repo_id: sample05
+        source_file: legacy/Gymerp.IntegrationTests/Gymerp.IntegrationTests.csproj
+        version: "4.20.72"
+        is_dev: false
+      - repo_id: sample05
+        source_file: modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj
+        version: "4.20.72"
+        is_dev: false
+      - repo_id: sample05
+        source_file: modernized/GymErp.UnitTests/GymErp.UnitTests.csproj
+        version: "4.20.72"
+        is_dev: false
+    versions:
+      - version: "4.20.72"
+        repos: [sample05]
+        source_files:
+          - "sample05:legacy/Gymerp.IntegrationTests/Gymerp.IntegrationTests.csproj"
+          - "sample05:modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj"
+          - "sample05:modernized/GymErp.UnitTests/GymErp.UnitTests.csproj"
+        occurrence_count: 3
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 3
+      occurrence_count: 3
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Npgsql.EntityFrameworkCore.PostgreSQL
+    slug: nuget__npgsql-entityframeworkcore-postgresql
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: trial
+    proposed_confidence: medium
+    proposed_rationale: "Presença consistente em 2 projetos, mas sinais externos permanecem não medidos; considerar uso controlado antes de padronizar."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: "315a6bfdb523c35a851d0b7b676402f4eba575457fc37a8123f4ccd9d97d5ed6"
+    occurrences:
+      - repo_id: sample05
+        source_file: legacy/Gymerp.Infrastructure/Gymerp.Infrastructure.csproj
+        version: "9.0.4"
+        is_dev: false
+      - repo_id: sample05
+        source_file: modernized/GymErp/GymErp.csproj
+        version: "9.0.4"
+        is_dev: false
+    versions:
+      - version: "9.0.4"
+        repos: [sample05]
+        source_files:
+          - "sample05:legacy/Gymerp.Infrastructure/Gymerp.Infrastructure.csproj"
+          - "sample05:modernized/GymErp/GymErp.csproj"
+        occurrence_count: 2
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 2
+      occurrence_count: 2
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Npgsql
+    slug: nuget__npgsql
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: assess
+    proposed_confidence: low
+    proposed_rationale: "Uso observado em apenas 1 projeto e sinais externos não medidos; manter em avaliação antes de ampliar a adoção."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: "9cb8e3b371bea2aa0cbb0b7da4ef8afad5304ac47bb8c3b9196cce9930cb7592"
+    occurrences:
+      - repo_id: sample05
+        source_file: modernized/GymErp/GymErp.csproj
+        version: "9.0.3"
+        is_dev: false
+    versions:
+      - version: "9.0.3"
+        repos: [sample05]
+        source_files: ["sample05:modernized/GymErp/GymErp.csproj"]
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 1
+      occurrence_count: 1
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Polly
+    slug: nuget__polly
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: assess
+    proposed_confidence: low
+    proposed_rationale: "Uso observado em apenas 1 projeto e sinais externos não medidos; manter em avaliação antes de ampliar a adoção."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: "0dca441d13fb1f528714ad3ec298c1db87c0ca343337b4527fca6cb130a02006"
+    occurrences:
+      - repo_id: sample05
+        source_file: modernized/GymErp/GymErp.csproj
+        version: "8.5.2"
+        is_dev: false
+    versions:
+      - version: "8.5.2"
+        repos: [sample05]
+        source_files: ["sample05:modernized/GymErp/GymErp.csproj"]
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 1
+      occurrence_count: 1
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Serilog.AspNetCore
+    slug: nuget__serilog-aspnetcore
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: assess
+    proposed_confidence: low
+    proposed_rationale: "Uso observado em apenas 1 projeto e sinais externos não medidos; manter em avaliação antes de ampliar a adoção."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: "072319fa72b44654f5fbfd13fe2f9c25656ab4b4d4bf3a98e1b6ae307cda2169"
+    occurrences:
+      - repo_id: sample05
+        source_file: modernized/GymErp/GymErp.csproj
+        version: "9.0.0"
+        is_dev: false
+    versions:
+      - version: "9.0.0"
+        repos: [sample05]
+        source_files: ["sample05:modernized/GymErp/GymErp.csproj"]
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 1
+      occurrence_count: 1
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Serilog.Enrichers.Thread
+    slug: nuget__serilog-enrichers-thread
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: assess
+    proposed_confidence: low
+    proposed_rationale: "Uso observado em apenas 1 projeto e sinais externos não medidos; manter em avaliação antes de ampliar a adoção."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: "409f42ddef39463caef66b1f6f71f23b0484e596908d5767610f312a9e199250"
+    occurrences:
+      - repo_id: sample05
+        source_file: modernized/GymErp/GymErp.csproj
+        version: "4.0.0"
+        is_dev: false
+    versions:
+      - version: "4.0.0"
+        repos: [sample05]
+        source_files: ["sample05:modernized/GymErp/GymErp.csproj"]
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 1
+      occurrence_count: 1
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Serilog.Extensions.Hosting
+    slug: nuget__serilog-extensions-hosting
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: assess
+    proposed_confidence: low
+    proposed_rationale: "Uso observado em apenas 1 projeto e sinais externos não medidos; manter em avaliação antes de ampliar a adoção."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: "072319fa72b44654f5fbfd13fe2f9c25656ab4b4d4bf3a98e1b6ae307cda2169"
+    occurrences:
+      - repo_id: sample05
+        source_file: modernized/GymErp/GymErp.csproj
+        version: "9.0.0"
+        is_dev: false
+    versions:
+      - version: "9.0.0"
+        repos: [sample05]
+        source_files: ["sample05:modernized/GymErp/GymErp.csproj"]
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 1
+      occurrence_count: 1
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Silverback.Integration.Kafka
+    slug: nuget__silverback-integration-kafka
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: assess
+    proposed_confidence: low
+    proposed_rationale: "Uso observado em apenas 1 projeto e sinais externos não medidos; manter em avaliação antes de ampliar a adoção."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: f74d9bbdf05c768f2a747c50cb5f30e6e7c9f5308ee633695c42bf7d3ef02354
+    occurrences:
+      - repo_id: sample05
+        source_file: modernized/GymErp/GymErp.csproj
+        version: "4.5.0"
+        is_dev: false
+    versions:
+      - version: "4.5.0"
+        repos: [sample05]
+        source_files: ["sample05:modernized/GymErp/GymErp.csproj"]
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 1
+      occurrence_count: 1
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Silverback.Integration.Testing
+    slug: nuget__silverback-integration-testing
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: assess
+    proposed_confidence: low
+    proposed_rationale: "Uso observado em apenas 1 projeto e sinais externos não medidos; manter em avaliação antes de ampliar a adoção."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: "059e33e5289d17e1f7c2041cb5b152e6f2bdf25ea53cbe09202a3fe5ba43fcd3"
+    occurrences:
+      - repo_id: sample05
+        source_file: modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj
+        version: "4.5.0"
+        is_dev: false
+    versions:
+      - version: "4.5.0"
+        repos: [sample05]
+        source_files:
+          - "sample05:modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj"
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 1
+      occurrence_count: 1
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Silverback.Integration
+    slug: nuget__silverback-integration
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: assess
+    proposed_confidence: low
+    proposed_rationale: "Uso observado em apenas 1 projeto e sinais externos não medidos; manter em avaliação antes de ampliar a adoção."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: f74d9bbdf05c768f2a747c50cb5f30e6e7c9f5308ee633695c42bf7d3ef02354
+    occurrences:
+      - repo_id: sample05
+        source_file: modernized/GymErp/GymErp.csproj
+        version: "4.5.0"
+        is_dev: false
+    versions:
+      - version: "4.5.0"
+        repos: [sample05]
+        source_files: ["sample05:modernized/GymErp/GymErp.csproj"]
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 1
+      occurrence_count: 1
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Swashbuckle.AspNetCore
+    slug: nuget__swashbuckle-aspnetcore
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: trial
+    proposed_confidence: medium
+    proposed_rationale: "Presença em 3 projetos, com 2 versões observadas; ampliar o uso somente após revisar a padronização e os sinais externos não medidos."
+    proposal_evidence:
+      - signals.project_count
+      - signals.version_spread
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: ce2c5d3a740efa863a43bc825d912e72fc80af9a6592b4d7b1e070684046855b
+    occurrences:
+      - repo_id: sample05
+        source_file: legacy/Gymerp.Api/Gymerp.Api.csproj
+        version: "9.0.4"
+        is_dev: false
+      - repo_id: sample05
+        source_file: legacy/Gymerp.QueueConsumer/Gymerp.QueueConsumer.csproj
+        version: "9.0.4"
+        is_dev: false
+      - repo_id: sample05
+        source_file: modernized/GymErp/GymErp.csproj
+        version: "7.2.0"
+        is_dev: false
+    versions:
+      - version: "7.2.0"
+        repos: [sample05]
+        source_files: ["sample05:modernized/GymErp/GymErp.csproj"]
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+      - version: "9.0.4"
+        repos: [sample05]
+        source_files:
+          - "sample05:legacy/Gymerp.Api/Gymerp.Api.csproj"
+          - "sample05:legacy/Gymerp.QueueConsumer/Gymerp.QueueConsumer.csproj"
+        occurrence_count: 2
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 3
+      occurrence_count: 3
+      version_spread: 2
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Testcontainers.Kafka
+    slug: nuget__testcontainers-kafka
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: assess
+    proposed_confidence: low
+    proposed_rationale: "Uso observado em apenas 1 projeto e sinais externos não medidos; manter em avaliação antes de ampliar a adoção."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: "8ee63c8ce69713544e999b96f25a19f212b294bffebad10be155fb14a71803d7"
+    occurrences:
+      - repo_id: sample05
+        source_file: modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj
+        version: "4.0.0"
+        is_dev: false
+    versions:
+      - version: "4.0.0"
+        repos: [sample05]
+        source_files:
+          - "sample05:modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj"
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 1
+      occurrence_count: 1
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Testcontainers.MsSql
+    slug: nuget__testcontainers-mssql
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: assess
+    proposed_confidence: low
+    proposed_rationale: "Uso observado em apenas 1 projeto e sinais externos não medidos; manter em avaliação antes de ampliar a adoção."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: "1efc1417295410251060c3ee450b4f7a4c8e021d4dee7f01397492410a3f6d66"
+    occurrences:
+      - repo_id: sample05
+        source_file: legacy/Gymerp.IntegrationTests/Gymerp.IntegrationTests.csproj
+        version: "4.7.0"
+        is_dev: false
+    versions:
+      - version: "4.7.0"
+        repos: [sample05]
+        source_files:
+          - "sample05:legacy/Gymerp.IntegrationTests/Gymerp.IntegrationTests.csproj"
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 1
+      occurrence_count: 1
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Testcontainers.PostgreSql
+    slug: nuget__testcontainers-postgresql
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: assess
+    proposed_confidence: low
+    proposed_rationale: "Uso observado em apenas 1 projeto e sinais externos não medidos; manter em avaliação antes de ampliar a adoção."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: "8ee63c8ce69713544e999b96f25a19f212b294bffebad10be155fb14a71803d7"
+    occurrences:
+      - repo_id: sample05
+        source_file: modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj
+        version: "4.0.0"
+        is_dev: false
+    versions:
+      - version: "4.0.0"
+        repos: [sample05]
+        source_files:
+          - "sample05:modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj"
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 1
+      occurrence_count: 1
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: Testcontainers
+    slug: nuget__testcontainers
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: assess
+    proposed_confidence: low
+    proposed_rationale: "Uso observado em apenas 1 projeto e sinais externos não medidos; manter em avaliação antes de ampliar a adoção."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: "8ee63c8ce69713544e999b96f25a19f212b294bffebad10be155fb14a71803d7"
+    occurrences:
+      - repo_id: sample05
+        source_file: modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj
+        version: "4.0.0"
+        is_dev: false
+    versions:
+      - version: "4.0.0"
+        repos: [sample05]
+        source_files:
+          - "sample05:modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj"
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 1
+      occurrence_count: 1
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: WorkflowCore
+    slug: nuget__workflowcore
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: assess
+    proposed_confidence: low
+    proposed_rationale: "Uso observado em apenas 1 projeto e sinais externos não medidos; manter em avaliação antes de ampliar a adoção."
+    proposal_evidence:
+      - signals.project_count
+      - "occurrences[0].source_file"
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: b4a2eab42a2ee4b86618d4d2642a3d4dbf2f6f4fd9fe19c2c2942d95eae4fa58
+    occurrences:
+      - repo_id: sample05
+        source_file: modernized/GymErp/GymErp.csproj
+        version: "3.13.0"
+        is_dev: false
+    versions:
+      - version: "3.13.0"
+        repos: [sample05]
+        source_files: ["sample05:modernized/GymErp/GymErp.csproj"]
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 1
+      occurrence_count: 1
+      version_spread: 1
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: xunit.runner.visualstudio
+    slug: nuget__xunit-runner-visualstudio
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: trial
+    proposed_confidence: medium
+    proposed_rationale: "Presença em 4 projetos, com 3 versões observadas; ampliar o uso somente após revisar a padronização e os sinais externos não medidos."
+    proposal_evidence:
+      - signals.project_count
+      - signals.version_spread
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: e77c930d6c0caf70fdedd5a36c0dfe4c63e6a52417bd176f4e884a819c8c72a0
+    occurrences:
+      - repo_id: sample05
+        source_file: legacy/Gymerp.IntegrationTests/Gymerp.IntegrationTests.csproj
+        version: "3.1.4"
+        is_dev: false
+      - repo_id: sample05
+        source_file: modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj
+        version: "2.8.2"
+        is_dev: false
+      - repo_id: sample05
+        source_file: modernized/GymErp.IntegrationTests/Masterclass/sample04/src/GymErp.UnitTests/GymErp.UnitTests.csproj
+        version: "2.5.3"
+        is_dev: false
+      - repo_id: sample05
+        source_file: modernized/GymErp.UnitTests/GymErp.UnitTests.csproj
+        version: "2.8.2"
+        is_dev: false
+    versions:
+      - version: "2.5.3"
+        repos: [sample05]
+        source_files:
+          - "sample05:modernized/GymErp.IntegrationTests/Masterclass/sample04/src/GymErp.UnitTests/GymErp.UnitTests.csproj"
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+      - version: "2.8.2"
+        repos: [sample05]
+        source_files:
+          - "sample05:modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj"
+          - "sample05:modernized/GymErp.UnitTests/GymErp.UnitTests.csproj"
+        occurrence_count: 2
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+      - version: "3.1.4"
+        repos: [sample05]
+        source_files:
+          - "sample05:legacy/Gymerp.IntegrationTests/Gymerp.IntegrationTests.csproj"
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 4
+      occurrence_count: 4
+      version_spread: 3
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown
+  - name: xunit
+    slug: nuget__xunit
+    description: null
+    blip_type: package
+    ecosystem: nuget
+    quadrant: languages_and_frameworks
+    active: true
+    proposed_ring: trial
+    proposed_confidence: medium
+    proposed_rationale: "Presença em 4 projetos, com 3 versões observadas; ampliar o uso somente após revisar a padronização e os sinais externos não medidos."
+    proposal_evidence:
+      - signals.project_count
+      - signals.version_spread
+      - signals.freshness.latest_stable_version
+      - signals.license_risk
+    decision_status: proposed
+    ring: null
+    decided_by: null
+    decided_at: null
+    decision_rationale: null
+    reviewer_note: null
+    needs_review: false
+    facts_hash: de1e3fd67c29c5f20ecd813bbf53c2c267a576e1faa0f3a6def2c3ffe72d5df6
+    occurrences:
+      - repo_id: sample05
+        source_file: legacy/Gymerp.IntegrationTests/Gymerp.IntegrationTests.csproj
+        version: "2.9.3"
+        is_dev: false
+      - repo_id: sample05
+        source_file: modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj
+        version: "2.9.2"
+        is_dev: false
+      - repo_id: sample05
+        source_file: modernized/GymErp.IntegrationTests/Masterclass/sample04/src/GymErp.UnitTests/GymErp.UnitTests.csproj
+        version: "2.5.3"
+        is_dev: false
+      - repo_id: sample05
+        source_file: modernized/GymErp.UnitTests/GymErp.UnitTests.csproj
+        version: "2.9.2"
+        is_dev: false
+    versions:
+      - version: "2.5.3"
+        repos: [sample05]
+        source_files:
+          - "sample05:modernized/GymErp.IntegrationTests/Masterclass/sample04/src/GymErp.UnitTests/GymErp.UnitTests.csproj"
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+      - version: "2.9.2"
+        repos: [sample05]
+        source_files:
+          - "sample05:modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj"
+          - "sample05:modernized/GymErp.UnitTests/GymErp.UnitTests.csproj"
+        occurrence_count: 2
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+      - version: "2.9.3"
+        repos: [sample05]
+        source_files:
+          - "sample05:legacy/Gymerp.IntegrationTests/Gymerp.IntegrationTests.csproj"
+        occurrence_count: 1
+        is_deprecated: null
+        licenses: null
+        license_risk: unknown
+        versions_behind: null
+        days_behind_latest: null
+        advisories: []
+    signals:
+      repo_count: 1
+      project_count: 4
+      occurrence_count: 4
+      version_spread: 3
+      last_seen: "2026-07-21T15:08:36.181Z"
+      coverage:
+        scanned_repos: 1
+        pending_repos: 0
+      advisory:
+        count: 0
+        max_severity: none
+      is_deprecated: false
+      freshness:
+        latest_stable_version: null
+        max_versions_behind: null
+        max_days_behind_latest: null
+      last_published_at: null
+      dependents_count: null
+      licenses: []
+      license_risk: unknown

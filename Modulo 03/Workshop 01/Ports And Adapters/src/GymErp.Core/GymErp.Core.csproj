@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <!--
+      O hexágono. Cockburn: "Ports & Adapters only specifies two layers, inside and outside."
+      Tudo o que é de dentro (domínio, portas e a implementação da porta de condução) fica aqui.
+      Nenhuma referência a EF Core, ASP.NET, broker ou Microsoft.Extensions.
+    -->
+    <ItemGroup>
+        <PackageReference Include="CSharpFunctionalExtensions" Version="3.6.0" />
+    </ItemGroup>
+
+</Project>

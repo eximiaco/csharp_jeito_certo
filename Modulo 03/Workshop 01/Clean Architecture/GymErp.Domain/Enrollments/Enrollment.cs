@@ -14,7 +14,6 @@ public sealed class Enrollment : Aggregate
         Client = client;
         RequestDate = requestDate;
         State = state;
-        _state = EnrollmentStateFactory.CreateState(state);
     }
 
     public Guid Id { get; private set; }
@@ -23,7 +22,11 @@ public sealed class Enrollment : Aggregate
     public EState State { get; private set; }
     public DateTime? SuspensionStartDate { get; private set; }
     public DateTime? SuspensionEndDate { get; private set; }
-    private IEnrollmentState _state = null!;
+
+    // O comportamento do State pattern é derivado do estado persistido.
+    // Assim a entidade funciona igual quando é criada por Create ou carregada pelo EF,
+    // que usa o construtor sem parâmetros e preenche só a propriedade State.
+    private IEnrollmentState Behavior => EnrollmentStateFactory.CreateState(State);
 
     public static Result<Enrollment> Create(Client client)
     {
@@ -40,8 +43,6 @@ public sealed class Enrollment : Aggregate
         string email,
         string phone,
         string document,
-        DateTime birthDate,
-        string gender,
         string address)
     {
         var client = new Client(document, name, email, phone, address);
@@ -50,7 +51,7 @@ public sealed class Enrollment : Aggregate
 
     public Result Activate()
     {
-        return _state.Activate(this);
+        return Behavior.Activate(this);
     }
 
     public Result Suspend(DateTime startDate, DateTime endDate)
@@ -62,7 +63,7 @@ public sealed class Enrollment : Aggregate
         if (endDate - startDate < minimumSuspensionPeriod)
             return Result.Failure("O período mínimo de suspensão é de 30 dias");
 
-        var result = _state.Suspend(this);
+        var result = Behavior.Suspend(this);
         if (result.IsSuccess)
         {
             SuspensionStartDate = startDate;
@@ -72,19 +73,18 @@ public sealed class Enrollment : Aggregate
         return result;
     }
 
-    public Result Cancel()
+    public Result Cancel(string reason)
     {
-        var result = _state.Cancel(this);
+        var result = Behavior.Cancel(this);
         if (result.IsSuccess)
         {
-            AddDomainEvent(new EnrollmentCanceledEvent(Id, DateTime.UtcNow));
+            AddDomainEvent(new EnrollmentCanceledEvent(Id, DateTime.UtcNow, reason));
         }
         return result;
     }
 
     internal void ChangeState(EState newState)
     {
-        _state = EnrollmentStateFactory.CreateState(newState);
         State = newState;
     }
 

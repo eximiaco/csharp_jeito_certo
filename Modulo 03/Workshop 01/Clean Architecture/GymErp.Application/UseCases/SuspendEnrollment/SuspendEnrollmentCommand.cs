@@ -1,19 +1,7 @@
 namespace GymErp.Application.UseCases.SuspendEnrollment;
 
+// A regra "suspensão mínima de 30 dias" mora só na entidade (Enrollment.Suspend).
 public record SuspendEnrollmentCommand(
     Guid EnrollmentId,
     DateTime SuspensionStartDate,
-    DateTime SuspensionEndDate)
-{
-    public bool IsValid()
-    {
-        if (SuspensionStartDate >= SuspensionEndDate)
-            return false;
-
-        var minimumSuspensionPeriod = TimeSpan.FromDays(30);
-        if (SuspensionEndDate - SuspensionStartDate < minimumSuspensionPeriod)
-            return false;
-
-        return true;
-    }
-}
+    DateTime SuspensionEndDate);

@@ -1,3 +1,4 @@
+using GymErp.Common;
 using GymErp.Domain.Financial.Features.ProcessCharging;
 using GymErp.Domain.Subscriptions.Aggreates.Enrollments;
 using GymErp.Domain.Subscriptions.Features.AddNewEnrollment;
@@ -28,11 +29,11 @@ public class MessagingFlowTests : IntegrationTestBase
 
         var dbContextAccessor = new EfDbContextAccessor<SubscriptionsDbContext>(_dbContext);
         var enrollmentRepository = new EnrollmentRepository(dbContextAccessor);
-        var unitOfWork = new UnitOfWork(_dbContext);
+        var unitOfWork = new UnitOfWork(dbContextAccessor);
         var subscriptionsHandler = new SubscriptionsHandler(
             enrollmentRepository,
             unitOfWork,
-            CancellationToken.None
+            NullLogger<SubscriptionsHandler>.Instance
         );
 
         _serviceProvider.GetService<IServiceCollection>()?.AddSingleton(financialHandler);
@@ -75,7 +76,7 @@ public class MessagingFlowTests : IntegrationTestBase
     {
         // Arrange
         var enrollmentId = Guid.NewGuid();
-        var enrollmentCreatedEvent = new EnrollmentCreatedEvent(enrollmentId);
+        var enrollmentCreatedEvent = new EnrollmentCreatedEvent(enrollmentId, string.Empty, DateTime.UtcNow);
 
         // Act
         await _financialHandler.HandleAsync(enrollmentCreatedEvent, CancellationToken.None);
@@ -89,7 +90,7 @@ public class MessagingFlowTests : IntegrationTestBase
     {
         // Arrange
         var enrollmentId = Guid.NewGuid();
-        var enrollmentCreatedEvent = new EnrollmentCreatedEvent(enrollmentId);
+        var enrollmentCreatedEvent = new EnrollmentCreatedEvent(enrollmentId, string.Empty, DateTime.UtcNow);
 
         // Act
         await _financialHandler.HandleAsync(enrollmentCreatedEvent, CancellationToken.None);

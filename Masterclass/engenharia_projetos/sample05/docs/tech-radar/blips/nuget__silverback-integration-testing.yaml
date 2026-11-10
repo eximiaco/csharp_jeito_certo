@@ -1,0 +1,57 @@
+name: Silverback.Integration.Testing
+slug: nuget__silverback-integration-testing
+description: null
+blip_type: package
+ecosystem: nuget
+quadrant: languages_and_frameworks
+active: true
+proposed_ring: assess
+proposed_confidence: low
+proposed_rationale: "Uso observado em apenas 1 projeto e sinais externos não medidos; manter em avaliação antes de ampliar a adoção."
+proposal_evidence: [signals.project_count, occurrences[0].source_file, signals.freshness.latest_stable_version, signals.license_risk]
+decision_status: proposed
+ring: null
+decided_by: null
+decided_at: null
+decision_rationale: null
+reviewer_note: null
+needs_review: false
+facts_hash: "059e33e5289d17e1f7c2041cb5b152e6f2bdf25ea53cbe09202a3fe5ba43fcd3"
+occurrences:
+  - repo_id: sample05
+    source_file: modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj
+    version: "4.5.0"
+    is_dev: false
+versions:
+  - version: "4.5.0"
+    repos: [sample05]
+    source_files:
+      - "sample05:modernized/GymErp.IntegrationTests/GymErp.IntegrationTests.csproj"
+    occurrence_count: 1
+    is_deprecated: null
+    licenses: null
+    license_risk: unknown
+    versions_behind: null
+    days_behind_latest: null
+    advisories: []
+signals:
+  repo_count: 1
+  project_count: 1
+  occurrence_count: 1
+  version_spread: 1
+  last_seen: "2026-07-21T15:08:36.181Z"
+  coverage:
+    scanned_repos: 1
+    pending_repos: 0
+  advisory:
+    count: 0
+    max_severity: none
+  is_deprecated: false
+  freshness:
+    latest_stable_version: null
+    max_versions_behind: null
+    max_days_behind_latest: null
+  last_published_at: null
+  dependents_count: null
+  licenses: []
+  license_risk: unknown

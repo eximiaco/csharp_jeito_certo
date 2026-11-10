@@ -7,19 +7,20 @@ public class CancelEnrollmentHandler(
     IEnrollmentRepository repository,
     IUnitOfWork unitOfWork) : ICancelEnrollmentUseCase
 {
-    public async Task<Result<CancelEnrollmentResponse>> HandleAsync(CancelEnrollmentRequest request, CancellationToken cancellationToken = default)
+    public async Task<Result<CancelEnrollmentResponse, EnrollmentError>> HandleAsync(CancelEnrollmentRequest request, CancellationToken cancellationToken = default)
     {
         var enrollment = await repository.GetByIdAsync(request.EnrollmentId, cancellationToken);
         if (enrollment == null)
-            return Result.Failure<CancelEnrollmentResponse>("Inscrição não encontrada");
+            return EnrollmentError.NotFound(request.EnrollmentId);
 
-        var cancelResult = enrollment.Cancel();
+        var cancelResult = enrollment.Cancel(request.Reason);
         if (cancelResult.IsFailure)
-            return Result.Failure<CancelEnrollmentResponse>(cancelResult.Error);
+            return EnrollmentError.RuleViolated(cancelResult.Error);
 
         await repository.UpdateAsync(enrollment, cancellationToken);
         await unitOfWork.Commit(cancellationToken);
 
-        return Result.Success(new CancelEnrollmentResponse(enrollment.Id, DateTime.UtcNow));
+        // A resposta é uma estrutura simples: a entidade não cruza a fronteira.
+        return new CancelEnrollmentResponse(enrollment.Id, DateTime.UtcNow);
     }
 }

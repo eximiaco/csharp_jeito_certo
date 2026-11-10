@@ -33,7 +33,7 @@ public class HandlerTests : IntegrationTestBase
     {
         // Arrange
         var enrollmentId = Guid.NewGuid();
-        var enrollmentCreatedEvent = new EnrollmentCreatedEvent(enrollmentId);
+        var enrollmentCreatedEvent = new EnrollmentCreatedEvent(enrollmentId, string.Empty, DateTime.UtcNow);
 
         // Act
         await _handler.HandleAsync(enrollmentCreatedEvent, CancellationToken.None);
@@ -47,7 +47,7 @@ public class HandlerTests : IntegrationTestBase
     {
         // Arrange
         var enrollmentId = Guid.NewGuid();
-        var enrollmentCreatedEvent = new EnrollmentCreatedEvent(enrollmentId);
+        var enrollmentCreatedEvent = new EnrollmentCreatedEvent(enrollmentId, string.Empty, DateTime.UtcNow);
 
         // Act
         await _handler.HandleAsync(enrollmentCreatedEvent, CancellationToken.None);

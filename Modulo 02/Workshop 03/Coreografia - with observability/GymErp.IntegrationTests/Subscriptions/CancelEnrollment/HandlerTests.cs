@@ -25,7 +25,7 @@ public class HandlerTests : IntegrationTestBase, IAsyncLifetime
         await base.InitializeAsync();
         _dbContextAccessor = new EfDbContextAccessor<SubscriptionsDbContext>(_dbContext);
         _enrollmentRepository = new EnrollmentRepository(_dbContextAccessor);
-        _unitOfWork = new UnitOfWork(_dbContext);
+        _unitOfWork = new UnitOfWork(_dbContextAccessor);
         _handler = new Handler(_enrollmentRepository, _unitOfWork);
 
         // Criar uma inscrição para os testes

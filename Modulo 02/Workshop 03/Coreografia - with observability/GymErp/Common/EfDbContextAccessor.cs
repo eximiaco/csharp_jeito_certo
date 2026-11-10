@@ -11,6 +11,10 @@ public sealed class EfDbContextAccessor<TDbContext> : IEfDbContextAccessor<TDbCo
 {
     private TDbContext? _contexto;
 
+    public EfDbContextAccessor() { }
+
+    public EfDbContextAccessor(TDbContext context) => Register(context);
+
     public void Register(TDbContext context)
     {
         _contexto = context ?? throw new ArgumentNullException(nameof(context));

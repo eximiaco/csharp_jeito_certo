@@ -1,0 +1,7 @@
+schema_version: 1
+title: "Tech Radar — GymErp Sample 05"
+repos:
+  - id: sample05
+    path: "/Users/gabrielkohlrausch/Documents/dev/csharp_jeito_certo/Masterclass/engenharia_projetos/sample05"
+    last_scanned_at: "2026-07-21T15:08:36.181Z"
+    status: scanned

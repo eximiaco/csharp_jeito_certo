@@ -55,6 +55,14 @@ try
         .CreateLogger();
     builder.Host.UseSerilog();
 
+    builder.Host.UseDefaultServiceProvider(options =>
+    {
+        options.ValidateScopes = true;
+        options.ValidateOnBuild = true;
+        // falha na startup, não em runtime
+    });
+
+
     builder.Services
         .AddVersioning()
         .AddStackExchangeRedisCache(opts =>

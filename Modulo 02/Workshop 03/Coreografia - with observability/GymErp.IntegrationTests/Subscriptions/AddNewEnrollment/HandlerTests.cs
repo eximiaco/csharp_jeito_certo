@@ -1,6 +1,7 @@
 using FluentAssertions;
 using GymErp.Common;
 using GymErp.Domain.Subscriptions;
+using Microsoft.Extensions.Logging.Abstractions;
 using GymErp.Domain.Subscriptions.Aggreates.Enrollments;
 using GymErp.Domain.Subscriptions.Features.AddNewEnrollment;
 using GymErp.Domain.Subscriptions.Infrastructure;
@@ -24,8 +25,8 @@ public class HandlerTests : IntegrationTestBase, IAsyncLifetime
         await base.InitializeAsync();
         _dbContextAccessor = new EfDbContextAccessor<SubscriptionsDbContext>(_dbContext);
         _enrollmentRepository = new EnrollmentRepository(_dbContextAccessor);
-        _unitOfWork = new UnitOfWork(_dbContext);
-        _handler = new Handler(_enrollmentRepository, _unitOfWork, CancellationToken.None);
+        _unitOfWork = new UnitOfWork(_dbContextAccessor);
+        _handler = new Handler(_enrollmentRepository, _unitOfWork, NullLogger<Handler>.Instance);
     }
 
     public new async Task DisposeAsync()

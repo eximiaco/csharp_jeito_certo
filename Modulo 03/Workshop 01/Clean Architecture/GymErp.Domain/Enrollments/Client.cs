@@ -2,11 +2,11 @@ namespace GymErp.Domain.Enrollments;
 
 public record Client
 {
-    public string Cpf { get; set; } = string.Empty;
-    public string Name { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-    public string Phone { get; set; } = string.Empty;
-    public string Address { get; set; } = string.Empty;
+    public string Cpf { get; init; } = string.Empty;
+    public string Name { get; init; } = string.Empty;
+    public string Email { get; init; } = string.Empty;
+    public string Phone { get; init; } = string.Empty;
+    public string Address { get; init; } = string.Empty;
 
     public Client() { }
 

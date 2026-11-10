@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <Nullable>enable</Nullable>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <!-- Casos de uso: conhecem Domain e uma biblioteca de Result. Nenhum framework (sem ASP.NET, EF Core ou Microsoft.Extensions). -->
     <ItemGroup>
         <PackageReference Include="CSharpFunctionalExtensions" Version="3.6.0" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
         <ProjectReference Include="..\GymErp.Domain\GymErp.Domain.csproj" />
     </ItemGroup>
 

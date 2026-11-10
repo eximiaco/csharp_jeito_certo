@@ -8,25 +8,22 @@ public class AddNewEnrollmentHandler(
     IEnrollmentRepository repository,
     IUnitOfWork unitOfWork) : IAddNewEnrollmentUseCase
 {
-    public async Task<Result<Guid>> HandleAsync(AddNewEnrollmentRequest request, CancellationToken cancellationToken = default)
+    public async Task<Result<Guid, EnrollmentError>> HandleAsync(AddNewEnrollmentRequest request, CancellationToken cancellationToken = default)
     {
         var enrollmentResult = Enrollment.Create(
             request.Name,
             request.Email,
             request.Phone,
             request.Document,
-            request.BirthDate,
-            request.Gender,
-            request.Address
-        );
+            request.Address);
 
         if (enrollmentResult.IsFailure)
-            return Result.Failure<Guid>(enrollmentResult.Error);
+            return EnrollmentError.RuleViolated(enrollmentResult.Error);
 
         var enrollment = enrollmentResult.Value;
         await repository.AddAsync(enrollment, cancellationToken);
         await unitOfWork.Commit(cancellationToken);
 
-        return Result.Success(enrollment.Id);
+        return enrollment.Id;
     }
 }

@@ -1,94 +1,91 @@
-# GymErp — Arquitetura Hexagonal (Ports & Adapters)
+# GymErp · Arquitetura Hexagonal (Ports and Adapters)
 
-Este projeto segue a **Arquitetura Hexagonal**: o Core (Domain + Application) define **portas** (contratos) e os **adapters** (API, Persistence, ServiceBus) implementam ou consomem essas portas. O **Composition Root** fica no `Program.cs` do host (GymErp.Api), onde os adapters são registrados e “plugados” nas portas.
+Este projeto segue a arquitetura de Alistair Cockburn. A intenção do padrão, nas palavras dele:
+
+> "Allow an application to equally be driven by users, programs, automated test or batch scripts, and to be developed and tested in isolation from its eventual run-time devices and databases."
+
+Por isso há só dois lados: **dentro** (o hexágono, `GymErp.Core`) e **fora** (os adaptadores). O livro de 2024 (Cockburn e Garrido de Paz) resume: "Ports & Adapters only specifies two layers, inside and outside."
 
 ## Visão da arquitetura
 
 ```mermaid
 flowchart LR
-    subgraph adapters_in [Adapters de Entrada]
-        Api[API Controllers]
+    subgraph driving [Adaptadores de condução]
+        Http[GymErp.Adapters.Http]
+        Tests[GymErp.Tests]
     end
-    subgraph core [Core]
-        subgraph inbound [Portas de Entrada]
-            UC_Add[IAddNewEnrollmentUseCase]
-            UC_Cancel[ICancelEnrollmentUseCase]
-            UC_Suspend[ISuspendEnrollmentUseCase]
-        end
-        subgraph app [Application]
-            Handlers[Handlers]
-        end
-        subgraph outbound [Portas de Saída]
-            IRepo[IEnrollmentRepository]
-            IUoW[IUnitOfWork]
-            IEvents[IEventPublisher]
-        end
+    subgraph core [GymErp.Core · o hexágono]
+        PIn[IForManagingEnrollments]
+        App[EnrollmentManagement]
+        Dom[Domain: Enrollment, states, eventos]
+        PStore[IForStoringEnrollments]
+        PNotify[IForNotifyingEnrollmentEvents]
     end
-    subgraph adapters_out [Adapters de Saída]
-        EF[EF Repository]
-        UoWImpl[UnitOfWork]
-        NoOp[NoOp/Kafka ServiceBus]
+    subgraph driven [Adaptadores conduzidos]
+        Pg[GymErp.Adapters.Postgres]
+        Mem[GymErp.Adapters.InMemory]
+        NoOp[GymErp.Adapters.NoOpNotifications]
     end
-    Api --> UC_Add
-    Api --> UC_Cancel
-    Api --> UC_Suspend
-    UC_Add --> Handlers
-    UC_Cancel --> Handlers
-    UC_Suspend --> Handlers
-    Handlers --> IRepo
-    Handlers --> IUoW
-    Handlers --> IEvents
-    IRepo --> EF
-    IUoW --> UoWImpl
-    IEvents --> NoOp
+    Http --> PIn
+    Tests --> PIn
+    PIn --> App
+    App --> Dom
+    App --> PStore
+    Pg -. implementa .-> PStore
+    Mem -. implementa .-> PStore
+    NoOp -. implementa .-> PNotify
 ```
 
-- **Portas de entrada**: como o mundo chama o sistema (use cases).
-- **Portas de saída**: o que o Core precisa do mundo (repositório, UoW, publicação de eventos).
-- **Adapters**: implementações concretas (HTTP, EF, NoOp/Kafka); só o host referencia e registra.
+## Portas
 
-## Portas de entrada (Use Cases)
+As portas são conversas com propósito, nomeadas pelo que a conversa faz, não pela tecnologia nem pelo padrão.
 
-| Interface | Descrição | Handler |
-|-----------|-----------|---------|
-| `IAddNewEnrollmentUseCase` | Nova inscrição | `AddNewEnrollmentHandler` |
-| `ICancelEnrollmentUseCase` | Cancelar inscrição | `CancelEnrollmentHandler` |
-| `ISuspendEnrollmentUseCase` | Suspender inscrição | `SuspendEnrollmentHandler` |
+| Porta | Tipo | O que faz |
+|---|---|---|
+| `IForManagingEnrollments` | Condução | Matricular, cancelar e suspender. Implementada pelo próprio núcleo (`EnrollmentManagement`) |
+| `IForStoringEnrollments` | Conduzida | Guardar e recuperar matrículas. Como e quando fazer commit é decisão do adaptador |
+| `IForNotifyingEnrollmentEvents` | Conduzida | Avisar o mundo sobre eventos de domínio |
 
-## Portas de saída (Outbound)
+O que cruza as portas são estruturas simples (`EnrollRequest`, `CancelRequest`, `CancelResponse`, `SuspendRequest`) e `Result<T, EnrollmentError>`. A entidade nunca sai do hexágono pela porta de condução.
 
-| Interface | Descrição |
-|-----------|-----------|
-| `IEnrollmentRepository` | Persistência de inscrições (add, get, update) |
-| `IUnitOfWork` | Transação / commit |
-| `IEventPublisher` | Publicação de eventos de domínio |
+## Adaptadores
 
-## Onde estão os Adapters
+| Adaptador | Lado | Porta |
+|---|---|---|
+| `GymErp.Adapters.Http` | Condução | `IForManagingEnrollments`. Também traduz `EnrollmentError` para 404 e 422 (`Presentation/ResultHttp.cs`) |
+| `GymErp.Tests` | Condução | `IForManagingEnrollments`, com o adaptador em memória: sem HTTP e sem banco |
+| `GymErp.Adapters.Postgres` | Conduzido | `IForStoringEnrollments` com EF Core e PostgreSQL; publica os eventos pendentes depois do `SaveChanges` |
+| `GymErp.Adapters.InMemory` | Conduzido | `IForStoringEnrollments` em memória; mesmo contrato de eventos |
+| `GymErp.Adapters.NoOpNotifications` | Conduzido | `IForNotifyingEnrollmentEvents` que não avisa ninguém (hoje); Kafka ou RabbitMQ amanhã |
 
-| Adapter | Projeto | Implementação |
-|---------|---------|---------------|
-| **Entrada (HTTP)** | GymErp.Api | Controllers chamam os use cases |
-| **Saída (persistência)** | GymErp.Infrastructure.Persistence | `EnrollmentRepository`, `UnitOfWork`, `SubscriptionsDbContext` (EF) |
-| **Saída (eventos)** | GymErp.Infrastructure.ServiceBus | `NoOpEventPublisher` (hoje no-op; no futuro Kafka/Rabbit) |
+## Configurador
 
-## Composition Root
+O `Program.cs` de `GymErp.Adapters.Http` é o único lugar que conhece todos os adaptadores. Ele escolhe o armazenamento por configuração:
 
-Todo o registro de adapters e use cases é feito no **Program.cs** do projeto **GymErp.Api**:
-
-- `AddApplication()` — registra use cases e handlers (Core).
-- `AddPersistence(config)` — DbContext, `IEnrollmentRepository`, `IUnitOfWork`.
-- `AddEventPublisher()` — `IEventPublisher` → `NoOpEventPublisher`.
-
-Nenhum outro projeto registra implementações de repositório ou message bus; apenas o host.
+```bash
+dotnet run --project GymErp.Adapters.Http                    # PostgreSQL
+dotnet run --project GymErp.Adapters.Http --Storage=InMemory # sem banco
+```
 
 ## Regra de ouro
 
-Se é possível **trocar a tecnologia** (SendGrid ↔ SES, Kafka ↔ Rabbit, EF ↔ Dapper) e o **Core (Application + Domain) não muda**, então aquilo é **Adapter**.
+Se é possível trocar a tecnologia (EF por Dapper, Postgres por memória, NoOp por Kafka) e o `GymErp.Core` não muda, aquilo é adaptador. `GymErp.Tests/HexagonBoundaryTests.cs` quebra se o núcleo passar a referenciar qualquer coisa além da biblioteca `CSharpFunctionalExtensions`.
 
-## Estrutura da solution
+## Diferença em relação à solução Clean Architecture
 
-- **GymErp.Domain** — entidades, eventos de domínio, agregados (`Common`: `IDomainEvent`, `Aggregate`).
-- **GymErp.Application** — portas **Inbound** (`Ports/Inbound`: use cases), portas **Outbound** (`Ports/Outbound`: repositório, UoW, event publisher) e implementações dos use cases em `UseCases/`.
-- **GymErp.Infrastructure.Persistence** — adapter EF (repositório, UoW, DbContext).
-- **GymErp.Infrastructure.ServiceBus** — adapter de publicação de eventos (NoOp; futuramente Kafka).
-- **GymErp.Api** — host HTTP e Composition Root.
+O domínio é idêntico nas duas. O que muda é a ênfase de cada autor:
+
+| | Ports and Adapters (aqui) | Clean Architecture |
+|---|---|---|
+| Lado de dentro | Um projeto, `GymErp.Core` | Dois projetos, Domain (entidades) e Application (casos de uso) |
+| Entrada | Uma porta por conversa | Uma interface por caso de uso |
+| Persistência | `IForStoringEnrollments`, commit no adaptador | `IEnrollmentRepository` mais `IUnitOfWork` |
+| Armazenamento | Postgres e em memória, escolhidos por configuração | Postgres |
+| Teste em destaque | O teste conduzindo a porta | A regra de dependência |
+
+## Testes
+
+```bash
+dotnet test src/GymErp.Tests            # rápido, sem Docker
+dotnet test src/GymErp.IntegrationTests # requer Docker; cada etapa usa um DbContext novo
+```

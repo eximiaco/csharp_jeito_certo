@@ -1,4 +1,4 @@
-using GymErp.Application;
+using GymErp.Api;
 using GymErp.Infrastructure.Persistence;
 using GymErp.Infrastructure.ServiceBus;
 using Serilog;
@@ -27,7 +27,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddHealthChecks();
-builder.Services.AddApplication();
+builder.Services.AddUseCases();
 builder.Services.AddEventPublisher();
 builder.Services.AddPersistence(builder.Configuration);
 

@@ -4,5 +4,5 @@ namespace GymErp.Application.UseCases.AddNewEnrollment;
 
 public interface IAddNewEnrollmentUseCase
 {
-    Task<Result<Guid>> HandleAsync(AddNewEnrollmentRequest request, CancellationToken cancellationToken = default);
+    Task<Result<Guid, EnrollmentError>> HandleAsync(AddNewEnrollmentRequest request, CancellationToken cancellationToken = default);
 }

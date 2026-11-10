@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+        <PackageReference Include="xunit" Version="2.9.2" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Testcontainers.PostgreSql" Version="4.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit" />
+    </ItemGroup>
+
+    <!-- Requer Docker. Exercita o adaptador Postgres pela mesma porta que o núcleo usa. -->
+    <ItemGroup>
+        <ProjectReference Include="..\GymErp.Adapters.Postgres\GymErp.Adapters.Postgres.csproj" />
+        <ProjectReference Include="..\GymErp.Adapters.NoOpNotifications\GymErp.Adapters.NoOpNotifications.csproj" />
+    </ItemGroup>
+
+</Project>

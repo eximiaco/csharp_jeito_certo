@@ -16,6 +16,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gymerp.Common", "Gymerp.Com
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gymerp.IntegrationTests", "Gymerp.IntegrationTests\Gymerp.IntegrationTests.csproj", "{84C96121-5881-49BE-95D8-8781897DCD4E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GymErp.ScheduleFinancialWorker", "GymErp.ScheduleFinancialWorker\GymErp.ScheduleFinancialWorker.csproj", "{D4566DC9-5ACA-4BCE-8AA7-7218BAC0BC11}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,5 +56,9 @@ Global
 		{84C96121-5881-49BE-95D8-8781897DCD4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{84C96121-5881-49BE-95D8-8781897DCD4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{84C96121-5881-49BE-95D8-8781897DCD4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4566DC9-5ACA-4BCE-8AA7-7218BAC0BC11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4566DC9-5ACA-4BCE-8AA7-7218BAC0BC11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4566DC9-5ACA-4BCE-8AA7-7218BAC0BC11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4566DC9-5ACA-4BCE-8AA7-7218BAC0BC11}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

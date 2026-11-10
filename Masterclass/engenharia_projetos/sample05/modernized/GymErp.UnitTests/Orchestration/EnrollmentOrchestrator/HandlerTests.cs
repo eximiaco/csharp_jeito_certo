@@ -3,6 +3,7 @@ using FluentAssertions;
 using Flurl.Http;
 using Flurl.Http.Testing;
 using GymErp.Domain.Orchestration.Features.EnrollmentOrchestrator;
+using GymErp.Domain.Subscriptions.Aggreates.Plans;
 using Microsoft.Extensions.Options;
 using Moq;
 using WorkflowCore.Interface;
@@ -13,14 +14,17 @@ namespace GymErp.UnitTests.Orchestration.EnrollmentOrchestrator;
 public class HandlerTests
 {
     private readonly Mock<IOptions<LegacyApiConfiguration>> _mockConfiguration;
+    private readonly Mock<IOptions<SubscriptionsApiConfiguration>> _mockSubscriptionsConfiguration;
     private readonly Mock<IWorkflowHost> _mockWorkflowHost;
     private readonly LegacyAdapter _legacyAdapter;
     private readonly ModernizedAdapter _modernizedAdapter;
+    private readonly PlanService _planService;
     private readonly Handler _handler;
 
     public HandlerTests()
     {
         _mockConfiguration = new Mock<IOptions<LegacyApiConfiguration>>();
+        _mockSubscriptionsConfiguration = new Mock<IOptions<SubscriptionsApiConfiguration>>();
         _mockWorkflowHost = new Mock<IWorkflowHost>();
 
         var configuration = new LegacyApiConfiguration
@@ -30,11 +34,19 @@ public class HandlerTests
             RetryAttempts = 3
         };
 
+        var subscriptionsConfiguration = new SubscriptionsApiConfiguration
+        {
+            BaseUrl = "http://localhost:6000",
+            TimeoutSeconds = 30
+        };
+
         _mockConfiguration.Setup(x => x.Value).Returns(configuration);
+        _mockSubscriptionsConfiguration.Setup(x => x.Value).Returns(subscriptionsConfiguration);
 
         _legacyAdapter = new LegacyAdapter(_mockConfiguration.Object);
         _modernizedAdapter = new ModernizedAdapter(_mockWorkflowHost.Object);
-        _handler = new Handler(_legacyAdapter, _modernizedAdapter);
+        _planService = new PlanService(_mockSubscriptionsConfiguration.Object);
+        _handler = new Handler(_legacyAdapter, _modernizedAdapter, _planService);
     }
 
     [Fact]
@@ -45,6 +57,7 @@ public class HandlerTests
         var expectedEnrollmentId = Guid.NewGuid();
 
         using var httpTest = new HttpTest();
+        httpTest.RespondWithJson(new PlanInfo(request.PlanId, "Plano Mensal", PlanType.Mensal));
         httpTest.RespondWithJson(new LegacyEnrollmentResponse { EnrollmentId = expectedEnrollmentId });
 
         // Act
@@ -67,6 +80,7 @@ public class HandlerTests
         var request = CreateValidRequest();
 
         using var httpTest = new HttpTest();
+        httpTest.RespondWithJson(new PlanInfo(request.PlanId, "Plano Mensal", PlanType.Mensal));
         httpTest.RespondWith("Internal Server Error", 500);
 
         // Act
@@ -84,6 +98,7 @@ public class HandlerTests
         var request = CreateValidRequest();
 
         using var httpTest = new HttpTest();
+        httpTest.RespondWithJson(new PlanInfo(request.PlanId, "Plano Mensal", PlanType.Mensal));
         httpTest.SimulateTimeout();
 
         // Act
@@ -101,6 +116,7 @@ public class HandlerTests
         var request = CreateValidRequest();
 
         using var httpTest = new HttpTest();
+        httpTest.RespondWithJson(new PlanInfo(request.PlanId, "Plano Mensal", PlanType.Mensal));
         httpTest.RespondWith("Service Unavailable", 503);
 
         // Act
@@ -119,6 +135,7 @@ public class HandlerTests
         var expectedEnrollmentId = Guid.NewGuid();
 
         using var httpTest = new HttpTest();
+        httpTest.RespondWithJson(new PlanInfo(request.PlanId, "Plano Mensal", PlanType.Mensal));
         httpTest.RespondWithJson(new LegacyEnrollmentResponse { EnrollmentId = expectedEnrollmentId });
 
         // Act

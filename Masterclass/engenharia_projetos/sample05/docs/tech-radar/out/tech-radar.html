@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tech Radar — GymErp Sample 05</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#eef0f4;color:#111;min-height:100vh}
+.page{max-width:1480px;margin:0 auto;padding:28px 32px}
+header{text-align:center;margin-bottom:20px}
+header h1{font-size:26px;font-weight:800;letter-spacing:-.5px}
+header p{font-size:13px;color:#777;margin-top:3px}
+.ring-legend{display:flex;gap:24px;justify-content:center;margin-bottom:22px;flex-wrap:wrap}
+.ring-legend-item{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.ring-dot{width:11px;height:11px;border-radius:50%}
+.radar-layout{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}
+.radar-wrapper{flex:0 0 auto;background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,.09);overflow:hidden;line-height:0}
+#radar-svg{display:block;width:680px;height:680px}
+.legend{flex:1;min-width:280px;display:flex;flex-direction:column;gap:12px}
+.legend-quadrant{background:#fff;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.07);overflow:hidden}
+.legend-quadrant-header{padding:9px 14px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#fff}
+.legend-ring-section{padding:9px 14px 7px;border-bottom:1px solid #f2f2f2}
+.legend-ring-section:last-child{border-bottom:none}
+.legend-ring-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+.legend-items{list-style:none}
+.legend-item{display:flex;align-items:center;gap:7px;padding:2px 3px;font-size:12px;cursor:pointer;border-radius:4px;transition:background .1s}
+.legend-item:hover{background:#f5f7ff}
+.legend-item.active{background:#fff3cd}
+.legend-num{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:50%;font-size:9px;font-weight:800;flex-shrink:0;color:#fff}
+.tooltip{position:fixed;background:rgba(16,18,36,.97);color:#fff;padding:10px 14px;border-radius:9px;font-size:13px;max-width:300px;pointer-events:none;z-index:9999;box-shadow:0 6px 24px rgba(0,0,0,.35);line-height:1.5;display:none}
+.tooltip .tt-name{font-weight:800;margin-bottom:3px;font-size:14px}
+.tooltip .tt-meta{font-size:10px;opacity:.6;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.tooltip .tt-context{font-size:12px;opacity:.88}
+.blip-g{cursor:pointer}
+.blip-g:hover .blip-circle{filter:brightness(1.25)}
+.blip-g.active .blip-circle{stroke:#111;stroke-width:2.5}
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <h1>Tech Radar</h1>
+    <p>DECISÕES APROVADAS &nbsp;·&nbsp; Tech Radar — GymErp Sample 05 &nbsp;·&nbsp; 21 de julho de 2026</p>
+  </header>
+  <div class="ring-legend" id="ring-legend"></div>
+  <div class="radar-layout">
+    <div class="radar-wrapper">
+      <svg id="radar-svg" viewBox="0 0 700 700" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+    <div class="legend" id="legend"></div>
+  </div>
+</div>
+<div class="tooltip" id="tooltip"></div>
+<script>
+const CX=350,CY=350;
+
+const RINGS=[
+  {name:'Adopt', minR:18, maxR:148, color:'#27a645'},
+  {name:'Trial', minR:156,maxR:218, color:'#e07c28'},
+  {name:'Assess',minR:226,maxR:276, color:'#3d87c4'},
+  {name:'Hold',  minR:284,maxR:332, color:'#c43535'},
+];
+
+// SVG angles: 0=right, 90=down, 180=left, 270=up (clockwise)
+const QUADS=[
+  {id:'lang',       name:'Languages & Frameworks', startAngle:-90, endAngle:0,   color:'#1460a0'},
+  {id:'tools',      name:'Tools',                  startAngle:0,   endAngle:90,  color:'#6b3a9e'},
+  {id:'platforms',  name:'Platforms',               startAngle:90,  endAngle:180, color:'#9e5c1a'},
+  {id:'techniques', name:'Techniques',              startAngle:180, endAngle:270, color:'#167a4a'},
+];
+
+const RAW={"lang":{"Adopt":[],"Trial":[],"Assess":[],"Hold":[]},"tools":{"Adopt":[],"Trial":[],"Assess":[],"Hold":[]},"platforms":{"Adopt":[],"Trial":[],"Assess":[],"Hold":[]},"techniques":{"Adopt":[],"Trial":[],"Assess":[],"Hold":[]}};
+
+// Build blips
+let seq=0;
+const BLIPS=[];
+QUADS.forEach((q,qi)=>{
+  RINGS.forEach((r,ri)=>{
+    (RAW[q.id][r.name]||[]).forEach(([name,context])=>{
+      seq++;
+      BLIPS.push({id:seq,name,context,qi,ri,qId:q.id,rName:r.name,qColor:q.color,rColor:r.color});
+    });
+  });
+});
+
+// Compute positions
+function rad(d){return d*Math.PI/180}
+
+function place(qCfg,rCfg){
+  const bs=BLIPS.filter(b=>b.qId===qCfg.id&&b.rName===rCfg.name);
+  if(!bs.length)return;
+  const aPad=8,rPad=14;
+  const aS=qCfg.startAngle+aPad, aE=qCfg.endAngle-aPad;
+  const rMin=rCfg.minR+rPad, rMax=rCfg.maxR-rPad;
+  const aSweep=aE-aS, rSpan=rMax-rMin;
+  const n=bs.length;
+  const midR=(rMin+rMax)/2;
+  const arcW=midR*Math.abs(rad(aSweep));
+  let cols=Math.max(1,Math.round(Math.sqrt(n*arcW/Math.max(rSpan,1))));
+  let rows=Math.ceil(n/cols);
+  while(cols*rows<n)cols++;
+  const dA=aSweep/cols, dR=rSpan/rows;
+  bs.forEach((b,i)=>{
+    const col=i%cols, row=Math.floor(i/cols);
+    const angle=aS+dA*(col+.5);
+    const r=rMin+dR*(row+.5);
+    b.x=CX+r*Math.cos(rad(angle));
+    b.y=CY+r*Math.sin(rad(angle));
+  });
+}
+QUADS.forEach(q=>RINGS.forEach(r=>place(q,r)));
+
+// SVG helpers
+const NS='http://www.w3.org/2000/svg';
+const svg=document.getElementById('radar-svg');
+function el(tag,attrs,parent){
+  const e=document.createElementNS(NS,tag);
+  for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);
+  (parent||svg).appendChild(e);
+  return e;
+}
+
+// Background
+el('rect',{x:0,y:0,width:700,height:700,fill:'#fcfcfe'});
+
+// Quadrant tints
+const TINTS=['#e8f3fc','#f0ebfc','#fdf0e6','#e8fcf1'];
+QUADS.forEach((q,i)=>{
+  const oR=336;
+  const sR=rad(q.startAngle),eR=rad(q.endAngle);
+  const x1=CX+oR*Math.cos(sR),y1=CY+oR*Math.sin(sR);
+  const x2=CX+oR*Math.cos(eR),y2=CY+oR*Math.sin(eR);
+  el('path',{d:`M${CX},${CY}L${x1},${y1}A${oR},${oR},0,0,1,${x2},${y2}Z`,fill:TINTS[i],opacity:'0.5'});
+});
+
+// Ring boundaries (outer to inner for layering)
+[...RINGS].reverse().forEach(r=>{
+  el('circle',{cx:CX,cy:CY,r:r.maxR,fill:'none',stroke:'#ccc','stroke-width':'1.5'});
+});
+el('circle',{cx:CX,cy:CY,r:RINGS[0].minR,fill:'none',stroke:'#ddd','stroke-width':'1'});
+el('circle',{cx:CX,cy:CY,r:3,fill:'#ccc'});
+
+// Dividers
+el('line',{x1:CX,y1:CY-336,x2:CX,y2:CY+336,stroke:'#bbb','stroke-width':'2'});
+el('line',{x1:CX-336,y1:CY,x2:CX+336,y2:CY,stroke:'#bbb','stroke-width':'2'});
+
+// Ring labels (on upper vertical axis)
+RINGS.forEach(r=>{
+  const midR=(r.minR+r.maxR)/2;
+  const t=el('text',{x:CX,y:CY-midR,'text-anchor':'middle','dominant-baseline':'middle',
+    fill:'#b0b0b0','font-size':'9.5','font-family':'sans-serif','font-weight':'700',
+    'letter-spacing':'1','pointer-events':'none'});
+  t.textContent=r.name.toUpperCase();
+});
+
+// Quadrant labels (corner positions)
+const LPOS=[[582,76,'end'],[582,634,'end'],[118,634,'start'],[118,76,'start']];
+QUADS.forEach((q,i)=>{
+  const[lx,ly,anchor]=LPOS[i];
+  const parts=q.name.includes(' & ')?q.name.split(' & ').map((p,j)=>j===0?p+' &':p):[q.name];
+  const lineH=15, yOff=parts.length>1?-7:0;
+  parts.forEach((part,j)=>{
+    const t=el('text',{x:lx,y:ly+yOff+j*lineH,'text-anchor':anchor,
+      fill:'#222','font-size':'12.5','font-family':'sans-serif','font-weight':'800',
+      'pointer-events':'none'});
+    t.textContent=part;
+  });
+});
+
+// Blips
+const blipEls={};
+BLIPS.forEach(b=>{
+  if(b.x==null)return;
+  const g=el('g',{class:'blip-g','data-id':b.id});
+  g.setAttribute('transform',`translate(${b.x.toFixed(1)},${b.y.toFixed(1)})`);
+  el('circle',{cx:0,cy:0,r:11,fill:b.rColor,class:'blip-circle',
+    stroke:'rgba(255,255,255,.2)','stroke-width':'1.5'},g);
+  const t=el('text',{x:0,y:0,'text-anchor':'middle','dominant-baseline':'middle',
+    fill:'white','font-size':b.id>=10?'7.5':'9','font-family':'sans-serif','font-weight':'800',
+    'pointer-events':'none'},g);
+  t.textContent=b.id;
+  blipEls[b.id]=g;
+  g.addEventListener('mouseenter',ev=>showTT(ev,b));
+  g.addEventListener('mouseleave',hideTT);
+  g.addEventListener('click',()=>toggle(b.id));
+});
+
+// Legend
+const legendEl=document.getElementById('legend');
+QUADS.forEach(q=>{
+  const qBs=BLIPS.filter(b=>b.qId===q.id);
+  if(!qBs.length)return;
+  const card=document.createElement('div');
+  card.className='legend-quadrant';
+  const hdr=document.createElement('div');
+  hdr.className='legend-quadrant-header';
+  hdr.textContent=q.name;
+  hdr.style.background=q.color;
+  card.appendChild(hdr);
+  RINGS.forEach(r=>{
+    const rBs=qBs.filter(b=>b.rName===r.name);
+    if(!rBs.length)return;
+    const sec=document.createElement('div');
+    sec.className='legend-ring-section';
+    const lbl=document.createElement('div');
+    lbl.className='legend-ring-label';
+    lbl.style.color=r.color;
+    lbl.textContent=r.name;
+    sec.appendChild(lbl);
+    const ul=document.createElement('ul');
+    ul.className='legend-items';
+    rBs.forEach(b=>{
+      const li=document.createElement('li');
+      li.className='legend-item';
+      li.dataset.id=b.id;
+      const num=document.createElement('span');
+      num.className='legend-num';
+      num.style.background=r.color;
+      num.textContent=b.id;
+      const nm=document.createElement('span');
+      nm.textContent=b.name;
+      li.append(num,nm);
+      li.addEventListener('mouseenter',ev=>showTT(ev,b));
+      li.addEventListener('mouseleave',hideTT);
+      li.addEventListener('click',()=>toggle(b.id));
+      ul.appendChild(li);
+    });
+    sec.appendChild(ul);
+    card.appendChild(sec);
+  });
+  legendEl.appendChild(card);
+});
+
+// Ring legend
+const rlEl=document.getElementById('ring-legend');
+RINGS.forEach(r=>{
+  const item=document.createElement('div');
+  item.className='ring-legend-item';
+  const dot=document.createElement('span');
+  dot.className='ring-dot';
+  dot.style.background=r.color;
+  const lbl=document.createElement('span');
+  lbl.textContent=r.name;
+  lbl.style.color=r.color;
+  item.append(dot,lbl);
+  rlEl.appendChild(item);
+});
+
+// Tooltip
+const ttEl=document.getElementById('tooltip');
+function showTT(ev,b){
+  const qName=QUADS[b.qi].name;
+  ttEl.innerHTML=`<div class="tt-name">${b.id}. ${b.name}</div>
+    <div class="tt-meta">${qName} &nbsp;·&nbsp; ${b.rName}</div>
+    <div class="tt-context">${b.context}</div>`;
+  ttEl.style.display='block';
+  moveTT(ev);
+}
+function hideTT(){ttEl.style.display='none'}
+function moveTT(ev){
+  const x=ev.clientX+18,y=ev.clientY-12;
+  const w=ttEl.offsetWidth,vw=window.innerWidth;
+  ttEl.style.left=(x+w>vw?x-w-36:x)+'px';
+  ttEl.style.top=Math.max(8,y)+'px';
+}
+document.addEventListener('mousemove',ev=>{if(ttEl.style.display!=='none')moveTT(ev)});
+
+// Highlight
+let activeId=null;
+function toggle(id){
+  if(activeId===id){clear();return}
+  clear();
+  activeId=id;
+  if(blipEls[id])blipEls[id].classList.add('active');
+  document.querySelectorAll(`.legend-item[data-id="${id}"]`).forEach(el=>{
+    el.classList.add('active');
+    el.scrollIntoView({block:'nearest',behavior:'smooth'});
+  });
+}
+function clear(){
+  if(activeId==null)return;
+  if(blipEls[activeId])blipEls[activeId].classList.remove('active');
+  document.querySelectorAll(`.legend-item[data-id="${activeId}"]`).forEach(el=>el.classList.remove('active'));
+  activeId=null;
+}
+</script>
+</body>
+</html>

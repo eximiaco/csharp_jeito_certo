@@ -17,13 +17,13 @@ public class EnrollmentCreatedEventConsumerTests
         // Arrange: Consumer recebe o evento e chama o Handler; o Handler publica ChargingProcessedEvent via IServiceBus.
         // Verificamos que o Consumer não lança e que o Handler foi acionado (via publicação).
         var enrollmentId = Guid.NewGuid();
-        var enrollmentCreatedEvent = new EnrollmentCreatedEvent(enrollmentId);
+        var enrollmentCreatedEvent = new EnrollmentCreatedEvent(enrollmentId, string.Empty, DateTime.UtcNow);
         var serviceBusMock = new Mock<IServiceBus>();
         serviceBusMock
             .Setup(s => s.PublishAsync(It.IsAny<object>()))
             .Returns(Task.CompletedTask);
         var handler = new Handler(NullLogger<Handler>.Instance, serviceBusMock.Object);
-        var consumer = new EnrollmentCreatedEventConsumer(handler);
+        var consumer = new EnrollmentCreatedEventConsumer(handler, NullLogger<EnrollmentCreatedEventConsumer>.Instance);
 
         // Act
         await consumer.HandleAsync(enrollmentCreatedEvent, CancellationToken.None);

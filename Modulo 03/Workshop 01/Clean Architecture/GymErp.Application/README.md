@@ -1,6 +1,6 @@
-# GymErp.Application — Use Cases (Clean Architecture)
+# GymErp.Application · Use Cases (Clean Architecture)
 
-Este projeto é a camada **Application** na Clean Architecture. Contém os **casos de uso** (handlers) e as **abstrações** (interfaces) que a Application precisa para persistência, transação e publicação de eventos. Nenhuma tecnologia externa (EF, Kafka, HTTP) é referenciada aqui.
+Este projeto é a camada **Application** na Clean Architecture. Contém os **casos de uso** (handlers) e as **abstrações** (interfaces) que a Application precisa para persistência, transação e publicação de eventos. Nenhuma tecnologia externa (EF, Kafka, HTTP) é referenciada aqui, nem o container de DI: o registro dos casos de uso fica na composition root da Api.
 
 ## Estrutura
 
@@ -24,7 +24,7 @@ GymErp.Application/
 │       ├── ISuspendEnrollmentUseCase.cs
 │       ├── SuspendEnrollmentHandler.cs
 │       └── SuspendEnrollmentCommand.cs
-└── DependencyInjection.cs
+└── UseCases/EnrollmentError.cs   ← erro tipado (NotFound, RuleViolated)
 ```
 
 - **Abstractions/**: interfaces que a Application depende para persistência, UoW e publicação de eventos. A Infrastructure implementa essas interfaces.

@@ -1,0 +1,6 @@
+@GymErp.ScheduleFinancialWorker_HostAddress = http://localhost:5184
+
+GET {{GymErp.ScheduleFinancialWorker_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
