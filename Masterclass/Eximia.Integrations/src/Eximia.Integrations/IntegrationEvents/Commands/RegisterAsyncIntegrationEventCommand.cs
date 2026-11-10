@@ -15,9 +15,6 @@ public record RegisterAsyncIntegrationEventCommand(
     int SchemaVersion,
     bool IsCallback,
     string? AggregateKey,
-    bool IsPayloadLink,
-    string PayloadFile,
-    Guid FileId,
     string? SapQueryAction,
     int? StatusCode,
     long Version,
@@ -38,10 +35,7 @@ public record RegisterAsyncIntegrationEventCommand(
         long version,
         int schemaVersion = 0,
         bool isCallback = false,
-        bool isCallbackError = false,
-        bool isPayloadLink = false,
-        string payloadFile = "",
-        Guid fileId = default)
+        bool isCallbackError = false)
     {
         var result = ResultAggregate.Combine(
             ResultAggregate.FailureIf(string.IsNullOrEmpty(destiny), "[Destiny]", "Destiny is invalid"),
@@ -64,9 +58,6 @@ public record RegisterAsyncIntegrationEventCommand(
             schemaVersion,
             isCallback,
             aggregateKey,
-            isPayloadLink,
-            payloadFile,
-            fileId,
             sapQueryAction,
             statusCode,
             version,

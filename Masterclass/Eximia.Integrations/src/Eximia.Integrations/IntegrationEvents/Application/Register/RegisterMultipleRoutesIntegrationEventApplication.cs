@@ -50,10 +50,7 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
                 command.Version,
                 command.SchemaVersion,
                 command.IsCallback,
-                command.IsCallbackError,
-                command.IsPayloadLink,
-                command.PayloadFile,
-                command.FileId);
+                command.IsCallbackError);
 
             if (asyncCommand.IsFailure)
                 return ResultAggregate.Failure("Command", "Invalid command parameters");
@@ -82,20 +79,15 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
                 return ResultAggregate.Failure("Routing", "No applicable routes found");
 
             var payload = command.Payload.ToStringJson();
-            var payloadFile = command.PayloadFile;
-            var payloadFileId = command.FileId;
-            if (!command.IsPayloadLink)
-            {
-                payloadFileId = Guid.NewGuid();
+            var payloadFileId = Guid.NewGuid();
 
-                var uploadResult = await uploadIntegrationEventPayloadService.UploadAsync(
-                    payload,
-                    payloadFileId,
-                    cancellationToken);
+            var uploadResult = await uploadIntegrationEventPayloadService.UploadAsync(
+                payload,
+                payloadFileId,
+                cancellationToken);
 
-                payload = uploadResult.NewPayload;
-                payloadFile = uploadResult.FileName;
-            }
+            payload = uploadResult.NewPayload;
+            var payloadFile = uploadResult.FileName;
 
             // 3. Processar cada rota aplicável
             var processedEvents = new List<IntegrationEvent>();
@@ -124,10 +116,7 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
                     command.Version,
                     command.SchemaVersion,
                     command.IsCallback,
-                    command.IsCallbackError,
-                    command.IsPayloadLink,
-                    payloadFile,
-                    payloadFileId);
+                    command.IsCallbackError);
 
                 if (asyncCommandForSchema.IsFailure)
                     continue;
