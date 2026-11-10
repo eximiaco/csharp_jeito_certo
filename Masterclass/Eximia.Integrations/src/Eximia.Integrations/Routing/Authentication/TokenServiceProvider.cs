@@ -1,23 +1,12 @@
-﻿using Eximia.Integrations.Routing.Telemetry;
-
 namespace Eximia.Integrations.Routing.Authentication;
 
-public abstract class TokenServiceProvider(TokenCache tokenCache, IClientCredentialsProviderTelemetry telemetry)
+public abstract class TokenServiceProvider(TokenCache tokenCache)
 {
-    protected readonly IClientCredentialsProviderTelemetry _telemetry = telemetry;
-
     public async Task<JwtBearerToken?> GetTokenAsync(Route route, string correlationId = "", CancellationToken cancellationToken = default)
     {
-        _telemetry.StartingTokenAquisition(route, "TokenServiceProvider.GetTokenAsync");
-
         return await tokenCache.GetAsync(
             CacheKey(route),
-            async ct =>
-            {
-                var token = await RequestNewTokenAsync(route, correlationId, ct);
-                _telemetry.NewTokenAdquired(token!);
-                return token!;
-            },
+            async ct => (await RequestNewTokenAsync(route, correlationId, ct))!,
             cancellationToken);
     }
 

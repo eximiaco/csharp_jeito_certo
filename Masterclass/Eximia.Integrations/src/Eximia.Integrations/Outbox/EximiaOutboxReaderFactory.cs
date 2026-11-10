@@ -30,8 +30,6 @@ public static class EximiaOutboxReaderServiceCollectionExtensions
             return new EximiaOutboxReader(
                 new PostgreSqlOutboxReader(postgreSqlSettings),
                 serviceProvider.GetRequiredService<PostgresConnectionStringFactory>(),
-                serviceProvider.GetRequiredService<OutboxMetricsReader>(),
-                serviceProvider.GetRequiredService<OutboxMetrics>(),
                 serviceProvider.GetRequiredService<ILogger>());
         });
 

@@ -6,14 +6,8 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
-using OpenTelemetry.Exporter;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
 using Serilog;
-using Serilog.Enrichers.Datadog.OpenTelemetry;
 using Serilog.Exceptions;
-using Serilog.Sinks.OpenTelemetry;
 using Silverback.Configuration;
 using Silverback.Messaging.Configuration;
 using Silverback.Messaging.Producing.TransactionalOutbox;
@@ -21,7 +15,6 @@ using Silverback.Messaging.HealthChecks;
 using Silverback.Storage;
 using Eximia.Integrations.Shared;
 using Eximia.Integrations.Shared.Kafka;
-using Eximia.Integrations.Shared.OpenTelemetry;
 using Eximia.Integrations.Shared.Postgres;
 using Eximia.Integrations.HttpApi.Infrastructure.ProducerBehaviors;
 using Eximia.Integrations.IntegrationEvents;
@@ -33,82 +26,6 @@ namespace Eximia.Integrations.HttpApi.Infrastructure;
 
 internal static class ServicesExtensions
 {
-    public static IServiceCollection AddTelemetry(this IServiceCollection serviceCollection, string serviceName,
-        string serviceVersion, IConfiguration configuration)
-    {
-        var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
-        Log.Information("ASPNETCORE_ENVIRONMENT -> " + environmentName);
-
-        TelemetrySettings settings;
-        if (configuration.GetSection("OpenTelemetry") is var section && section.Exists())
-            settings = new TelemetrySettings(serviceName, serviceVersion,
-                new TelemetryExporter(section["Type"] ?? string.Empty, section["Endpoint"] ?? string.Empty));
-        else
-            settings = new TelemetrySettings(serviceName, serviceVersion,
-                new TelemetryExporter("console", ""));
-        serviceCollection.AddSingleton(settings);
-        serviceCollection.AddSingleton(sp => new OtelTracingService(sp.GetService<TelemetrySettings>()));   // dono do ActivitySource: singleton
-        Action<ResourceBuilder> configureResource = r => r
-            .AddService(
-                serviceName: settings.ServiceName,
-                serviceVersion: settings.ServiceVersion,
-                serviceInstanceId: Environment.MachineName)
-            .AddAttributes(new Dictionary<string, object> { ["deployment.environment"] = environmentName });
-        serviceCollection
-            .AddOpenTelemetry()
-            .ConfigureResource(configureResource)
-            .WithTracing(builder =>
-            {
-                builder
-                    .SetSampler(new AlwaysOnSampler())
-                    .AddSource(settings.ServiceName)
-                    .AddSource("Silverback.Integration.Produce")
-                    .AddHttpClientInstrumentation(o =>
-                        o.FilterHttpWebRequest = request => !request.Address.AbsoluteUri.Contains("/raw"))
-                    .AddAspNetCoreInstrumentation(opts =>
-                    {
-                        opts.EnrichWithHttpRequest = (a, r) => a?.AddTag("env", environmentName);
-
-                    });
-                switch (settings.Exporter.Type.ToLower())
-                {
-                    case "otlp":
-                        builder.AddOtlpExporter(config =>
-                        {
-                            config.Endpoint = new Uri(settings.Exporter.Endpoint ?? string.Empty);
-                            //config.ExportProcessorType = ExportProcessorType.Simple;
-                            config.Protocol = OtlpExportProtocol.Grpc;
-                        });
-                        break;
-                    default:
-                        builder.AddConsoleExporter();
-                        break;
-                }
-            })
-            .WithMetrics(builder =>
-            {
-                builder
-                    .ConfigureResource(configureResource)
-                    .AddMeter(PlatformMetrics.MeterName)
-                    .AddMeter(OutboxMetrics.MeterName)
-                    //.AddRuntimeInstrumentation()
-                    .AddAspNetCoreInstrumentation();
-
-                switch (settings.Exporter.Type.ToLower())
-                {
-                    case "otlp":
-                        builder.AddOtlpExporter(config =>
-                        {
-                            config.Endpoint = new Uri(settings.Exporter.Endpoint ?? string.Empty);
-                        });
-                        break;
-                    default:
-                        builder.AddConsoleExporter();
-                        break;
-                }
-            });
-        return serviceCollection;
-    }
 
     public static IServiceCollection AddKafka(this IServiceCollection services, IConfiguration configuration)
     {
@@ -259,14 +176,8 @@ internal static class ServicesExtensions
     {
         Log.Logger = new LoggerConfiguration()
             .ReadFrom.Configuration(configuration)
-            .Enrich.FromLogContext()
             .Enrich.WithThreadId()
-            .Enrich.WithDatadogTraceId()
-            .Enrich.WithDatadogSpanId()
             .Enrich.WithExceptionDetails()
-            .WriteTo.OpenTelemetry(
-                endpoint: "http://localhost:4317",
-                protocol: OtlpProtocol.Grpc)
             .CreateLogger();
         services.AddSingleton(Log.Logger);
         return services;
