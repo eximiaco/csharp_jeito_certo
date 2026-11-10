@@ -54,6 +54,10 @@ try
         options.ValidateScopes = true;
         options.ValidateOnBuild = true;
     });
+
+    // Prazo de encerramento explícito: requisições em andamento e o OutboxWorker precisam terminar dentro dele, e deve ser MENOR que o terminationGracePeriodSeconds do pod
+    // (senão o orquestrador mata o processo antes de o host terminar de parar os serviços).
+    builder.Services.Configure<HostOptions>(options => options.ShutdownTimeout = TimeSpan.FromSeconds(30));
     
     var app = builder.Build();
 

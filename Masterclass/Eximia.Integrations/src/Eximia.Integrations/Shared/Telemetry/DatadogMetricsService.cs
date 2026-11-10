@@ -54,6 +54,8 @@ public sealed class DatadogMetricsService : IDisposable
 
     public void Dispose()
     {
-        _service!.Dispose();
+        // null quando o Datadog não está configurado. O Dispose do cliente também envia o que ainda está no
+        // buffer: é aqui que as últimas métricas do processo saem.
+        _service?.Dispose();
     }
 }

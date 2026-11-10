@@ -1,3 +1,4 @@
+using Npgsql;
 using Hangfire;
 using Hangfire.Console;
 using Silverback.Configuration;
@@ -154,10 +155,9 @@ internal static class ServicesExtensions
 
     internal static IServiceCollection AddEfDbContext(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContextPool<EximiaIntegrationDbContext>(options =>
-        {
-            options.UseNpgsql(new PostgresConnectionStringFactory(configuration).CreateConnectionString().ConnectionString);
-        });
+        // O EF usa o MESMO data source (e o mesmo pool) do acesso via Dapper.
+        services.AddDbContextPool<EximiaIntegrationDbContext>((sp, options) =>
+            options.UseNpgsql(sp.GetRequiredService<NpgsqlDataSource>()));
         return services;
     }
 

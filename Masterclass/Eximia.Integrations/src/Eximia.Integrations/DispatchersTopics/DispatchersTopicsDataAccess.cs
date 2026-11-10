@@ -6,7 +6,7 @@ using Eximia.Integrations.Shared.Postgres;
 
 namespace Eximia.Integrations.DispatchersTopics;
 
-public class DispatchersTopicsDataAccess(PostgresConnectionStringFactory connectionStringFactory)
+public class DispatchersTopicsDataAccess(NpgsqlDataSource dataSource)
 {
     public async Task<Maybe<DispatcherTopics>> GetFromTopicAsync(string topic)
     {
@@ -16,7 +16,7 @@ public class DispatchersTopicsDataAccess(PostgresConnectionStringFactory connect
                      FROM dispatchers_topics
                      WHERE topics @> '[""{topic}""]'";
 
-        await using NpgsqlConnection connection = new(connectionStringFactory.CreateConnectionString().ConnectionString);
+        await using var connection = dataSource.CreateConnection();
         var result = await connection.QueryFirstOrDefaultAsync<DispatcherTopicsDto>(sql);
         if (result is null)
             return Maybe.None;

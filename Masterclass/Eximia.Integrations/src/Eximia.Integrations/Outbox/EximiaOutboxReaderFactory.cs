@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using Silverback.Messaging.Producing.TransactionalOutbox;
 using Eximia.Integrations.Shared.Postgres;
 using ILogger = Serilog.ILogger;
@@ -29,7 +30,7 @@ public static class EximiaOutboxReaderServiceCollectionExtensions
 
             return new EximiaOutboxReader(
                 new PostgreSqlOutboxReader(postgreSqlSettings),
-                serviceProvider.GetRequiredService<PostgresConnectionStringFactory>(),
+                serviceProvider.GetRequiredService<NpgsqlDataSource>(),
                 serviceProvider.GetRequiredService<OutboxMetricsReader>(),
                 serviceProvider.GetRequiredService<OutboxMetrics>(),
                 serviceProvider.GetRequiredService<ILogger>());

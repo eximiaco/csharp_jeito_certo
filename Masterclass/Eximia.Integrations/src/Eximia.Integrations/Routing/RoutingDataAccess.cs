@@ -12,7 +12,7 @@ namespace Eximia.Integrations.Routing;
 
 public class RoutingDataAccess(
     IMemoryCache memoryCache,
-    PostgresConnectionStringFactory connectionStringFactory,
+    NpgsqlDataSource dataSource,
     ITelemetryService telemetryService,
     IOptions<List<RouteAuthenticationSettings>> routeAuthenticationSettings)
 {
@@ -28,7 +28,7 @@ public class RoutingDataAccess(
                     cacheEntry.SlidingExpiration = TimeSpan.FromSeconds(3);
                     cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(20);
                     cacheEntry.Size = 500;
-                    await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
+                    await using var connection = dataSource.CreateConnection();
                     var dto = await connection.QueryFirstOrDefaultAsync<RouteDto>(new CommandDefinition(
                             @"SELECT id,
                                         origin,
@@ -101,7 +101,7 @@ public class RoutingDataAccess(
                     cacheEntry.SlidingExpiration = TimeSpan.FromSeconds(3);
                     cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(20);
                     cacheEntry.Size = 500;
-                    await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
+                    await using var connection = dataSource.CreateConnection();
                     var dto = await connection.QueryFirstOrDefaultAsync<RouteDto>(new CommandDefinition(
                             @"SELECT id,
                                         origin,
@@ -173,7 +173,7 @@ public class RoutingDataAccess(
                     cacheEntry.SlidingExpiration = TimeSpan.FromSeconds(3);
                     cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(20);
                     cacheEntry.Size = 500;
-                    await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
+                    await using var connection = dataSource.CreateConnection();
                     var dto = await connection.QueryFirstOrDefaultAsync<RouteWithoutRulesDto>(new CommandDefinition(
                             @"SELECT id,
                                         origin,
@@ -244,7 +244,7 @@ public class RoutingDataAccess(
                     cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(20);
                     cacheEntry.Size = 500;
 
-                    await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
+                    await using var connection = dataSource.CreateConnection();
 
                     var results = await connection.QueryAsync<RouteDto>(new CommandDefinition(
                         @"SELECT r.id, r.origin, r.destination, r.entity, r.topic_name AS TopicName,

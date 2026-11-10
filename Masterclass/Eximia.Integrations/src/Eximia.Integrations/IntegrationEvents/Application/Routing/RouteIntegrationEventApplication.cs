@@ -94,6 +94,12 @@ public class RouteIntegrationEventApplication(
 
             routeIntegrationEventTelemetry.IntegrationEventDispatched(integrationEvent.Value);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            // SHUTDOWN: cancelamento não é falha de entrega. Relança como está: o consumer não confirma o
+            // offset, o evento é reentregue depois do restart e nenhum callback de erro sai.
+            throw;
+        }
         catch (Exception ex)
         {
             routeIntegrationEventTelemetry.CriticalFail(ex, command);

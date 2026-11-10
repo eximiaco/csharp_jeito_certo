@@ -11,13 +11,13 @@ namespace Eximia.Integrations.Outbox;
 /// <summary>
 ///     Lê os headers das mensagens pendentes no outbox do Silverback para alimentar as métricas de fila.
 /// </summary>
-public class OutboxMetricsReader(PostgresConnectionStringFactory connectionStringFactory)
+public class OutboxMetricsReader(NpgsqlDataSource dataSource)
 {
     private static readonly string Sql = $"SELECT headers FROM \"{OutboxDefaults.TableName}\"";
 
     public async Task<IEnumerable<OutboxMeasurement>> GetQueue(CancellationToken cancellationToken)
     {
-        await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
+        await using var connection = dataSource.CreateConnection();
         var rows = (await connection.QueryAsync<object?>(new CommandDefinition(Sql, cancellationToken: cancellationToken))).ToList();
 
         var queue = rows.Select(raw =>

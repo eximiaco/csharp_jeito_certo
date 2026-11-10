@@ -89,7 +89,8 @@ public sealed class OutboxMetrics : IDisposable
     
     public void Dispose()
     {
+        // O DatadogMetricsService é um singleton COMPARTILHADO (injetado): quem o recebe não é o dono e
+        // não o descarta. O container faz isso uma única vez, no fim da aplicação.
         _meter.Dispose();
-        _datadogMetricsService.Dispose();
     }
 }

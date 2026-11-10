@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using Eximia.Integrations.Auth;
 using Eximia.Integrations.DestinationsErrorsConfiguration;
 using Eximia.Integrations.DestinationsErrorsConfiguration.DataAccess;
@@ -42,6 +43,11 @@ public static class DependencyInjection
     {
         // Singletons: sem estado por mensagem, thread-safe. Quem tem Dispose é descartado pelo container.
         services.AddSingleton<PostgresConnectionStringFactory>();
+
+        // DONO do pool de conexões com o Postgres. Por estar no container, ele é descartado no encerramento do
+        // host, e as conexões ociosas são fechadas pelo protocolo do Postgres, e não cortadas quando o processo morre.
+        services.AddSingleton(sp => NpgsqlDataSource.Create(
+            sp.GetRequiredService<PostgresConnectionStringFactory>().CreateConnectionString()));
         services.AddSingleton<OtelVariables>();
         services.AddSingleton<SquadsSingleton>();
         services.AddSingleton<DatadogMetricsService>();

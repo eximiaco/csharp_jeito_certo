@@ -8,7 +8,7 @@ using Eximia.Integrations.Shared.Postgres;
 
 namespace Eximia.Integrations.IntegrationEvents;
 
-public sealed class IntegrationEventsDataAccess(PostgresConnectionStringFactory connectionStringFactory)
+public sealed class IntegrationEventsDataAccess(NpgsqlDataSource dataSource)
 {
     public async Task InsertAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
@@ -99,7 +99,7 @@ public sealed class IntegrationEventsDataAccess(PostgresConnectionStringFactory 
         param.Add("@SapQueryAction", integrationEvent.SapQueryAction, DbType.AnsiString, ParameterDirection.Input);
         param.Add("@StatusCode", integrationEvent.StatusCode, DbType.Int32, ParameterDirection.Input);
 
-        await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
+        await using var connection = dataSource.CreateConnection();
         var result = await connection.ExecuteScalarAsync<int>(
             new CommandDefinition(sql, param, cancellationToken: cancellationToken));
         integrationEvent.SetDatabaseId(result);
@@ -145,7 +145,7 @@ public sealed class IntegrationEventsDataAccess(PostgresConnectionStringFactory 
         param.Add("StartTime", startTime, DbType.DateTime, ParameterDirection.Input);
 
         // Um único comando: marca o evento como Processing e devolve a linha já atualizada.
-        await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
+        await using var connection = dataSource.CreateConnection();
         var dto = await connection.QueryFirstOrDefaultAsync<EventDto>(new CommandDefinition(
             $@"UPDATE public.integration_events
                   SET
@@ -214,7 +214,7 @@ public sealed class IntegrationEventsDataAccess(PostgresConnectionStringFactory 
         param.Add("@Attempts", integrationEvent.Retry.Attempts, DbType.Int16, ParameterDirection.Input);
         param.Add("@LastError", integrationEvent.Retry.LastError, DbType.AnsiString, ParameterDirection.Input);
 
-        await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
+        await using var connection = dataSource.CreateConnection();
         await connection.ExecuteAsync(new CommandDefinition(sql, param, cancellationToken: cancellationToken));
     }
 
@@ -226,13 +226,13 @@ public sealed class IntegrationEventsDataAccess(PostgresConnectionStringFactory 
         var param = new DynamicParameters();
         param.Add("@Status", EIntegrationStatus.WaitingCallback, DbType.Int16, ParameterDirection.Input);
         param.Add("@ControlCode", integrationEvent.ControlCode, DbType.AnsiString, ParameterDirection.Input);
-        await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
+        await using var connection = dataSource.CreateConnection();
         await connection.ExecuteAsync(new CommandDefinition(sql, param, cancellationToken: cancellationToken));
     }
 
     public async Task<bool> AnyEventWaitingCallback(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
-        await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
+        await using var connection = dataSource.CreateConnection();
         var query = await connection.QueryAsync<int>(new CommandDefinition(
             @$"SELECT
                         id as Id
@@ -246,7 +246,7 @@ public sealed class IntegrationEventsDataAccess(PostgresConnectionStringFactory 
 
     public async Task<Maybe<IntegrationEvent>> GetAsync(int id, CancellationToken cancellationToken)
     {
-        await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
+        await using var connection = dataSource.CreateConnection();
         var dto = await connection.QueryFirstOrDefaultAsync<EventDto>(new CommandDefinition(
             $@"SELECT {_eventColumns}
                 FROM public.integration_events
@@ -270,7 +270,7 @@ public sealed class IntegrationEventsDataAccess(PostgresConnectionStringFactory 
         param.Add("queueOffset", queueOffset, DbType.Int64, ParameterDirection.Input);
         param.Add("queuePartition", queuePartition, DbType.Int32, ParameterDirection.Input);
 
-        await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
+        await using var connection = dataSource.CreateConnection();
         await connection.ExecuteAsync(new CommandDefinition(sql, param, cancellationToken: cancellationToken));
     }
 
@@ -293,7 +293,7 @@ public sealed class IntegrationEventsDataAccess(PostgresConnectionStringFactory 
         param.Add("payloadFile", payloadFile, DbType.AnsiString);
         param.Add("payloadFileId", payloadFileId, DbType.Guid);
 
-        await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
+        await using var connection = dataSource.CreateConnection();
         await connection.ExecuteAsync(new CommandDefinition(sql, param, cancellationToken: cancellationToken));
     }
 
@@ -306,7 +306,7 @@ public sealed class IntegrationEventsDataAccess(PostgresConnectionStringFactory 
         DynamicParameters param = new();
         param.Add("id", id, DbType.Int32);
         
-        await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
+        await using var connection = dataSource.CreateConnection();
         var destiny = await connection.QueryFirstOrDefaultAsync<string>(
             new CommandDefinition(sql, param, cancellationToken: cancellationToken));
         

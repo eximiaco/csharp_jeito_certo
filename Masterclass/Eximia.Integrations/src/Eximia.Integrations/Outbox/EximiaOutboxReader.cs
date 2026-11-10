@@ -15,7 +15,7 @@ namespace Eximia.Integrations.Outbox;
 /// </summary>
 public sealed class EximiaOutboxReader(
     IOutboxReader inner,
-    PostgresConnectionStringFactory connectionStringFactory,
+    NpgsqlDataSource dataSource,
     OutboxMetricsReader outboxMetricsReader,
     OutboxMetrics outboxMetrics,
     ILogger logger) : IOutboxReader
@@ -66,7 +66,7 @@ public sealed class EximiaOutboxReader(
 
     private async Task MarkAsInQueueAsync(List<Guid> uniqueIds)
     {
-        await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
+        await using var connection = dataSource.CreateConnection();
         await connection.ExecuteAsync(InQueueSql, new
         {
             InQueue = (int)EIntegrationStatus.InQueue,

@@ -1,4 +1,5 @@
-﻿using Google.Apis.Auth.OAuth2;
+﻿using Npgsql;
+using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Storage.V1;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -284,10 +285,9 @@ internal static class ServicesExtensions
 
     public static IServiceCollection AddEfDbContext(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContextPool<EximiaIntegrationDbContext>(options =>
-        {
-            options.UseNpgsql(new PostgresConnectionStringFactory(configuration).CreateConnectionString().ConnectionString);
-        });
+        // O EF usa o MESMO data source (e o mesmo pool) do acesso via Dapper.
+        services.AddDbContextPool<EximiaIntegrationDbContext>((sp, options) =>
+            options.UseNpgsql(sp.GetRequiredService<NpgsqlDataSource>()));
         return services;
     }
 

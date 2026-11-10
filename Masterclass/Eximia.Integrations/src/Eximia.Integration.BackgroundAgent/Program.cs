@@ -52,6 +52,10 @@ try
         options.ValidateOnBuild = true;
     });
 
+    // Prazo de encerramento explícito: uma iteração em andamento precisa caber aqui, e ele deve ser MENOR que
+    // o terminationGracePeriodSeconds do pod.
+    builder.Services.Configure<HostOptions>(options => options.ShutdownTimeout = TimeSpan.FromSeconds(30));
+
     var app = builder.Build();
     app.UseHealthChecks("/health-ready");
     app.UseHealthChecks("/health-check");

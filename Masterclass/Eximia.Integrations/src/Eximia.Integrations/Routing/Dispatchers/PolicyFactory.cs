@@ -68,10 +68,15 @@ public static class PolicyFactory
 
     public static IAsyncPolicy<DispatcherResult> CreateFallbackPolicy() =>
         Policy<DispatcherResult>
-            .Handle<Exception>()
+            // Cancelamento (shutdown) NÃO é falha de entrega: sem isso o evento vira "erro" e a origem recebe
+            // um callback de erro que nunca aconteceu.
+            .Handle<Exception>(ex => ex is not OperationCanceledException)
             .FallbackAsync(
                  fallbackAction: async (result, context, token) =>
                  {
+                     // O cliente HTTP pode embrulhar o cancelamento em outra exceção: confira o token.
+                     token.ThrowIfCancellationRequested();
+
                      if (result.Exception is FlurlHttpException flurlException)
                      {
                          return DispatcherResult.Failure("Exception on call destination",

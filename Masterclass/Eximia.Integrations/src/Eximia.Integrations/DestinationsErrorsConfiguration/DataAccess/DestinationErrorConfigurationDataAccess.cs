@@ -9,11 +9,11 @@ namespace Eximia.Integrations.DestinationsErrorsConfiguration.DataAccess;
 
 public class DestinationErrorConfigurationDataAccess : IDestinationErrorConfigurationDataAccess
 {
-    private readonly PostgresConnectionStringFactory _connectionStringFactory;
+    private readonly NpgsqlDataSource _dataSource;
 
-    public DestinationErrorConfigurationDataAccess(PostgresConnectionStringFactory connectionStringFactory)
+    public DestinationErrorConfigurationDataAccess(NpgsqlDataSource dataSource)
     {
-        _connectionStringFactory = connectionStringFactory;
+        _dataSource = dataSource;
     }
 
     public async Task<Maybe<DestinationErrorConfiguration>> GetAsync(string id, CancellationToken cancellationToken = default)
@@ -29,7 +29,7 @@ public class DestinationErrorConfigurationDataAccess : IDestinationErrorConfigur
         DynamicParameters param = new();
         param.Add("id", id, DbType.AnsiStringFixedLength, ParameterDirection.Input, 100);
 
-        await using var connection = new NpgsqlConnection(_connectionStringFactory.CreateConnectionString().ConnectionString);
+        await using var connection = _dataSource.CreateConnection();
         var result = await connection.QueryAsync<DestinationErrorConfigurationDto>(
             new CommandDefinition(sql, param, cancellationToken: cancellationToken)).ConfigureAwait(false);
         if (!result.Any())
