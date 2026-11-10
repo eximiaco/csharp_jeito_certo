@@ -32,7 +32,7 @@ Isto é **pior** do que não ter o token: dá a falsa impressão de que o métod
 
 ### 3. Métodos que nem recebem o token
 
-`UpdateIntegrationProcess`, `UpdateKafkaOffsetAsync` e `AnyEventWaitingCallback` nem tinham o parâmetro. O mesmo valia para as consultas de rota (`RoutingDataAccess`) e para `OutboxMetricsReader`, e `GetRoutesByOriginAndEntityAsync` recebia o token na assinatura sem usá-lo.
+`UpdateIntegrationProcess`, `UpdateKafkaOffsetAsync` e `AnyEventWaitingCallback` nem tinham o parâmetro. O mesmo valia para as consultas de rota (`RoutingDataAccess`), e `GetRoutesByOriginAndEntityAsync` recebia o token na assinatura sem usá-lo.
 
 ### 4. A política de resiliência executada sem o token: HTTP e retries que não param
 
@@ -49,7 +49,7 @@ var result = await policy.ExecuteAsync(
             .PostStringAsync(payload);
         // ...
     },
-    contextWithTelemetry);
+    policyContext);
 ```
 
 O método recebe `cancellationToken`, mas ele **não entra na política**. As consequências vão além da chamada HTTP:
@@ -75,7 +75,7 @@ var dto = await connection.QueryFirstOrDefaultAsync<EventDto>(new CommandDefinit
     cancellationToken: cancellationToken));
 ```
 
-`CommandDefinition` (Dapper) leva o token para o Npgsql, que envia o cancelamento ao servidor: a query **realmente para** e a conexão volta ao pool. Todos os métodos de acesso a dados passaram a receber e repassar o token: `InsertAsync`, `GetAndSetEventToDispatch`, `UpdateIntegrationProcess`, `FinalizeOriginalIntegrationEventsForCallback`, `AnyEventWaitingCallback`, `GetAsync`, `UpdateKafkaOffsetAsync`, `UpdatePayloadAsync`, `GetDestinyAsync`, as consultas de rota, a configuração de erro por destino e `OutboxMetricsReader.GetQueue`. Os chamadores (`RouteIntegrationEventApplication`, `HandleRoutingErrorService`, `ValidateCallbackRule`) foram ajustados para repassá-lo.
+`CommandDefinition` (Dapper) leva o token para o Npgsql, que envia o cancelamento ao servidor: a query **realmente para** e a conexão volta ao pool. Todos os métodos de acesso a dados passaram a receber e repassar o token: `InsertAsync`, `GetAndSetEventToDispatch`, `UpdateIntegrationProcess`, `FinalizeOriginalIntegrationEventsForCallback`, `AnyEventWaitingCallback`, `GetAsync`, `UpdateKafkaOffsetAsync`, `UpdatePayloadAsync`, `GetDestinyAsync`, as consultas de rota e a configuração de erro por destino. Os chamadores (`RouteIntegrationEventApplication`, `HandleRoutingErrorService`, `ValidateCallbackRule`) foram ajustados para repassá-lo.
 
 ### O token entra na política, e a política o entrega a cada tentativa
 
@@ -89,7 +89,7 @@ var result = await policy.ExecuteAsync(
             .PostStringAsync(payload, cancellationToken: token);
         // ...
     },
-    contextWithTelemetry,
+    policyContext,
     cancellationToken);
 ```
 
@@ -111,7 +111,7 @@ A regra geral: **depois de um efeito colateral externo que você não consegue d
 
 ## O que ficou de fora, de propósito
 
-- **`IOutboxReader.GetAsync`** não recebe token, então o `EximiaOutboxReader` chama `GetQueue(CancellationToken.None)`, com um comentário dizendo por quê. O ponto certo para resolver isso é tirar esse trabalho do polling (branch `05-background-service`).
+- **`IOutboxReader`** (interface do Silverback) não recebe token em `GetAsync` nem em `AcknowledgeAsync`, então o `EximiaOutboxReader` não tem de onde propagá-lo.
 - Alguns `WaitAsync` restantes (`SendIntegrationEventService`, `AzureAdAuthenticationService`) esperam a **leitura do corpo de uma resposta HTTP já recebida**, e o cliente HTTP já recebe o token na chamada principal. O risco ali é pequeno. O caso grave é o de operações longas e sem cancelamento próprio, como uma query.
 - As consultas de rota usam um cache com *factory*. O token do chamador é repassado, mas lembre que o factory pode rodar em nome de várias requisições: uma exceção de cancelamento não é armazenada no cache e a próxima tenta de novo.
 - O callback de renovação de token no 401 (`onRetryAsync` do Polly) não recebe token nessa versão da biblioteca.

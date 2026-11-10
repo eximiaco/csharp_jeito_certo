@@ -11,19 +11,16 @@ namespace Eximia.Integrations.Outbox;
 /// <summary>
 ///     Decorator do reader padrão do Silverback (PostgreSql). Depois que o <see cref="OutboxWorker" /> confirma a
 ///     produção das mensagens no Kafka (<see cref="AcknowledgeAsync" />), marca os integration events como
-///     <see cref="EIntegrationStatus.InQueue" /> e atualiza as métricas de publicação.
+///     <see cref="EIntegrationStatus.InQueue" />.
 /// </summary>
 public sealed class EximiaOutboxReader(
     IOutboxReader inner,
     NpgsqlDataSource dataSource,
-    OutboxMetrics outboxMetrics,
     ILogger logger) : IOutboxReader
 {
     private const string InQueueSql = @"UPDATE integration_events SET status = @InQueue
                                         WHERE unique_id = ANY(@UniqueIds) AND status = @InOutbox";
 
-    // Este método roda a CADA poll do OutboxWorker (500 ms). Ele só lê o outbox: o cálculo das métricas de
-    // fila (varredura completa dos headers) mora no QueueMetricsWorker do BackgroundAgent.
     public Task<IDisposableAsyncEnumerable<OutboxMessage>> GetAsync(int count) => inner.GetAsync(count);
 
     public async Task AcknowledgeAsync(IEnumerable<OutboxMessage> outboxMessages)
@@ -39,12 +36,8 @@ public sealed class EximiaOutboxReader(
         foreach (var message in messages)
         {
             var id = message.Headers?.FirstOrDefault(h => h.Name == OutboxDefaults.HeaderIntegrationId)?.Value;
-            var origin = message.Headers?.FirstOrDefault(h => h.Name == OutboxDefaults.HeaderOrigin)?.Value;
-            var destiny = message.Headers?.FirstOrDefault(h => h.Name == OutboxDefaults.HeaderDestiny)?.Value;
-            var entity = message.Headers?.FirstOrDefault(h => h.Name == OutboxDefaults.HeaderEntity)?.Value;
 
             logger.Debug("Outbox produce message with success. {IntegrationId}", id);
-            outboxMetrics.AddPublishedMessages(origin, destiny, entity);
 
             if (Guid.TryParse(id, out var uniqueId))
                 uniqueIds.Add(uniqueId);

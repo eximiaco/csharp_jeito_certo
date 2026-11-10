@@ -4,11 +4,10 @@ using Polly;
 using Eximia.Integrations.Shared;
 using Eximia.Integrations.DestinationsErrorsConfiguration;
 using Eximia.Integrations.IntegrationEvents;
-using Eximia.Integrations.Routing.Telemetry;
 
 namespace Eximia.Integrations.Routing.Dispatchers;
 
-public class HttpJsonDispatcher(IDispatcherEventTelemetry routeIntegrationEventTelemetry)
+public class HttpJsonDispatcher
     : IDestinationDispatcher
 {
     public async Task<DispatcherResult> SendAsync(
@@ -18,11 +17,7 @@ public class HttpJsonDispatcher(IDispatcherEventTelemetry routeIntegrationEventT
         string payload,
         CancellationToken cancellationToken)
     {
-        routeIntegrationEventTelemetry.IntegrationEventLoaded(nameof(HttpJsonDispatcher.SendAsync), integrationEvent, route);
-
-        var contextWithTelemetry = new Context()
-            .WithOpenTelemetry(routeIntegrationEventTelemetry)
-            .WithIntegrationId(integrationEvent.Id);
+        var policyContext = new Context();
 
         var uri = integrationEvent.Control.IsCallbackError ? route.CallbackErrorUri : route.Uri;
 
@@ -34,18 +29,16 @@ public class HttpJsonDispatcher(IDispatcherEventTelemetry routeIntegrationEventT
             // O token entra na POLÍTICA: é ela que o entrega a cada tentativa (token) e o usa nas esperas entre elas.
             action: async (context, token) =>
             {
-                routeIntegrationEventTelemetry.MakingCallToDestiny();
                 using var response = await uri
                     .WithHeader("Content-Type", route.ContentType)
                     .WithHeader("x-eximia-correlation-id", integrationEvent.ControlCode)
                     .WithTimeout(TimeSpan.FromSeconds(route.TimeOut))
                     .PostStringAsync(payload, cancellationToken: token);
-                routeIntegrationEventTelemetry.RequestFinished();
                 return integrationEvent.Control.IsSync
                     ? DispatcherResult.Success(response.StatusCode, await response.GetStringAsync())
                     : DispatcherResult.DefaultSuccess;
             },
-            contextWithTelemetry,
+            policyContext,
             cancellationToken);
         
         return result;
