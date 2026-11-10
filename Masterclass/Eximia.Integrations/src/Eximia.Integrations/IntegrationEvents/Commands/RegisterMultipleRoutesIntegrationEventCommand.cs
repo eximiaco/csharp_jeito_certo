@@ -18,9 +18,6 @@ public record RegisterMultipleRoutesIntegrationEventCommand
     public int SchemaVersion { get; }
     public bool IsCallback { get; }
     public bool IsCallbackError { get; }
-    public bool IsPayloadLink { get; }
-    public string PayloadFile { get; }
-    public Guid FileId { get; }
     public string? SapQueryAction { get; }
     public int? StatusCode { get; }
     public long Version { get; }
@@ -39,9 +36,6 @@ public record RegisterMultipleRoutesIntegrationEventCommand
         int schemaVersion,
         bool isCallback,
         bool isCallbackError,
-        bool isPayloadLink,
-        string payloadFile,
-        Guid fileId,
         string? sapQueryAction,
         int? statusCode,
         long version,
@@ -59,9 +53,6 @@ public record RegisterMultipleRoutesIntegrationEventCommand
         SchemaVersion = schemaVersion;
         IsCallback = isCallback;
         IsCallbackError = isCallbackError;
-        IsPayloadLink = isPayloadLink;
-        PayloadFile = payloadFile;
-        FileId = fileId;
         SapQueryAction = sapQueryAction;
         StatusCode = statusCode;
         Version = version;
@@ -81,9 +72,6 @@ public record RegisterMultipleRoutesIntegrationEventCommand
         int schemaVersion,
         bool isCallback,
         bool isCallbackError,
-        bool isPayloadLink,
-        string payloadFile,
-        Guid fileId,
         string? sapQueryAction,
         int? statusCode,
         long version,
@@ -112,9 +100,6 @@ public record RegisterMultipleRoutesIntegrationEventCommand
             schemaVersion,
             isCallback,
             isCallbackError,
-            isPayloadLink,
-            payloadFile,
-            fileId,
             sapQueryAction,
             statusCode,
             version,
