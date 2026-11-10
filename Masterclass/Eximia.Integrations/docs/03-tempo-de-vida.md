@@ -9,7 +9,7 @@ Em serviços persistentes (API, consumer, worker), as dependências vivem por mu
 
 As dependências são registradas no container padrão do .NET, por caso de uso, em [DependencyInjection.cs](../src/Eximia.Integrations/DependencyInjection.cs). Os problemas estão em **quanto tempo cada coisa vive**.
 
-### 1. Singleton por conveniência: o handler que prende o `DbContext`
+### 1. Captive dependency na API: o handler que prende o `DbContext`
 
 ```csharp
 // Usado em toda requisição da API: uma instância só.
@@ -26,7 +26,22 @@ O `PublishPlataformEventService` tem o mesmo defeito em menor escala: é registr
 
 Nada disso quebra um teste com uma requisição por vez. O sintoma aparece sob carga, como exceções intermitentes e dados trocados, que é o pior tipo de defeito para investigar.
 
-### 2. Captive dependency: um `BackgroundService` prendendo o `DbContext`
+### 2. Singleton desnecessário: o serviço que não precisa ser compartilhado
+
+```csharp
+// Só lê uma configuração e faz um POST: uma instância basta para todo o processo.
+services.AddSingleton<SendIntegrationEventService>();
+```
+
+Este caso é diferente dos anteriores: **nada quebra hoje**. O `SendIntegrationEventService` só recebe o `IConfiguration` (que é singleton), lê uma URL no construtor e faz um POST. Não tem estado por operação e não depende de nada scoped. O problema é que **singleton é uma decisão de compartilhar uma instância**, e aqui não há o que compartilhar:
+
+- **Sem ganho.** A construção é barata (uma leitura de configuração) e não há recurso, cache ou semáforo para dividir entre as requisições. Quem justifica um singleton é o `TokenCache` (os semáforos single-flight vivem nele) ou o `NpgsqlDataSource` (é dono do pool). Aqui o singleton não protege nada.
+- **Uma armadilha para quem vem depois.** Amanhã alguém precisa do `IntegrationEventsDataAccess` ou do `DbContext` nesse serviço e adiciona ao construtor. Ele vira uma *captive dependency* (problema 1) **sem nenhum aviso**, porque a validação do container está desligada (problema 4).
+- **Configuração congelada.** A URL é lida uma única vez e vale até o processo reiniciar. Com o serviço scoped, ela é relida a cada mensagem.
+
+O sinal de alerta é a justificativa: "é só um serviço simples, uma instância basta". Isso descreve o que o objeto **não precisa**, e não o que ele **é**.
+
+### 3. Captive dependency: um `BackgroundService` prendendo o `DbContext`
 
 O `ReprocessStuckEventsWorker` (um `BackgroundService`, ou seja, **singleton**) recebia o `DbContext` diretamente no construtor:
 
@@ -46,7 +61,7 @@ O `DbContext` foi projetado para uma unidade de trabalho curta. Preso ao singlet
 
 O mesmo vale para o `RoutingDataAccess` e para qualquer serviço scoped recebido no construtor de um `BackgroundService`.
 
-### 3. A validação do container desligada
+### 4. A validação do container desligada
 
 Nos três hosts:
 
@@ -58,7 +73,7 @@ builder.Host.UseDefaultServiceProvider(options =>
 });
 ```
 
-Por padrão, o container do .NET só valida em **Development**: `ValidateScopes` acusa um singleton que consome um serviço scoped, e `ValidateOnBuild` acusa uma dependência não registrada, ambos na subida. Fora do Development, nada disso é verificado. Desligar nos três hosts deixa os problemas 1 e 2 **passarem em silêncio em todos os ambientes**.
+Por padrão, o container do .NET só valida em **Development**: `ValidateScopes` acusa um singleton que consome um serviço scoped, e `ValidateOnBuild` acusa uma dependência não registrada, ambos na subida. Fora do Development, nada disso é verificado. Desligar nos três hosts deixa os problemas 1 e 3 **passarem em silêncio em todos os ambientes**.
 
 Isso foi conferido: religando a validação na baseline, a API deixa de subir com `Cannot consume scoped service '...TopicNameFactoryPeerEnviroment' from singleton '...RegisterMultipleRoutesIntegrationEventApplication'`, e o agent acusa o worker.
 
@@ -66,7 +81,7 @@ A mesma validação revelou um terceiro defeito, antigo e escondido:
 
 - **O health check do outbox nunca funcionou.** O `OutboxHealthCheckService` do Silverback exige um `IOutboxReader` que nada registra. O `/health-check` da API falharia na primeira chamada de verdade, e sem validação ninguém via.
 
-### 4. Sobras de Web API nos hosts sem HTTP
+### 5. Sobras de Web API nos hosts sem HTTP
 
 O dispatcher e o agent registram `HttpContextAccessor`, `IntegrationRequestHttpAdapter`, `IIntegrationRequest` e `EximiaProblemDetailsFactory`: classes de Web API que um consumer e um worker não usam, já que não há `HttpContext` nenhum. Registrar o que ninguém usa engana quem lê (cada linha sugere que algo depende dela) e carrega dependências sem necessidade.
 
@@ -77,6 +92,7 @@ O dispatcher e o agent registram `HttpContextAccessor`, `IntegrationRequestHttpA
 ```csharp
 services.AddScoped<RegisterMultipleRoutesIntegrationEventApplication>();
 services.AddScoped<PublishPlataformEventService>();
+services.AddScoped<SendIntegrationEventService>();   // não havia o que compartilhar
 ```
 
 A pergunta que decide o tempo de vida não é "quantas vezes esse objeto é usado?", e sim **"esse objeto guarda ou depende de algo de uma operação específica?"**. Se guarda ou depende, não pode ser singleton, por mais que seja usado.
@@ -143,6 +159,7 @@ Saíram do dispatcher e do agent o `HttpContextAccessor`, o `IntegrationRequestH
 ## Regras para levar
 
 - **Singleton é para o que não guarda nem depende do estado de uma operação**, e não para o que é muito usado.
+- **Singleton exige um motivo.** Estado compartilhado, recurso caro ou dono de um recurso. "É simples e basta uma instância" não é motivo: na dúvida, scoped.
 - **Singleton não recebe serviço scoped.** Em um serviço de background, crie um escopo por iteração com `IServiceScopeFactory.CreateAsyncScope()`.
 - **Ligue `ValidateScopes` e `ValidateOnBuild` em todos os ambientes**, não só em Development. Desligá-los para "calar o erro" esconde o defeito em vez de corrigi-lo.
 - **Registre só o que o host usa**, e nada por conveniência: cada registro é uma afirmação de que alguém depende daquilo.
