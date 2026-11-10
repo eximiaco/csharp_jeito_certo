@@ -165,8 +165,7 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
                         command.Entity,
                         route.Id));
 
-                // Telemetria da plataforma: roda em paralelo para não atrasar a resposta à origem.
-                _ = Task.Run(() => publishPlataformEventService.PublishIntegrationEventReceivedAsync(integrationEvent.Value));
+                await publishPlataformEventService.PublishIntegrationEventReceivedAsync(integrationEvent.Value);
             }
 
             await eximiaIntegrationDbContext.SaveChangesAsync(cancellationToken);
@@ -174,12 +173,12 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
             }
 
             // Executar ações pós-registro para cada evento
-            Parallel.ForEach(processedEvents, async integrationEvent =>
+            foreach (var integrationEvent in processedEvents)
             {
                 using var eventIdLog = LogContext.PushProperty(otelVariables.IntegrationId, integrationEvent.Id);
                 await integrationEventActionsEngine.Execute(integrationEvent, cancellationToken);
-                registerNewIntegrationEventTelemetry.IntegrationEventPublish(processedEvents.FirstOrDefault()!);
-            });
+                registerNewIntegrationEventTelemetry.IntegrationEventPublish(integrationEvent);
+            }
             
             registerNewIntegrationEventTelemetry.IntegrationEventRequestProcessed();
 
