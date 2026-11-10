@@ -7,17 +7,20 @@
 
 O `CancellationToken` percorria os métodos do consumer, mas parava antes de chegar onde o trabalho realmente acontece: no banco, na chamada HTTP e nas operações que uma política de resiliência cria por conta própria.
 
-### 1. `WaitAsync(cancellationToken)` no lugar de passar o token
+### 1. O token para na porta do banco
 
-Em [IntegrationEventsDataAccess.cs](../src/Eximia.Integrations/IntegrationEvents/IntegrationEventsDataAccess.cs):
+O token entra pelo consumer e desce até o acesso a dados, mas **ninguém o entrega ao driver**. Em [IntegrationEventsDataAccess.cs](../src/Eximia.Integrations/IntegrationEvents/IntegrationEventsDataAccess.cs):
 
 ```csharp
-var dto = await connection
-    .QueryFirstOrDefaultAsync<EventDto>(sql, param)
-    .WaitAsync(cancellationToken);
+public async Task<Maybe<IntegrationEvent>> GetAndSetEventToDispatch(Guid uniqueId, CancellationToken cancellationToken)
+{
+    // ...
+    var dto = await connection.QueryFirstOrDefaultAsync<EventDto>(sql, param);   // o token não vai junto
 ```
 
-`WaitAsync` faz o **chamador** parar de esperar quando o token é cancelado. Mas a operação subjacente **continua**: a query segue rodando no Postgres (visível em `pg_stat_activity`), a conexão do pool continua ocupada e, no shutdown, o processo espera, ou é morto, com trabalho pendurado. Para quem olha o código, "está cancelável". Para o banco, não está.
+O mesmo vale para `GetAsync` e `GetDestinyAsync`. A query segue até o fim no Postgres (visível em `pg_stat_activity`), a conexão do pool continua ocupada e, no shutdown, o processo espera, ou é morto, com trabalho pendurado. Para quem olha o código, "está cancelável". Para o banco, não está.
+
+> **E o `.WaitAsync(cancellationToken)`?** Ele não resolve. Pendurar `.WaitAsync(ct)` numa chamada que não recebeu o token só faz **quem chamou** parar de esperar quando o token é cancelado: a operação em si continua rodando. O caminho certo é passar o token **para a própria chamada**, que é o que a seção "O token vai até o driver" faz.
 
 ### 2. Aceitar o token na assinatura e ignorá-lo
 
@@ -75,7 +78,7 @@ var dto = await connection.QueryFirstOrDefaultAsync<EventDto>(new CommandDefinit
     cancellationToken: cancellationToken));
 ```
 
-`CommandDefinition` (Dapper) leva o token para o Npgsql, que envia o cancelamento ao servidor: a query **realmente para** e a conexão volta ao pool. Todos os métodos de acesso a dados passaram a receber e repassar o token: `InsertAsync`, `GetAndSetEventToDispatch`, `UpdateIntegrationProcess`, `FinalizeOriginalIntegrationEventsForCallback`, `GetAsync`, `UpdateKafkaOffsetAsync`, `UpdatePayloadAsync`, `GetDestinyAsync`, as consultas de rota e a configuração de erro por destino. Os chamadores (`RouteIntegrationEventApplication` e `HandleRoutingErrorService`) foram ajustados para repassá-lo.
+`CommandDefinition` (Dapper) leva o token para o Npgsql, que envia o cancelamento ao servidor: a query **realmente para** e a conexão volta ao pool. Todos os métodos de acesso a dados passaram a receber e repassar o token: `InsertAsync`, `GetAndSetEventToDispatch`, `UpdateIntegrationProcess`, `FinalizeOriginalIntegrationEventsForCallback`, `GetAsync`, `UpdateKafkaOffsetAsync`, `UpdatePayloadAsync`, `GetDestinyAsync`, as consultas de rota e a configuração de erro por destino. O `PublishAsync` do callback de erro (`HandleRoutingErrorService`) também recebe o token. Os chamadores (`RouteIntegrationEventApplication` e `HandleRoutingErrorService`) foram ajustados para repassá-lo.
 
 ### O token entra na política, e a política o entrega a cada tentativa
 
@@ -112,13 +115,12 @@ A regra geral: **depois de um efeito colateral externo que você não consegue d
 ## O que ficou de fora, de propósito
 
 - **`IOutboxReader`** (interface do Silverback) não recebe token em `GetAsync` nem em `AcknowledgeAsync`, então o `EximiaOutboxReader` não tem de onde propagá-lo.
-- Alguns `WaitAsync` restantes (`SendIntegrationEventService`, `AzureAdAuthenticationService`) esperam a **leitura do corpo de uma resposta HTTP já recebida**, e o cliente HTTP já recebe o token na chamada principal. O risco ali é pequeno. O caso grave é o de operações longas e sem cancelamento próprio, como uma query.
 - As consultas de rota usam um cache com *factory*. O token do chamador é repassado, mas lembre que o factory pode rodar em nome de várias requisições: uma exceção de cancelamento não é armazenada no cache e a próxima tenta de novo.
 - O callback de renovação de token no 401 (`onRetryAsync` do Polly) não recebe token nessa versão da biblioteca.
 
 ## Regras para levar
 
-- **`WaitAsync(ct)` não cancela a operação**, só a espera por ela. Use o token na própria chamada.
+- **`.WaitAsync(ct)` não cancela a operação**, só faz quem chama parar de esperar por ela. Passe o token para a própria chamada.
 - **Receber um `CancellationToken` e não repassá-lo é um defeito**, mesmo que compile e passe nos testes.
 - **O token precisa entrar em quem cria operações filhas** (políticas de retry, loops paralelos, `WhenAll`), e cada operação filha usa o token que recebe dele.
 - **Combine token do host com timeout próprio** com `CancellationTokenSource.CreateLinkedTokenSource(stoppingToken)` + `CancelAfter(timeout)`, e distinga os dois casos no `catch`: `catch (OperationCanceledException) when (!stoppingToken.IsCancellationRequested)` é o timeout; o contrário é o shutdown.
