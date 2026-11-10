@@ -19,7 +19,7 @@ public class AzureAdAuthenticationDecorator(
                 if (token.IsSuccess)
                     cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(token.Value.ExpiresIn - 5);
                 return token;
-            }).WaitAsync(cancellationToken).ConfigureAwait(false);
+            }).ConfigureAwait(false);
 
         if (cachedToken.IsFailure)
         {
