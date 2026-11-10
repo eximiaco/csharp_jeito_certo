@@ -19,9 +19,6 @@ public class ReprocessStuckEventsWorker(
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        dbContext.Database.ExecuteSqlRaw(
-            "CREATE INDEX IF NOT EXISTS ix_integration_events_status_start_time ON integration_events (status, start_time)");
-
         while (true)
         {
             try
