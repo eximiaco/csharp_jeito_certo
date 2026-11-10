@@ -40,9 +40,6 @@ public class SendIntegrationEventService(IConfiguration configuration) : IServic
         int? integrationEventId,
         string request,
         string controlCode,
-        bool isPayloadLink,
-        string payloadFile,
-        Guid payloadFileId,
         string token,
         CancellationToken cancellationToken = default)
     {
@@ -54,9 +51,6 @@ public class SendIntegrationEventService(IConfiguration configuration) : IServic
                     .AllowAnyHttpStatus()
                     .WithHeader("Content-Type", "application/json")
                     .WithHeader("x-eximia-correlation-id", controlCode)
-                    .WithHeader("x-eximia-is-payload-link", isPayloadLink)
-                    .WithHeader("x-eximia-payload-file", payloadFile)
-                    .WithHeader("x-eximia-payload-file-id", payloadFileId)
                     .WithHeader("x-eximia-integration-event-id", integrationEventId)
                     .WithOAuthBearerToken(token)
                     .PostStringAsync(request, cancellationToken: context);

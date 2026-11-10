@@ -66,20 +66,15 @@ public sealed class RegisterAsyncIntegrationEventApplication(
             using var routeLog = LogContext.PushProperty(otelVariables.RouteId, route.Value.Id);
 
             var payload = command.Payload.ToStringJson();
-            var payloadFile = command.PayloadFile;
-            var payloadFileId = command.FileId;
-            if (!command.IsPayloadLink)
-            {
-                payloadFileId = Guid.NewGuid();
+            var payloadFileId = Guid.NewGuid();
 
-                var uploadResult = await payloadService.UploadAsync(
-                    payload,
-                    payloadFileId,
-                    cancellationToken);
+            var uploadResult = await payloadService.UploadAsync(
+                payload,
+                payloadFileId,
+                cancellationToken);
 
-                payload = uploadResult.NewPayload;
-                payloadFile = uploadResult.FileName;
-            }
+            payload = uploadResult.NewPayload;
+            var payloadFile = uploadResult.FileName;
 
             var integrationEvent = jsonSchemaService.CreateFrom(
                 command,

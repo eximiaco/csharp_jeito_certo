@@ -17,8 +17,7 @@ namespace Eximia.Integrations.HttpApi.Controllers;
 public class IntegrationEventsController(
     EximiaProblemDetailsFactory detailsFactory,
     OtelVariables otelVariables,
-    SquadsSingleton squadsSingleton,
-    IHttpContextAccessor httpContextAccessor)
+    SquadsSingleton squadsSingleton)
     : ControllerBase
 {
     [HttpPost("integrations")]
@@ -64,18 +63,6 @@ public class IntegrationEventsController(
         using var isCallbackLog = LogContext.PushProperty(otelVariables.IsCallback, isCallback);
         using var isCallbackErrorLog = LogContext.PushProperty(otelVariables.IsCallbackError, payload.Meta.IsCallbackError);
 
-        var isPayloadLink = false;
-        if (httpContextAccessor.HttpContext?.Request?.Headers?.TryGetValue("x-eximia-is-payload-link", out var isPayloadLinkHeader) == true)
-            isPayloadLink = isPayloadLinkHeader.ToString().Equals("true", StringComparison.InvariantCultureIgnoreCase);
-
-        var payloadFile = string.Empty;
-        if (httpContextAccessor.HttpContext?.Request?.Headers?.TryGetValue("x-eximia-payload-file", out var payloadFileHeader) == true)
-            payloadFile = payloadFileHeader;
-
-        var fileId = Guid.Empty;
-        if (httpContextAccessor.HttpContext?.Request?.Headers?.TryGetValue("x-eximia-payload-file-id", out var payloadFileIdHeader) == true)
-            Guid.TryParse(payloadFileIdHeader, out fileId);
-
         var command = RegisterMultipleRoutesIntegrationEventCommand.Create(
             payload.Meta.Origin.Name ?? string.Empty,
             payload.Meta.Origin.Key ?? string.Empty,
@@ -89,9 +76,6 @@ public class IntegrationEventsController(
             payload.Meta.SchemaVersion ?? 0,
             isCallback,
             payload.Meta.IsCallbackError,
-            isPayloadLink,
-            payloadFile ?? string.Empty,
-            fileId,
             payload.Meta.SapQueryAction,
             payload.Meta.StatusCode,
             payload.Meta.Entity.Version,
