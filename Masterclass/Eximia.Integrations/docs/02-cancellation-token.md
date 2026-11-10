@@ -114,7 +114,6 @@ A regra geral: **depois de um efeito colateral externo que você não consegue d
 
 ## O que ficou de fora, de propósito
 
-- **`IOutboxReader`** (interface do Silverback) não recebe token em `GetAsync` nem em `AcknowledgeAsync`, então o `EximiaOutboxReader` não tem de onde propagá-lo.
 - As consultas de rota usam um cache com *factory*. O token do chamador é repassado, mas lembre que o factory pode rodar em nome de várias requisições: uma exceção de cancelamento não é armazenada no cache e a próxima tenta de novo.
 - O callback de renovação de token no 401 (`onRetryAsync` do Polly) não recebe token nessa versão da biblioteca.
 
