@@ -4,7 +4,7 @@ using Eximia.Integrations.Shared;
 namespace Eximia.Integrations.Routing.Authentication.Providers;
 
 public class ClientCredentialsProvider(TokenCache tokenCache)
-    : TokenServiceProvider(tokenCache), IService<ClientCredentialsProvider>
+    : TokenServiceProvider(tokenCache)
 {
     protected override async Task<JwtBearerToken?> RequestNewTokenAsync(Route route, string correlationId, CancellationToken cancellationToken)
     {

@@ -9,7 +9,7 @@ namespace Eximia.Integrations.Routing;
 public class RoutingService(
     DestinationDispatcherFactory destinationDispatcherFactory,
     IDestinationErrorConfigurationDataAccess destinationErrorConfigurationDataAccess,
-    PayloadService payloadService) : IService<RoutingService>
+    PayloadService payloadService)
 {
     public async Task<DispatcherResult> SendIntegrationEvent(
         IntegrationEvent integrationEvent,

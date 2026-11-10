@@ -14,7 +14,6 @@ public class RoutingDataAccess(
     IMemoryCache memoryCache,
     PostgresConnectionStringFactory connectionStringFactory,
     IOptions<List<RouteAuthenticationSettings>> routeAuthenticationSettings)
-    : IService<RoutingDataAccess>
 {
     public async Task<Maybe<Route>> GetRoute(string entity, string destiny, CancellationToken cancellationToken = default)
     {
