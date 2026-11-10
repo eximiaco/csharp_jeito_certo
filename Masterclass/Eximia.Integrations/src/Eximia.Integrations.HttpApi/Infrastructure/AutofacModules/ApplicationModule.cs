@@ -5,6 +5,7 @@ using Eximia.Integrations.Shared.Postgres;
 using Eximia.Integrations.Shared.Telemetry;
 using Eximia.Integrations.IntegrationEvents.Telemetry;
 using Eximia.Integrations.Outbox;
+using Eximia.Integrations.Routing.Authentication;
 using Eximia.Integrations.Routing.Telemetry;
 
 namespace Eximia.Integrations.HttpApi.Infrastructure.AutofacModules;
@@ -30,6 +31,7 @@ public class ApplicationModule : Module
         builder.RegisterType<TelemetryService>().As<ITelemetryService>().InstancePerLifetimeScope();
         builder.RegisterType<PostgresConnectionStringFactory>().SingleInstance();
         builder.RegisterType<OtelVariables>().SingleInstance();
+        builder.RegisterType<TokenCache>().SingleInstance();
         builder.RegisterType<PlatformMetrics>().SingleInstance();
         builder.RegisterType<OutboxMetrics>().SingleInstance();
         builder.RegisterType<DatadogMetricsService>().SingleInstance();

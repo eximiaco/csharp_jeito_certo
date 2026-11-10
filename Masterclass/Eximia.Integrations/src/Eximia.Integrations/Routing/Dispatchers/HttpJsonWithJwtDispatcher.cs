@@ -40,7 +40,7 @@ public class HttpJsonWithJwtDispatcher(
             {
                 routeIntegrationEventTelemetry.MakingCallToDestiny();
                 var tokenJwt = string.Empty;
-                var authToken = await clientCredentialsProvider.GetTokenAsync(route);
+                var authToken = await clientCredentialsProvider.GetTokenAsync(route, integrationEvent.ControlCode);
 
                 if (authToken != null)
                     tokenJwt = string.IsNullOrEmpty(authToken.access_token) ? "" : $"Bearer {authToken.access_token}";

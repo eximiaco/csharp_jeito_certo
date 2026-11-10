@@ -5,6 +5,7 @@ using Eximia.Integrations.Shared.Postgres;
 using Eximia.Integrations.Shared.Telemetry;
 using Eximia.Integrations.IntegrationEvents.Telemetry;
 using Eximia.Integrations.IntegrationEvents.Telemetry.Callback;
+using Eximia.Integrations.Routing.Authentication;
 using Eximia.Integrations.Routing.Telemetry;
 
 namespace Eximia.Integrations.EventDispatcher.Infrastructure;
@@ -31,6 +32,7 @@ public class ApplicationModule : Autofac.Module
         builder.RegisterType<CallbackEventTelemetry>().As<ICallbackEventTelemetry>().InstancePerLifetimeScope();
         builder.RegisterType<TelemetryService>().As<ITelemetryService>().InstancePerLifetimeScope();
         builder.RegisterType<OtelVariables>().SingleInstance();
+        builder.RegisterType<TokenCache>().SingleInstance();
         builder.RegisterType<PlatformMetrics>().SingleInstance();
         builder.RegisterType<SquadsSingleton>().SingleInstance();
         builder.RegisterType<DatadogMetricsService>().SingleInstance();

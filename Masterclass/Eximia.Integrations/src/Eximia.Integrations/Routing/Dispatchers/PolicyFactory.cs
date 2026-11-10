@@ -15,15 +15,16 @@ public static class PolicyFactory
         Policy<DispatcherResult>
             .Handle<FlurlHttpException>(c => c.StatusCode == (int)HttpStatusCode.Unauthorized)
             .RetryAsync(
-                onRetry: (result, retry, context) =>
+                onRetryAsync: async (result, retry, context) =>
                 {
                     var telemetry = context.GetOpenTelemetryService();
                     var error = result.Exception.Message;
                     if (result.Exception is FlurlHttpException flurlException)
-                        error = flurlException.GetResponseStringAsync().Result;
+                        error = await flurlException.GetResponseStringAsync();
 
                     telemetry!.UnAuthorizeCall();
-                    provider.GetTokenAsync(route, correlationId).GetAwaiter().GetResult();
+                    provider.Invalidate(route);                       // descarta o token recusado
+                    await provider.GetTokenAsync(route, correlationId);
                 });
 
     public static IAsyncPolicy<DispatcherResult> CreateRetryPolicy(int maxRetries, Maybe<DestinationErrorConfiguration> destinationErrorConfiguration) =>

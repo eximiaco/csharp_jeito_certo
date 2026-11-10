@@ -5,14 +5,10 @@ using Eximia.Integrations.Routing.Telemetry;
 
 namespace Eximia.Integrations.Routing.Authentication.Providers;
 
-public class ClientCredentialsProvider : TokenServiceProvider, IService<ClientCredentialsProvider>
+public class ClientCredentialsProvider(TokenCache tokenCache, IClientCredentialsProviderTelemetry telemetry)
+    : TokenServiceProvider(tokenCache, telemetry), IService<ClientCredentialsProvider>
 {
-    public ClientCredentialsProvider(
-        IClientCredentialsProviderTelemetry telemetry,
-        IMemoryCache memoryCache) : base(memoryCache, telemetry)
-    { }
-
-    protected override async Task<JwtBearerToken?> RequestNewTokenAsync(Route route, string correlationId = "")
+    protected override async Task<JwtBearerToken?> RequestNewTokenAsync(Route route, string correlationId, CancellationToken cancellationToken)
     {
         _telemetry.RequestingNewToken(route);
         try
@@ -27,13 +23,12 @@ public class ClientCredentialsProvider : TokenServiceProvider, IService<ClientCr
             if (!string.IsNullOrWhiteSpace(route.Authentication.Scope))
                 content["scope"] = route.Authentication.Scope;
             
-            var foo = await route.Authentication.Uri
+            return await route.Authentication.Uri
                 .WithHeader("Content-Type", "application/x-www-form-urlencoded")
                 .WithHeader("x-eximia-correlation-id", correlationId)
                 .WithTimeout(TimeSpan.FromSeconds(route.TimeOut))
-                .PostUrlEncodedAsync(content)
+                .PostUrlEncodedAsync(content, cancellationToken: cancellationToken)
                 .ReceiveJson<JwtBearerToken>();
-            return foo;
         }
         catch (Exception e)
         {

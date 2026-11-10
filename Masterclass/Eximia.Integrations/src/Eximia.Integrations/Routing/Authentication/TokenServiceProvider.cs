@@ -1,46 +1,30 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using Eximia.Integrations.Routing.Telemetry;
+﻿using Eximia.Integrations.Routing.Telemetry;
 
 namespace Eximia.Integrations.Routing.Authentication;
 
-public abstract class TokenServiceProvider
+public abstract class TokenServiceProvider(TokenCache tokenCache, IClientCredentialsProviderTelemetry telemetry)
 {
-    private readonly IMemoryCache _memoryCache;
-    protected readonly IClientCredentialsProviderTelemetry _telemetry;
+    protected readonly IClientCredentialsProviderTelemetry _telemetry = telemetry;
 
-    protected TokenServiceProvider(IMemoryCache memoryCache,
-        IClientCredentialsProviderTelemetry telemetry)
-    {
-        _memoryCache = memoryCache;
-        _telemetry = telemetry;
-    }
-
-    public async Task<JwtBearerToken?> GetTokenAsync(Route route, string correlationId = "")
+    public async Task<JwtBearerToken?> GetTokenAsync(Route route, string correlationId = "", CancellationToken cancellationToken = default)
     {
         _telemetry.StartingTokenAquisition(route, "TokenServiceProvider.GetTokenAsync");
-        JwtBearerToken? token = null;
-        var key = $"{route.Destination}-JwtAuth";
 
-        var cachedValue = await _memoryCache.GetOrCreateAsync(
-            key,
-            async cacheEntry =>
+        return await tokenCache.GetAsync(
+            CacheKey(route),
+            async ct =>
             {
-                token = await RequestNewTokenAsync(route); 
+                var token = await RequestNewTokenAsync(route, correlationId, ct);
                 _telemetry.NewTokenAdquired(token!);
-                cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMilliseconds(token!.expires_in);
-                return token;
-            });
-        
-        if (!cachedValue!.Expired(TimeSpan.FromSeconds(5)))
-        {
-            _telemetry.ValidToken(cachedValue);
-            return token;
-        }
-        _telemetry.TokenExpired(cachedValue);
-        token = await RequestNewTokenAsync(route);
-        _telemetry.SucessoOnNewToken();
-        return token;
+                return token!;
+            },
+            cancellationToken);
     }
 
-    protected abstract Task<JwtBearerToken?> RequestNewTokenAsync(Route route, string correlationId = "");
+    /// <summary>Descarta o token em cache (por exemplo, depois de um 401) para forçar uma nova aquisição.</summary>
+    public void Invalidate(Route route) => tokenCache.Invalidate(CacheKey(route));
+
+    private static string CacheKey(Route route) => $"{route.Destination}-JwtAuth";
+
+    protected abstract Task<JwtBearerToken?> RequestNewTokenAsync(Route route, string correlationId, CancellationToken cancellationToken);
 }
