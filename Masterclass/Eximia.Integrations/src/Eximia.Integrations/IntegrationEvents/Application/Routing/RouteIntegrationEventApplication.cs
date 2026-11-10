@@ -1,9 +1,8 @@
-﻿using Serilog.Context;
+﻿using Serilog;
 using Silverback.Messaging.Broker;
 using Eximia.Integrations.Shared;
 using Eximia.Integrations.Events;
 using Eximia.Integrations.IntegrationEvents.Commands;
-using Eximia.Integrations.IntegrationEvents.Telemetry;
 using Eximia.Integrations.Routing;
 using Eximia.Integrations.Routing.Exceptions;
 
@@ -12,11 +11,10 @@ namespace Eximia.Integrations.IntegrationEvents.Application.Routing;
 public class RouteIntegrationEventApplication(
     IntegrationEventsDataAccess integrationEventsDataAccess,
     RoutingService routingService,
-    IRouteIntegrationEventTelemetry routeIntegrationEventTelemetry,
     HandleRoutingErrorService handleRoutingErrorService,
     PublishPlataformEventService publishPlataformEventService,
-    OtelVariables otelVariables,
-    RoutingDataAccess routingDataAccess)
+    RoutingDataAccess routingDataAccess,
+    ILogger logger)
 {
     public async Task RouteAsync(
         KafkaOffset? kafkaMessage,
@@ -25,23 +23,12 @@ public class RouteIntegrationEventApplication(
     {
         try
         {
-            routeIntegrationEventTelemetry.IntegrationEventConsumed(command, kafkaMessage!);
-
             var integrationEvent = await integrationEventsDataAccess.GetAndSetEventToDispatch(command.Id, cancellationToken);
             if (integrationEvent.HasNoValue)
             {
-                routeIntegrationEventTelemetry.FailOnRetrieveIntegrationEvent(command);
+                logger.Error("Integration event {IntegrationEventId} not found.", command.Id);
                 return;
             }
-
-            using var eventIdLog = LogContext.PushProperty(otelVariables.IntegrationId, integrationEvent.Value.Id);
-            using var destinyKeyLog = LogContext.PushProperty(otelVariables.DestinyKey, integrationEvent.Value.Entity.Destiny.Key);
-            using var originKeyLog = LogContext.PushProperty(otelVariables.OriginKey, integrationEvent.Value.Entity.Origin.Key);
-            using var aggregateKeyLog = LogContext.PushProperty(otelVariables.AggregateKey, integrationEvent.Value.Entity.AggregateKey);
-            using var isCallbackLog = LogContext.PushProperty(otelVariables.IsCallback, integrationEvent.Value.Control.IsCallback);
-            using var isCallbackErrorLog = LogContext.PushProperty(otelVariables.IsCallbackError, integrationEvent.Value.Control.IsCallbackError);
-
-            routeIntegrationEventTelemetry.IntegrationEventLoaded(integrationEvent.Value);
 
             // O offset/partição passam a ser gravados no consumo (o OutboxWorker padrão do Silverback não expõe o ack do produtor).
             if (kafkaMessage is not null)
@@ -56,7 +43,7 @@ public class RouteIntegrationEventApplication(
             var route = await routingDataAccess.GetRouteWithoutRules(command.RouteId, cancellationToken);
             if (route.HasNoValue)
             {
-                routeIntegrationEventTelemetry.FailOnRetrieveRoute(command);
+                logger.Error("Route {RouteId} not found for integration event {IntegrationEventId}.", command.RouteId, command.Id);
                 return;
             }
 
@@ -72,7 +59,7 @@ public class RouteIntegrationEventApplication(
             {
                 integrationEvent.Value.RegisterRetry(dispatcherResult.Message);
                 await integrationEventsDataAccess.UpdateIntegrationProcess(integrationEvent.Value, cancellationToken);
-                routeIntegrationEventTelemetry.DispatcherNeedsRetry(integrationEvent.Value, dispatcherResult.Message);
+                logger.Warning("Integration event {IntegrationEventId} needs retry. | Error: {Error}", command.Id, dispatcherResult.Message);
                 throw new RetryDispatcherException(
                     integrationEvent.Value.Entity.Destiny.Name!,
                     integrationEvent.Value.Entity.Entity,
@@ -80,7 +67,6 @@ public class RouteIntegrationEventApplication(
             }
 
             integrationEvent.Value.RegisterSuccessOnDispatching();
-            using var statusLog = LogContext.PushProperty(otelVariables.Status, integrationEvent.Value.Control.IntegrationStatus);
 
             // O destino JÁ recebeu o evento. Gravar o resultado com o token do consumer faria um cancelamento
             // (shutdown) deixar o evento "não confirmado" e a reentrega duplicaria a entrega: por isso, aqui, um
@@ -91,8 +77,6 @@ public class RouteIntegrationEventApplication(
                 integrationEvent.Value.ControlCode,
                 integrationEvent.Value.Control.IsCallback,
                 eventDate);
-
-            routeIntegrationEventTelemetry.IntegrationEventDispatched(integrationEvent.Value);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -102,7 +86,7 @@ public class RouteIntegrationEventApplication(
         }
         catch (Exception ex)
         {
-            routeIntegrationEventTelemetry.CriticalFail(ex, command);
+            logger.Error(ex, "Integration event {IntegrationEventId} failed. | Error: {Error}", command.Id, ex.Message);
             throw new FailureDispatcherException(string.Empty, string.Empty, 0, ex.Message, ex);
         }
     }

@@ -8,8 +8,6 @@ using Eximia.Integrations;
 var builder = Host.CreateApplicationBuilder(args);
 var assemblyName = Assembly.GetExecutingAssembly().GetName();
 var serviceName = assemblyName.Name;
-var serviceVersion = Environment.GetEnvironmentVariable("DD_VERSION") ??
-                     Assembly.GetExecutingAssembly().GetName().Version?.ToString();
 
 try
 {
@@ -17,7 +15,6 @@ try
 
     builder.Services
         .AddLogs(builder.Configuration)
-        .AddTelemetry(serviceName!, serviceVersion!, builder.Configuration)
         .AddMemoryCache()
         .AddCustomOptions(builder.Configuration)
         .AddOptions()
@@ -27,9 +24,7 @@ try
         .AddIntegrationsShared()
         .AddScoped<Eximia.Integrations.Routing.RoutingDataAccess>()
         .AddScoped<ReprocessStuckEvents>()
-        .AddScoped<PublishQueueMetrics>()
-        .AddHostedService<ReprocessStuckEventsWorker>()
-        .AddHostedService<QueueMetricsWorker>();
+        .AddHostedService<ReprocessStuckEventsWorker>();
 
     builder.Services.AddSerilog();
 

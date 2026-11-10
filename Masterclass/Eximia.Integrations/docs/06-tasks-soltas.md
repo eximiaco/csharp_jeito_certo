@@ -12,7 +12,7 @@ O registro do evento ([RegisterMultipleRoutesIntegrationEventApplication.cs](../
 ```csharp
 await publisher.PublishAsync(RouteIntegrationEventRequestCommand.Create(...));
 
-// Telemetria da plataforma: roda em paralelo para não atrasar a resposta à origem.
+// Evento da plataforma: roda em paralelo para não atrasar a resposta à origem.
 _ = Task.Run(() => publishPlataformEventService.PublishIntegrationEventReceivedAsync(integrationEvent.Value));
 ```
 
@@ -22,16 +22,14 @@ A intenção era "não atrasar a resposta". O `_ =` descarta a `Task`, e o `Task
 - **O trabalho sobrevive à requisição que o criou.** A API devolve 202 e o escopo da requisição é descartado. Os serviços scoped que a tarefa usa (o `PublishPlataformEventService` e o `IPublisher` do Silverback) podem já ter sido descartados quando ela roda, e a falha aparece como uma `ObjectDisposedException` que, de novo, ninguém vê.
 - **Uso concorrente de objetos que não são thread-safe.** O `IPublisher` que a tarefa usa é o **mesmo** que está enlistado na transação do outbox e que o loop continua usando na thread original. São duas threads usando o mesmo objeto ao mesmo tempo.
 - **O trabalho não participa do ciclo de vida.** No shutdown (branch `04`), o host espera as requisições em andamento, mas não sabe que essa tarefa existe. Ela é interrompida no meio, sem rastro.
-- **Não economiza nada.** Publicar um evento de telemetria leva milissegundos. O `Task.Run` adiciona uma troca de thread e esconde o custo, não o elimina.
+- **Não economiza nada.** Publicar um evento da plataforma leva milissegundos. O `Task.Run` adiciona uma troca de thread e esconde o custo, não o elimina.
 
 ### 2. `Parallel.ForEach` com lambda assíncrona: `async void`
 
 ```csharp
 Parallel.ForEach(processedEvents, async integrationEvent =>
 {
-    using var eventIdLog = LogContext.PushProperty(otelVariables.IntegrationId, integrationEvent.Id);
     await integrationEventActionsEngine.Execute(integrationEvent, cancellationToken);
-    registerNewIntegrationEventTelemetry.IntegrationEventPublish(processedEvents.FirstOrDefault()!);
 });
 ```
 
@@ -40,8 +38,6 @@ Parallel.ForEach(processedEvents, async integrationEvent =>
 - **O `ForEach` retorna antes do trabalho terminar.** Ele só espera o código *até o primeiro `await`*. O método segue adiante, responde 202 e as ações pós-registro ainda estão rodando, ou nem começaram.
 - **Exceções derrubam o processo.** Num `async void` não há `Task` para observar a falha: a exceção é relançada no pool de threads, e uma exceção não tratada ali **encerra o processo**. Uma falha numa ação pós-registro derruba a API inteira, com todas as requisições em andamento.
 - **Sem limite de paralelismo**, e com o mesmo escopo e o mesmo `DbContext` compartilhados entre as iterações.
-
-Há ainda um defeito silencioso na mesma linha: `IntegrationEventPublish(processedEvents.FirstOrDefault()!)` reporta o **primeiro** evento a cada iteração, em vez do evento corrente. A métrica contava o mesmo evento N vezes.
 
 ## A solução
 
@@ -52,16 +48,11 @@ await publishPlataformEventService.PublishIntegrationEventReceivedAsync(integrat
 // ...
 
 foreach (var integrationEvent in processedEvents)
-{
-    using var eventIdLog = LogContext.PushProperty(otelVariables.IntegrationId, integrationEvent.Id);
     await integrationEventActionsEngine.Execute(integrationEvent, cancellationToken);
-    registerNewIntegrationEventTelemetry.IntegrationEventPublish(integrationEvent);
-}
 ```
 
 - **Aguardar de verdade.** Falhas voltam para o chamador e viram erro tratado, não silêncio, e o trabalho termina dentro do escopo da requisição.
 - **Sequencial de propósito.** O loop usa um `DbContext` e um escopo compartilhados. `DbContext` **não é thread-safe**: paralelizar ali seria trocar um erro por outro. A regra é: se as iterações são independentes, não compartilham estado mutável e há um limite claro, use `Parallel.ForEachAsync` com `MaxDegreeOfParallelism` e o `CancellationToken`. Se não, mantenha sequencial.
-- **A métrica correta.** `IntegrationEventPublish(integrationEvent)` agora recebe o evento da iteração.
 
 ### E quando eu realmente não quero esperar?
 
@@ -92,7 +83,7 @@ Note que o projeto já faz uma escolha consciente em outro lugar: o producer de 
 |---|---|
 | `01-sync-over-async` | Threads bloqueadas esperando I/O; cache de token que nunca funcionou |
 | `02-cancellation-token` | O token que parava antes do banco, do HTTP e das esperas do retry |
-| `03-tempo-de-vida` | Singleton com estado por mensagem e `DbContext` preso no worker |
+| `03-tempo-de-vida` | `DbContext` preso no worker e container sem validação |
 | `04-shutdown` | Cancelamento tratado como falha, e recursos sem dono no encerramento |
 | `05-background-service` | O `while(true)`, a mudança do .NET 10 e o host errado |
 | `06-tasks-soltas` | `Task.Run` solto, `async void` e exceções que desaparecem |

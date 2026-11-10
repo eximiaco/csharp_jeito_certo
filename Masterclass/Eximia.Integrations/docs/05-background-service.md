@@ -94,10 +94,6 @@ app.MapControllers();
 
 Custos reais: superfície de ataque sem necessidade (o `/Topics` expõe a configuração do consumer), pacotes e tempo de subida a mais, e a confusão sobre o que o serviço de fato é.
 
-### 5. Trabalho de background escondido no caminho crítico
-
-[EximiaOutboxReader.GetAsync](../src/Eximia.Integrations/Outbox/EximiaOutboxReader.cs) rodava uma varredura completa dos headers do outbox **a cada poll do OutboxWorker (500 ms)**, só para calcular uma métrica de fila. Era uma tarefa periódica de observabilidade, sem dono, enfiada no caminho que publica as mensagens.
-
 ## A solução
 
 ### O `BackgroundService` correto
@@ -148,8 +144,6 @@ O lock vale para a **sessão**, então a conexão (pedida ao `NpgsqlDataSource` 
 
 [Program.cs](../src/Eximia.Integration.BackgroundAgent/Program.cs) usa `Host.CreateApplicationBuilder`, e o projeto passou para `Microsoft.NET.Sdk.Worker`. Saíram o Hangfire, o dashboard, o OpenID Connect e os filtros. A imagem Docker passou de `dotnet/aspnet` para `dotnet/runtime`, porque o serviço não depende mais do ASP.NET.
 
-O agent ganhou um segundo worker real, [QueueMetricsWorker.cs](../src/Eximia.Integration.BackgroundAgent/Workers/QueueMetricsWorker.cs), que calcula a métrica de fila a cada minuto, com o mesmo padrão (`PeriodicTimer`, escopo por iteração, falha por iteração).
-
 > O agent ficou sem endpoint HTTP. Os probes do Kubernetes para ele precisam ser de outro tipo (por exemplo, `exec` verificando um arquivo de *heartbeat* que o worker atualiza a cada ciclo). Isso não foi implementado aqui.
 
 ### Dispatcher: host web mínimo
@@ -168,10 +162,6 @@ Saíram o Swagger, o CORS, o MVC, o `/Topics` e os pacotes que só eles usavam (
 
 Com isso, os três hosts mostram as três formas lado a lado: a **API completa**, o **consumer com host web mínimo** e o **agent como Worker puro**.
 
-### Métricas fora do caminho crítico
-
-O `EximiaOutboxReader` voltou a só ler o outbox. O cálculo da métrica de fila mora no `QueueMetricsWorker`, e o `OutboxMetricsReader` voltou a ser scoped, porque agora é usado dentro do escopo de cada iteração.
-
 ## O que continua fora, de propósito
 
 O `ReprocessStuckEventsWorker` publica no Kafka direto, fora da transação que grava o status do evento (*dual write*). É um defeito de **mensageria**, e fica fora deste material.
@@ -183,7 +173,6 @@ O `ReprocessStuckEventsWorker` publica no Kafka direto, fora da transação que 
 - **Não dependa do que roda antes do primeiro `await`.** Inicialização que precisa terminar antes da subida vai para `StartAsync` ou `IHostedLifecycleService`.
 - **Trate falha por iteração, mas deixe o cancelamento passar.**
 - **Serviço de background com várias réplicas precisa de exclusão explícita** quando o trabalho não pode rodar em duplicidade.
-- **Tarefa periódica merece um worker próprio**, e não uma carona no caminho crítico de outro.
 
 ## Novidades de plataforma
 
