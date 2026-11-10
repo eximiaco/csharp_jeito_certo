@@ -5,7 +5,7 @@
 
 ## O problema
 
-O dispatcher autentica no destino com um token JWT (client credentials). Dois pontos desse caminho tinham problemas.
+O dispatcher autentica no destino com um token JWT (client credentials). Os dois primeiros itens são desse caminho. O terceiro mostra o mesmo defeito espalhado pelo resto do fluxo.
 
 ### 1. A renovação do token no 401 bloqueava a thread
 
@@ -57,6 +57,23 @@ Além disso não havia proteção de concorrência: sob carga, N mensagens simul
 
 > A confirmação de que `expires_in` vem em segundos depende do provedor de identidade usado. Vale conferir na documentação dele.
 
+### 3. O mesmo padrão em outros pontos do fluxo
+
+Bloquear a thread à espera de I/O não ficou só na renovação do token. Está em mais seis pontos, todos em caminhos que rodam **por mensagem** ou **por requisição**:
+
+| Onde | O que bloqueia | Quando pesa |
+|---|---|---|
+| `Routing/RoutingService.cs` | `payloadService.DownloadAsync(...).Result`, o download do payload no storage | Em toda entrega do dispatcher: cada mensagem em andamento segura uma thread até o storage responder |
+| `Routing/Dispatchers/HttpJsonWithJwtDispatcher.cs` | `GetTokenAsync(route).GetAwaiter().GetResult()`, a obtenção do token do destino | Em toda entrega a destino com JWT, e mais ainda quando o token expira |
+| `IntegrationEvents/Application/Routing/HandleRoutingErrorService.cs` | `NeedRetryAsync(...).GetAwaiter().GetResult()`, que consulta a configuração de erro do destino no banco | Quando o destino falha: é justamente o momento em que **todas** as mensagens caem nesse caminho ao mesmo tempo |
+| `IntegrationEvents/Services/SendIntegrationEventService.cs` | `response.GetStringAsync().Result` e `ex.GetResponseStringAsync().Result`, a leitura do corpo da resposta | No callback de erro devolvido à origem |
+| `IntegrationEvents/Application/Register/RegisterMultipleRoutesIntegrationEventApplication.cs` | `GetRoutesByOriginAndEntityAsync(...).GetAwaiter().GetResult()` (banco) e `UploadAsync(...).Result` (storage) | Em **toda requisição** da API: segura a thread do Kestrel durante duas idas a serviços externos |
+| `Outbox/EximiaOutboxReader.cs` | `MarkAsInQueueAsync(...).GetAwaiter().GetResult()`, o `UPDATE` que marca os eventos como `InQueue` | A cada lote publicado pelo `OutboxWorker` |
+
+Em todos eles o método que chama **já é `async`**. O `.Result` ali não evita nada: só troca a liberação da thread por um bloqueio, e o código fica com a aparência de assíncrono sem o comportamento.
+
+A situação mais perigosa é o caminho de erro. Com o destino fora do ar, as 10 mensagens em paralelo do consumer vão para `HandleRoutingErrorService` e bloqueiam 10 threads de uma vez, esperando um banco que pode estar sob a mesma carga. O sistema piora justamente quando mais precisa responder.
+
 ## A solução
 
 ### Async de ponta a ponta
@@ -73,6 +90,8 @@ onRetryAsync: async (result, retry, context) =>
     await provider.GetTokenAsync(route, correlationId);
 }
 ```
+
+A mesma troca vale para os seis pontos do item 3: cada `.Result` ou `.GetAwaiter().GetResult()` virou `await`. Não houve mudança de assinatura, porque todos os métodos já eram `async`.
 
 Além de aguardar de verdade, a policy agora **invalida** o token em cache antes de pedir outro. Antes, ela pedia um token e descartava o resultado: o 401 se repetia, porque o token recusado continuava sendo o usado.
 
@@ -111,6 +130,7 @@ finally { gate.Release(); }
 ## Regras para levar
 
 - **Nunca bloqueie em código assíncrono** (`.Result`, `.Wait()`, `.GetAwaiter().GetResult()`) em serviços que processam mensagens em paralelo. Se um callback é síncrono, procure a variante assíncrona (`onRetryAsync`, não `onRetry`).
+- **Dentro de um método `async`, `.Result` nunca é necessário**: o `await` está disponível e é a única forma de devolver a thread ao pool.
 - **`Task.Delay`, não `Thread.Sleep`**, em esperas e backoffs.
 - **`Task.Run` em volta de código síncrono não é async**: só empurra o bloqueio para outra thread do mesmo pool.
 - Cache compartilhado e caro de renovar precisa de **single-flight**, e de validade guardada em um instante absoluto.
