@@ -154,8 +154,7 @@ public sealed class IntegrationEventsDataAccess(PostgresConnectionStringFactory 
                           start_time = @StartTime
                       WHERE unique_id = @uniqueId
                       RETURNING {_eventColumns};",
-                param)
-            .WaitAsync(cancellationToken);
+                param);
 
         if (dto == null)
             return Maybe<IntegrationEvent>.None;
@@ -239,8 +238,7 @@ public sealed class IntegrationEventsDataAccess(PostgresConnectionStringFactory 
                 $@"SELECT {_eventColumns}
                     FROM public.integration_events
                     WHERE id = @id;",
-                new { id })
-            .WaitAsync(cancellationToken);
+                new { id });
 
         if (dto == null)
             return Maybe<IntegrationEvent>.None;
@@ -295,7 +293,7 @@ public sealed class IntegrationEventsDataAccess(PostgresConnectionStringFactory 
         param.Add("id", id, DbType.Int32);
         
         await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
-        var destiny = await connection.QueryFirstOrDefaultAsync<string>(sql, param).WaitAsync(cancellationToken);
+        var destiny = await connection.QueryFirstOrDefaultAsync<string>(sql, param);
         
         return string.IsNullOrEmpty(destiny) ? Maybe.None : destiny;
     }
