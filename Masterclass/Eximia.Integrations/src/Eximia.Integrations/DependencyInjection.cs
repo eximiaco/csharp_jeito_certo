@@ -12,8 +12,6 @@ using Eximia.Integrations.IntegrationEvents.Application;
 using Eximia.Integrations.IntegrationEvents.Application.Register;
 using Eximia.Integrations.IntegrationEvents.Application.Routing;
 using Eximia.Integrations.IntegrationEvents.Services;
-using Eximia.Integrations.IntegrationEvents.Telemetry;
-using Eximia.Integrations.IntegrationEvents.Telemetry.Callback;
 using Eximia.Integrations.IntegrationEvents.ValidationRules;
 using Eximia.Integrations.Outbox;
 using Eximia.Integrations.Routing;
@@ -21,11 +19,8 @@ using Eximia.Integrations.Routing.Authentication;
 using Eximia.Integrations.Routing.Authentication.Providers;
 using Eximia.Integrations.Routing.Dispatchers;
 using Eximia.Integrations.Routing.Rules.Engine;
-using Eximia.Integrations.Routing.Telemetry;
 using Eximia.Integrations.Shared;
-using Eximia.Integrations.Shared.OpenTelemetry;
 using Eximia.Integrations.Shared.Postgres;
-using Eximia.Integrations.Shared.Telemetry;
 
 namespace Eximia.Integrations;
 
@@ -38,7 +33,7 @@ namespace Eximia.Integrations;
 /// </summary>
 public static class DependencyInjection
 {
-    /// <summary>Métricas, telemetria e acesso ao banco: o mínimo que qualquer host precisa.</summary>
+    /// <summary>Acesso ao banco e eventos da plataforma: o mínimo que qualquer host precisa.</summary>
     public static IServiceCollection AddIntegrationsShared(this IServiceCollection services)
     {
         // Singletons: sem estado por mensagem, thread-safe. Quem tem Dispose é descartado pelo container.
@@ -48,18 +43,6 @@ public static class DependencyInjection
         // host, e as conexões ociosas são fechadas pelo protocolo do Postgres, e não cortadas quando o processo morre.
         services.AddSingleton(sp => NpgsqlDataSource.Create(
             sp.GetRequiredService<PostgresConnectionStringFactory>().CreateConnectionString()));
-        services.AddSingleton<OtelVariables>();
-        services.AddSingleton<SquadsSingleton>();
-        services.AddSingleton<DatadogMetricsService>();
-        services.AddSingleton<PlatformMetrics>();
-        services.AddSingleton<OutboxMetrics>();
-        // Sem estado (só lê o banco). É singleton porque quem o usa, o leitor do outbox, também é: um
-        // scoped aqui seria resolvido pelo provider raiz, e o ValidateScopes acusaria isso em tempo de execução.
-        services.AddSingleton<OutboxMetricsReader>();
-
-        // Scoped: carregam o span/atividade da operação corrente.
-        services.AddScoped<ITelemetryFactory, TelemetryFactory>();
-        services.AddScoped<ITelemetryService, TelemetryService>();
 
         services.AddScoped<IntegrationEventsDataAccess>();
         services.AddScoped<PublishPlataformEventService>();
@@ -80,8 +63,6 @@ public static class DependencyInjection
         services.AddScoped<HttpJsonDispatcher>();
         services.AddScoped<HttpJsonWithJwtDispatcher>();
 
-        services.AddScoped<IDispatcherEventTelemetry, DispatcherEventTelemetry>();
-        services.AddScoped<IClientCredentialsProviderTelemetry, ClientCredentialsProviderTelemetry>();
 
         // O cache de tokens PRECISA ser singleton: os semáforos single-flight vivem nele.
         services.AddSingleton<TokenCache>();
@@ -108,7 +89,6 @@ public static class DependencyInjection
     {
         services.AddScoped<RegisterMultipleRoutesIntegrationEventApplication>();
         services.AddScoped<JsonSchemaService>();
-        services.AddScoped<IRegisterNewIntegrationEventTelemetry, RegisterNewIntegrationEventOtelTelemetry>();
 
         // As regras de validação e as ações pós-registro são resolvidas por tipo pelos engines
         // (IServiceProvider.GetRequiredService), então precisam estar registradas aqui.
@@ -124,7 +104,6 @@ public static class DependencyInjection
     {
         services.AddScoped<RouteIntegrationEventApplication>();
         services.AddScoped<HandleRoutingErrorService>();
-        services.AddScoped<IRouteIntegrationEventTelemetry, RouteIntegrationEventOtelTelemetry>();
         // O consumer (subscriber do Silverback) é registrado no host, com AddScopedSubscriber.
         return services;
     }
@@ -133,7 +112,6 @@ public static class DependencyInjection
     public static IServiceCollection AddProcessIntegrationEventCallback(this IServiceCollection services)
     {
         services.AddScoped<SendIntegrationEventService>();
-        services.AddScoped<ICallbackEventTelemetry, CallbackEventTelemetry>();
         // O handler (subscriber do Silverback) é registrado no host, com AddScopedSubscriber.
         return services;
     }

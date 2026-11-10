@@ -19,7 +19,7 @@ Quando o destino responde 401, a policy do Polly renova o token e tenta de novo.
         if (result.Exception is FlurlHttpException flurlException)
             error = flurlException.GetResponseStringAsync().Result;
 
-        telemetry!.UnAuthorizeCall();
+        Log.Warning("Destination {Destination} returned 401, renewing the token. | Error: {Error}", route.Destination, error);
         provider.GetTokenAsync(route, correlationId).GetAwaiter().GetResult();
     });
 ```
@@ -68,7 +68,7 @@ onRetryAsync: async (result, retry, context) =>
     if (result.Exception is FlurlHttpException flurlException)
         error = await flurlException.GetResponseStringAsync();
 
-    telemetry!.UnAuthorizeCall();
+    Log.Warning("Destination {Destination} returned 401, renewing the token. | Error: {Error}", route.Destination, error);
     provider.Invalidate(route);                       // descarta o token recusado
     await provider.GetTokenAsync(route, correlationId);
 }

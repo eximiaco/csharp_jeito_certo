@@ -5,7 +5,7 @@
 
 ## O que acontece num deploy
 
-Num deploy, o Kubernetes envia `SIGTERM` ao processo. O host .NET dispara o `stoppingToken`, para os serviços e começa a contar o **`ShutdownTimeout`** (padrão: 30 segundos). Depois que os serviços param, o host **descarta o container**, e é nesse momento que os singletons fecham o que possuem: pools de conexão, clientes de rede, buffers de métricas. Se o processo não sair a tempo, recebe `SIGKILL` e nada disso acontece.
+Num deploy, o Kubernetes envia `SIGTERM` ao processo. O host .NET dispara o `stoppingToken`, para os serviços e começa a contar o **`ShutdownTimeout`** (padrão: 30 segundos). Depois que os serviços param, o host **descarta o container**, e é nesse momento que os singletons fecham o que possuem: pools de conexão e clientes de rede. Se o processo não sair a tempo, recebe `SIGKILL` e nada disso acontece.
 
 Um encerramento correto tem quatro etapas:
 
@@ -65,25 +65,6 @@ await using var connection = new NpgsqlConnection(connectionStringFactory.Create
 Abrir uma conexão curta por operação **é** o padrão certo: o Npgsql guarda as conexões físicas num pool. O problema é **de quem é esse pool**. Com `new NpgsqlConnection(connectionString)`, o pool é global e estático, indexado pela *connection string*, e **ninguém o descarta**. No encerramento, as conexões TCP com o Postgres não são fechadas pelo protocolo: elas morrem junto com o processo. O Postgres registra o fim abrupto no log (algo como `unexpected EOF on client connection`), e uma transação que estivesse aberta naquela conexão só é desfeita quando o servidor percebe a queda.
 
 Além disso, o EF e o Dapper montavam a *connection string* cada um por conta própria. Nada no código dizia que os dois compartilhavam um recurso.
-
-### 5. Métricas: dispose pelo dono errado, e um `Dispose` que lança
-
-O `DatadogMetricsService` é um singleton compartilhado por `PlatformMetrics` e `OutboxMetrics`. O `Dispose` dele é o que envia as últimas métricas do buffer e fecha o socket com o agente do Datadog. Dois defeitos:
-
-```csharp
-// OutboxMetrics
-public void Dispose()
-{
-    _meter.Dispose();
-    _datadogMetricsService.Dispose();      // mas esse serviço foi INJETADO, e é compartilhado
-}
-
-// DatadogMetricsService
-public void Dispose() { _service!.Dispose(); }     // _service é null quando o Datadog não está configurado
-```
-
-- **Dispose pelo dono errado.** Quem recebe uma dependência por injeção não é dono dela. Descartar o cliente compartilhado no meio do encerramento faz as métricas de quem ainda está parando se perderem.
-- **`Dispose` que lança.** Sem o Datadog configurado, `_service` é `null` e o `Dispose` lança `NullReferenceException` justamente no descarte do container. A exceção sai de `app.Run()`, cai no `catch` do `Program.cs`, que registra **"Program terminated unexpectedly"** e devolve código de saída 1. Um deploy normal passa a parecer um crash, e uma exceção no descarte pode impedir que o restante do container seja descartado.
 
 ## A solução
 
@@ -164,21 +145,9 @@ Agora o pool tem um dono (o container), um tempo de vida (o do host) e um moment
 
 > O outbox do Silverback e o storage do Hangfire ainda recebem a *connection string* e usam o pool global do Npgsql. São bibliotecas de terceiros com a própria configuração, e ficaram como estão.
 
-### Métricas: dono certo e `Dispose` que não lança
-
-```csharp
-// OutboxMetrics: não descarta o que recebeu por injeção
-public void Dispose() => _meter.Dispose();
-
-// DatadogMetricsService: null-safe, e é aqui que o buffer de métricas é enviado
-public void Dispose() => _service?.Dispose();
-```
-
-O container descarta o `DatadogMetricsService` uma única vez, no fim, depois de todos que o usam.
-
 ## Conexões TCP e arquivos que você mesmo abre
 
-Neste projeto, as conexões TCP de longa duração (Postgres, Kafka, agente do Datadog, HTTP) pertencem a bibliotecas que têm o próprio `Dispose`. O trabalho do código da aplicação é **registrá-las no container e deixar o container fechá-las**, como foi feito acima. O Silverback, por exemplo, desconecta do Kafka quando o host para: os consumers deixam de buscar mensagens e saem do grupo, e os producers enviam o que estava na fila. Isso só acontece se o processo tiver tempo para isso, o que é mais um motivo para o `ShutdownTimeout` explícito.
+Neste projeto, as conexões TCP de longa duração (Postgres, Kafka, HTTP) pertencem a bibliotecas que têm o próprio `Dispose`. O trabalho do código da aplicação é **registrá-las no container e deixar o container fechá-las**, como foi feito acima. O Silverback, por exemplo, desconecta do Kafka quando o host para: os consumers deixam de buscar mensagens e saem do grupo, e os producers enviam o que estava na fila. Isso só acontece se o processo tiver tempo para isso, o que é mais um motivo para o `ShutdownTimeout` explícito.
 
 Quando é o seu código que abre o recurso (`TcpClient`, `FileStream`, um socket próprio):
 
@@ -194,8 +163,8 @@ Quando é o seu código que abre o recurso (`TcpClient`, `FileStream`, um socket
 - **`catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }`** antes de qualquer `catch (Exception)` genérico.
 - **`Handle<Exception>()` em Polly (e `catch (Exception)` em geral) é amplo demais:** exclua o cancelamento.
 - **Todo recurso de longa duração precisa de um dono** que o feche. Em .NET, o dono natural é o container: registre o recurso como singleton e deixe o container descartá-lo.
-- **Quem recebe uma dependência por injeção não a descarta.**
-- **`Dispose` não pode lançar.**
+- **Quem recebe uma dependência por injeção não a descarta.** O container a descarta uma única vez, no fim.
+- **`Dispose` não pode lançar:** uma exceção no descarte do container aparece como "Program terminated unexpectedly" e transforma um deploy normal em um crash.
 - **Configure o `ShutdownTimeout` de propósito** e o alinhe com o `terminationGracePeriodSeconds`.
 
 ## Novidades de plataforma

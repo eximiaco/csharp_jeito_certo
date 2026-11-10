@@ -10,8 +10,6 @@ using Eximia.Integrations.Routing;
 var builder = WebApplication.CreateBuilder(args);
 var assemblyName = Assembly.GetExecutingAssembly().GetName();
 var serviceName = assemblyName.Name;
-var serviceVersion = Environment.GetEnvironmentVariable("DD_VERSION") ?? 
-                     Assembly.GetExecutingAssembly().GetName().Version?.ToString();
 
 try
 {
@@ -26,7 +24,6 @@ try
 
     builder.Services
         .AddLogs(builder.Configuration)
-        .AddTelemetry(serviceName!, serviceVersion!, builder.Configuration)
         .AddEndpointsApiExplorer()
         .AddMemoryCache()
         .AddCustomCors()

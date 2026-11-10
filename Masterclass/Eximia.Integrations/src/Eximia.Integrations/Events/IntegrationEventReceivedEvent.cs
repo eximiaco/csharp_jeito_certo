@@ -2,7 +2,6 @@
 
 public record IntegrationEventReceivedEvent(
     string Entity,
-    string? Squad,
     string? Origin,
     string? Destiny,
     string? OriginId,

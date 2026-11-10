@@ -1,4 +1,4 @@
-﻿using Serilog.Context;
+﻿using Serilog;
 using Silverback.Messaging.Publishing;
 using Eximia.Integrations.Shared;
 using Eximia.Integrations.Shared.Extensions;
@@ -6,7 +6,6 @@ using Eximia.Integrations.DomainServices;
 using Eximia.Integrations.Events;
 using Eximia.Integrations.IntegrationEvents.Commands;
 using Eximia.Integrations.IntegrationEvents.Services;
-using Eximia.Integrations.IntegrationEvents.Telemetry;
 using Eximia.Integrations.Outbox;
 using Eximia.Integrations.Outbox.EntityFramework;
 using Eximia.Integrations.Routing;
@@ -21,12 +20,11 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
     RoutingDataAccess routingDataAccess,
     IntegrationEventActionsEngine integrationEventActionsEngine,
     IPublisher publisher,
-    IRegisterNewIntegrationEventTelemetry registerNewIntegrationEventTelemetry,
     EximiaIntegrationDbContext eximiaIntegrationDbContext,
     PublishPlataformEventService publishPlataformEventService,
     RoutingRuleEngine routingRuleEngine,
-    OtelVariables otelVariables,
-    PayloadService uploadIntegrationEventPayloadService)
+    PayloadService uploadIntegrationEventPayloadService,
+    ILogger logger)
 {
     public async Task<ResultAggregate> HandleV3(
         RegisterMultipleRoutesIntegrationEventCommand command,
@@ -34,29 +32,6 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
     {
         try
         {
-            // Converter para comando compatível com telemetry
-            var asyncCommand = RegisterAsyncIntegrationEventCommand.Create(
-                command.Destiny,
-                command.DestinyKey,
-                command.Origin,
-                command.OriginKey,
-                command.Entity,
-                command.Method,
-                command.CorrelationId,
-                command.Payload,
-                command.AggregateKey,
-                command.SapQueryAction,
-                command.StatusCode,
-                command.Version,
-                command.SchemaVersion,
-                command.IsCallback,
-                command.IsCallbackError);
-
-            if (asyncCommand.IsFailure)
-                return ResultAggregate.Failure("Command", "Invalid command parameters");
-
-            registerNewIntegrationEventTelemetry.IntegrationEventReceived(asyncCommand.Value);
-
             // 1. Buscar TODAS as rotas para origem + entidade
             var allRoutes = await routingDataAccess.GetRoutesByOriginAndEntityAsync(
                 command.Origin,
@@ -65,7 +40,10 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
 
             var allRoutesList = allRoutes.ToList();
             if (allRoutesList.Count == 0)
-                return registerNewIntegrationEventTelemetry.RouteNotFound(asyncCommand.Value);
+            {
+                logger.Error("No route found for origin {Origin} and entity {Entity}.", command.Origin, command.Entity);
+                return ResultAggregate.Failure("Destiny", "No route for destiny and entity");
+            }
 
             // 2. Filtrar rotas aplicáveis baseado nas regras
             var applicableRoutes = await routingRuleEngine.FilterApplicableRoutesAsync(
@@ -97,43 +75,14 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
             {
             foreach (var route in applicableRoutesList)
             {
-                using var routeLog = LogContext.PushProperty(otelVariables.RouteId, route.Id);
-                using var destinyLog = LogContext.PushProperty(otelVariables.Destiny, route.Destination);
-
-                // Converter para comando compatível com JsonSchemaService
-                var asyncCommandForSchema = RegisterAsyncIntegrationEventCommand.Create(
-                    route.Destination,
-                    command.DestinyKey,
-                    command.Origin,
-                    command.OriginKey,
-                    command.Entity,
-                    command.Method,
-                    command.CorrelationId,
-                    command.Payload,
-                    command.AggregateKey,
-                    command.SapQueryAction,
-                    command.StatusCode,
-                    command.Version,
-                    command.SchemaVersion,
-                    command.IsCallback,
-                    command.IsCallbackError);
-
-                if (asyncCommandForSchema.IsFailure)
-                    continue;
-
                 var integrationEvent = jsonSchemaService.CreateFrom(
-                    asyncCommandForSchema.Value,
+                    command,
                     route,
-                    isPayloadLink: true,
                     payloadFile,
                     payloadFileId);
-                
+
                 if (integrationEvent.IsFailure)
                     continue;
-
-                using var uniqueIdLog = LogContext.PushProperty(otelVariables.IntegrationUniqueId, integrationEvent.Value.UniqueId);
-                using var controlCodeLog = LogContext.PushProperty(otelVariables.ControlCode, integrationEvent.Value.ControlCode);
-                using var statusLog = LogContext.PushProperty(otelVariables.Status, integrationEvent.Value.Control.IntegrationStatus);
 
                 // Validação
                 var validationResult = await integrationEventPolicyEngine.Execute(integrationEvent.Value, cancellationToken);
@@ -142,7 +91,6 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
 
                 // Salvar no banco
                 await eximiaIntegrationDbContext.IntegrationEvents.AddAsync(integrationEvent.Value, cancellationToken);
-                registerNewIntegrationEventTelemetry.IntegrationEventCreated(integrationEvent.Value);
                 processedEvents.Add(integrationEvent.Value);
 
                 // Publicar no Kafka
@@ -154,7 +102,7 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
                         command.Entity,
                         route.Id));
 
-                // Telemetria da plataforma: roda em paralelo para não atrasar a resposta à origem.
+                // Evento da plataforma: roda em paralelo para não atrasar a resposta à origem.
                 _ = Task.Run(() => publishPlataformEventService.PublishIntegrationEventReceivedAsync(integrationEvent.Value));
             }
 
@@ -165,18 +113,14 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
             // Executar ações pós-registro para cada evento
             Parallel.ForEach(processedEvents, async integrationEvent =>
             {
-                using var eventIdLog = LogContext.PushProperty(otelVariables.IntegrationId, integrationEvent.Id);
                 await integrationEventActionsEngine.Execute(integrationEvent, cancellationToken);
-                registerNewIntegrationEventTelemetry.IntegrationEventPublish(processedEvents.FirstOrDefault()!);
             });
-            
-            registerNewIntegrationEventTelemetry.IntegrationEventRequestProcessed();
 
             return ResultAggregate.Success();
         }
         catch (Exception ex)
         {
-            registerNewIntegrationEventTelemetry.FatalErrorCreatingIntegrationEvent(ex);
+            logger.Fatal(ex, "Fatal error registering integration event for origin {Origin} and entity {Entity}.", command.Origin, command.Entity);
             throw;
         }
     }

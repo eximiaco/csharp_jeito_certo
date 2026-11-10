@@ -23,7 +23,7 @@ Para acompanhar, troque de branch (`git switch <branch>`) e leia o documento daq
 ```
 Eximia.Integrations.sln
 └── src/
-    ├── Eximia.Integrations                   biblioteca com o domínio, roteamento, outbox e telemetria
+    ├── Eximia.Integrations                   biblioteca com o domínio, roteamento e outbox
     ├── Eximia.Integrations.HttpApi           API que recebe os eventos das origens
     ├── Eximia.Integrations.EventDispatcher   consumidor Kafka que entrega os eventos aos destinos
     └── Eximia.Integration.BackgroundAgent    tarefas em background

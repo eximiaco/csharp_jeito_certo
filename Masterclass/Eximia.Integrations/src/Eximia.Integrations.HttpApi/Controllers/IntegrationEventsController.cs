@@ -1,9 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
-using Serilog.Context;
-using Eximia.Integrations.Shared;
-using Eximia.Integrations.Shared.OpenTelemetry;
 using Eximia.Integrations.HttpApi.Infrastructure;
 using Eximia.Integrations.HttpApi.Models;
 using Eximia.Integrations.IntegrationEvents.Application.Register;
@@ -15,9 +11,7 @@ namespace Eximia.Integrations.HttpApi.Controllers;
 [Authorize]
 [Route("api")]
 public class IntegrationEventsController(
-    EximiaProblemDetailsFactory detailsFactory,
-    OtelVariables otelVariables,
-    SquadsSingleton squadsSingleton)
+    EximiaProblemDetailsFactory detailsFactory)
     : ControllerBase
 {
     [HttpPost("integrations")]
@@ -25,11 +19,10 @@ public class IntegrationEventsController(
     [RequestSizeLimit(100_000_000)]
     public Task<IActionResult> RegisterNewEvent(
         [FromServices] RegisterMultipleRoutesIntegrationEventApplication application,
-        [FromServices] ITelemetryFactory telemetryFactory,
         [FromBody] IntegrationEventRequest payload,
         CancellationToken cancellationToken)
     {
-        return ProcessNewIntegrationEventRequest(application, telemetryFactory, payload, false, cancellationToken);
+        return ProcessNewIntegrationEventRequest(application, payload, false, cancellationToken);
     }
 
     [HttpPost("integrations/callback")]
@@ -37,32 +30,18 @@ public class IntegrationEventsController(
     [RequestSizeLimit(100_000_000)]
     public Task<IActionResult> RegisterNewCallbackEvent(
         [FromServices] RegisterMultipleRoutesIntegrationEventApplication application,
-        [FromServices] ITelemetryFactory telemetryFactory,
         [FromBody] IntegrationEventRequest payload,
         CancellationToken cancellationToken)
     {
-        return ProcessNewIntegrationEventRequest(application, telemetryFactory, payload, true, cancellationToken);
+        return ProcessNewIntegrationEventRequest(application, payload, true, cancellationToken);
     }
 
     private async Task<IActionResult> ProcessNewIntegrationEventRequest(
         RegisterMultipleRoutesIntegrationEventApplication application,
-        ITelemetryFactory telemetryFactory,
         IntegrationEventRequest payload,
         bool isCallback,
         CancellationToken cancellationToken)
     {
-        var activity = telemetryFactory.GetFromActivity(HttpContext.Features.Get<IHttpActivityFeature>()?.Activity!);
-
-        using var destinyLog = LogContext.PushProperty(otelVariables.Destiny, payload.Meta.Destiny.Name);
-        using var destinyKeyLog = LogContext.PushProperty(otelVariables.DestinyKey, payload.Meta.Destiny.Key);
-        using var originLog = LogContext.PushProperty(otelVariables.Origin, payload.Meta.Origin.Name);
-        using var originKeyLog = LogContext.PushProperty(otelVariables.Origin, payload.Meta.Origin.Key);
-        using var entityLog = LogContext.PushProperty(otelVariables.Entity, payload.Meta.Entity.Name);
-        using var squadLog = LogContext.PushProperty(otelVariables.Squad, squadsSingleton.GetByEntity(payload.Meta.Entity.Name));
-        using var aggregateKeyLog = LogContext.PushProperty(otelVariables.AggregateKey, payload.Meta.Entity.AggregateKey);
-        using var isCallbackLog = LogContext.PushProperty(otelVariables.IsCallback, isCallback);
-        using var isCallbackErrorLog = LogContext.PushProperty(otelVariables.IsCallbackError, payload.Meta.IsCallbackError);
-
         var command = RegisterMultipleRoutesIntegrationEventCommand.Create(
             payload.Meta.Origin.Name ?? string.Empty,
             payload.Meta.Origin.Key ?? string.Empty,
@@ -82,7 +61,6 @@ public class IntegrationEventsController(
             payload.Meta.IntegrationEventId);
         if (command.IsFailure)
         {
-            activity.SetError("Request has invalid parameters");
             return detailsFactory.Create400WithMessages(
                 "Request invalid",
                 "Request has invalid params",
@@ -92,14 +70,12 @@ public class IntegrationEventsController(
         var result = await application.HandleV3(command.Value, cancellationToken);
         if (result.IsFailure)
         {
-            activity.SetError("Request processing error");
             return detailsFactory.Create400WithMessages(
                 "Request error",
                 "Request processing error",
                 result);
         }
 
-        activity.SetSuccess("Success");
         return Accepted();
     }
 }

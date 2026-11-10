@@ -78,7 +78,9 @@ public record RegisterMultipleRoutesIntegrationEventCommand
         int? integrationEventId)
     {
         var result = ResultAggregate.Combine(
+            ResultAggregate.FailureIf(string.IsNullOrEmpty(destiny), "[Destiny]", "Destiny is invalid"),
             ResultAggregate.FailureIf(string.IsNullOrEmpty(origin), "[Origin]", "Origin is invalid"),
+            ResultAggregate.FailureIf(!isCallback && string.IsNullOrEmpty(originKey), "[OriginKey]", "Origin Key is invalid"),
             ResultAggregate.FailureIf(string.IsNullOrEmpty(entity), "[Entity]", "Entity is invalid"),
             ResultAggregate.FailureIf(string.IsNullOrEmpty(method), "[Method]", "Method is invalid"),
             ResultAggregate.FailureIf(string.IsNullOrEmpty(correlationId), "[CorrelationId]", "CorrelationId is invalid"),

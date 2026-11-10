@@ -16,20 +16,12 @@
         <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
         <PackageReference Include="Microsoft.Identity.Web.UI" Version="3.16.0" />
         <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
-        <PackageReference Include="Serilog.Enrichers.Datadog.OpenTelemetry" Version="1.2.0" />
         <PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
         <PackageReference Include="Serilog.Exceptions" Version="8.4.0" />
         <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.1" />
         <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
         <PackageReference Include="Serilog.Sinks.Seq" Version="9.1.0" />
         <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
-        <PackageReference Include="OpenTelemetry" Version="1.20.1" />
-        <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.20.1" />
-        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.20.1" />
-        <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.20.1" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.20.2" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.20.2" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.20.1" />
         <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0" />
         <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
         <PackageReference Include="Dapper" Version="2.1.35" />
