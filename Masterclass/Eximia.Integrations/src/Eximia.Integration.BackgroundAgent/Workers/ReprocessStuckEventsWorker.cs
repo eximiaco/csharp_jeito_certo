@@ -9,7 +9,7 @@ using ILogger = Serilog.ILogger;
 namespace Eximia.Integration.BackgroundAgent.Workers;
 
 /// <summary>
-///     Devolve para a fila os eventos que ficaram parados em Processing/InQueue por mais de 30 minutos.
+///     Devolve para a fila os eventos que ficaram parados em Processing por mais de 30 minutos.
 /// </summary>
 public class ReprocessStuckEventsWorker(
     EximiaIntegrationDbContext dbContext,
@@ -26,8 +26,7 @@ public class ReprocessStuckEventsWorker(
                 var limit = DateTime.UtcNow.AddMinutes(-30);
 
                 var stuckEvents = await dbContext.IntegrationEvents
-                    .Where(e => (e.Control.IntegrationStatus == EIntegrationStatus.Processing
-                                 || e.Control.IntegrationStatus == EIntegrationStatus.InQueue)
+                    .Where(e => e.Control.IntegrationStatus == EIntegrationStatus.Processing
                                 && (e.Control.StartedAt ?? e.Control.CreatedAt) < limit)
                     .OrderBy(e => e.Id)
                     .Take(100)
