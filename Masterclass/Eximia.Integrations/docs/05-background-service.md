@@ -40,12 +40,6 @@ O `ReprocessStuckEventsWorker`, depois da branch `03`:
 ```csharp
 protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 {
-    using (var setup = scopes.CreateScope())
-    {
-        setup.ServiceProvider.GetRequiredService<EximiaIntegrationDbContext>().Database.ExecuteSqlRaw(
-            "CREATE INDEX IF NOT EXISTS ...");                            // síncrono, antes do primeiro await
-    }
-
     while (true)                                                          // ignora o token
     {
         try { /* ... RunAsync() ... */ }
@@ -61,16 +55,18 @@ protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 - **Nada recebe o token.** Nem o EF (`ToListAsync()`, `SaveChangesAsync()`), nem as rotas.
 - **Sem exclusão entre réplicas.** Se houver duas réplicas do agent, as duas reprocessam os mesmos eventos. O Hangfire resolvia isso com lock no banco. Ao sair dele, a exclusão precisa ser explícita.
 
-### 2. Trabalho síncrono antes do primeiro `await`, e a mudança do .NET 10
+### 2. A mudança do .NET 10 no `BackgroundService`
 
-Até o .NET 9, a parte **síncrona** do `ExecuteAsync`, antes do primeiro `await`, rodava na thread principal durante a subida, e **bloqueava a subida dos outros serviços**. O `ExecuteSqlRaw` acima, com o banco lento ou fora do ar, segurava o host inteiro.
+Até o .NET 9, a parte **síncrona** do `ExecuteAsync`, antes do primeiro `await`, rodava na thread principal durante a subida, e **bloqueava a subida dos outros serviços**. Qualquer trabalho de inicialização colocado no começo do método (abrir uma conexão, aquecer um cache, uma chamada síncrona ao banco) segurava o host inteiro, e com o banco lento ou fora do ar o serviço simplesmente não subia.
 
 **No .NET 10 isso mudou** (é uma *breaking change* documentada): todo o `ExecuteAsync` passa a rodar numa thread em segundo plano, e nenhuma parte dele bloqueia a subida dos outros serviços.
 
 Duas consequências práticas:
 
 - **Código que dependia do bloqueio quebra em silêncio.** Se alguém colocava a inicialização no começo do `ExecuteAsync` justamente para que ela terminasse antes de o resto subir, isso deixou de ser verdade. A documentação indica onde colocar esse código agora: no construtor, num override de `StartAsync` (antes de chamar `base.StartAsync`), com `IHostedLifecycleService`, ou implementando `IHostedService` diretamente.
-- **O defeito de "travar a subida" some, mas o código continua errado.** O `ExecuteSqlRaw` síncrono ainda bloqueia uma thread do pool e ainda ignora o cancelamento. O código certo não depende do comportamento de nenhuma das duas versões.
+- **O defeito de "travar a subida" some, mas o código síncrono continua errado.** Ele ainda bloqueia uma thread do pool e ainda ignora o cancelamento. O código certo não depende do comportamento de nenhuma das duas versões.
+
+> O worker deste projeto já começa direto no loop, sem trabalho antes do primeiro `await`, então nada nele muda entre o .NET 9 e o .NET 10. A mudança vale como regra para o que você escrever depois.
 
 ### 3. O agent era uma casca de Hangfire
 
@@ -123,7 +119,7 @@ protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 ```
 
 - **`PeriodicTimer`** no lugar de `while (true)` + `Task.Delay`: ele termina no cancelamento e não acumula atraso entre os ciclos.
-- **Nenhum trabalho antes do primeiro `await`.** A criação do índice foi para dentro da iteração, assíncrona e com token (`ExecuteSqlRawAsync`). O comportamento é o mesmo no .NET 9 e no .NET 10.
+- **Nenhum trabalho antes do primeiro `await`.** O `ExecuteAsync` começa direto no `PeriodicTimer`, então o comportamento é o mesmo no .NET 9 e no .NET 10.
 - **Token em tudo**: EF Core, rotas, lock.
 - **Exceção por iteração** não derruba o serviço, mas o cancelamento passa (`when (ex is not OperationCanceledException)`). O oposto, um `catch {}` vazio, deixaria o serviço "vivo" e quebrado.
 - **Escopo por iteração**, da branch `03`, continua: o worker só agenda.
