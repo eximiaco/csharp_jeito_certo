@@ -30,7 +30,7 @@ public class DestinationErrorConfigurationDataAccess : IDestinationErrorConfigur
         param.Add("id", id, DbType.AnsiStringFixedLength, ParameterDirection.Input, 100);
 
         await using var connection = new NpgsqlConnection(_connectionStringFactory.CreateConnectionString().ConnectionString);
-        var result = await connection.QueryAsync<DestinationErrorConfigurationDto>(sql, param).WaitAsync(cancellationToken).ConfigureAwait(false);
+        var result = await connection.QueryAsync<DestinationErrorConfigurationDto>(sql, param).ConfigureAwait(false);
         if (!result.Any())
             return Maybe.None;
 

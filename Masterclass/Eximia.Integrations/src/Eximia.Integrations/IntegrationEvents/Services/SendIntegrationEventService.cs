@@ -56,8 +56,8 @@ public class SendIntegrationEventService(IConfiguration configuration) : IServic
                     .PostStringAsync(request, cancellationToken: context);
 
                 return !response.ResponseMessage.IsSuccessStatusCode
-                    ? DispatcherResult.Failure("Failure integrating event.", response.StatusCode, await response.GetStringAsync().WaitAsync(context))
-                    : DispatcherResult.Success(response.StatusCode, await response.GetStringAsync().WaitAsync(context));
+                    ? DispatcherResult.Failure("Failure integrating event.", response.StatusCode, await response.GetStringAsync())
+                    : DispatcherResult.Success(response.StatusCode, await response.GetStringAsync());
             },
             cancellationToken: cancellationToken).ConfigureAwait(false);
 

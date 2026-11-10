@@ -47,6 +47,6 @@ public class HandleRoutingErrorService(
             return;
 
         ProcessIntegrationEventCallbackCommand callbackMessage = new(integrationEvent.Id, dispatcherResult.StatusCode, command.Key);
-        await publisher.PublishAsync(callbackMessage).WaitAsync(cancellationToken);
+        await publisher.PublishAsync(callbackMessage);
     }
 }
