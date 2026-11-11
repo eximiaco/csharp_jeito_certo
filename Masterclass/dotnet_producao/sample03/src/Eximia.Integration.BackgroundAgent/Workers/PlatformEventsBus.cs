@@ -30,9 +30,6 @@ public sealed class PlatformEventsBus(KafkaConfig config)
             throw new InvalidOperationException("The platform events consumer is already running and needs to be stopped in order to perform this operation.");
 
         var topic = config.Events.Topic;
-
-        // PROBLEMA: configuração padrão. O offset é confirmado em segundo plano antes de processar: um crash perde mensagens.
-        // Sem EnableAutoOffsetStore=false, sem CooperativeSticky, sem handlers de erro e sem Close() no encerramento.
         _consumer = new ConsumerBuilder<string, string>(new ConsumerConfig
         {
             BootstrapServers = config.Connection.BootstrapServers,
@@ -56,8 +53,8 @@ public sealed class PlatformEventsBus(KafkaConfig config)
             var result = _consumer!.Consume();
 
             // Para "não segurar o consumer", cada mensagem vira uma tarefa solta.
-            // PROBLEMA: uma task solta por mensagem. Sem limite (a rajada enche a fila do pool), a exceção some e a ordem
-            // dentro da partição se perde.
+            // PROBLEMA: uma task solta por mensagem. Sem limite (a rajada enche a fila do pool),
+            // a exceção some e a ordem dentro da partição se perde.
             _ = Task.Run(() => Process(result));
         }
     }

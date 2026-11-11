@@ -41,7 +41,8 @@ public sealed class PlatformEventsConsumer(
     private const int MaxAttempts = 4;
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
-        // Thread dedicada: Consume() bloqueia. O Task devolvido representa a vida do loop; se ele falhar, o host cai.
+        // Thread dedicada: Consume() bloqueia. O Task devolvido representa a vida do loop; se ele falhar,
+        // o host cai.
         => Task.Factory.StartNew(
             () => ConsumeLoop(stoppingToken),
             CancellationToken.None,
@@ -53,7 +54,8 @@ public sealed class PlatformEventsConsumer(
         // Nome do tópico FIXO, vindo do arquivo de configuração (Kafka:Events:Topic).
         var topic = config.Events.Topic;
 
-        // O consumer nasce, é usado e morre nesta thread: o IConsumer não deve ser compartilhado entre threads.
+        // O consumer nasce, é usado e morre nesta thread: o IConsumer não deve ser compartilhado
+        // entre threads.
         using var consumer = new ConsumerBuilder<string, string>(BuildConfig())
             .SetErrorHandler((_, error) => logger.Write(
                 error.IsFatal ? LogEventLevel.Fatal : LogEventLevel.Warning,

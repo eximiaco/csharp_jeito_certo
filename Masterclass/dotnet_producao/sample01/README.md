@@ -114,6 +114,7 @@ diff -rq sample01/src sample04/src -x bin -x obj
 Os arquivos abaixo são os que diferem do sample 4. Tudo que não está na lista é idêntico: o sample foi montado a
 partir do sample 4 com **só os problemas deste tema** plantados.
 
+- `Eximia.Integration.BackgroundAgent/Workers/PlatformEventsConsumer.cs`
 - `Eximia.Integration.BackgroundAgent/Workers/ReprocessStuckEventsWorker.cs`
 - `Eximia.Integrations/DependencyInjection.cs`
 - `Eximia.Integrations/DestinationsErrorsConfiguration/DataAccess/DestinationErrorConfigurationDataAccess.cs`

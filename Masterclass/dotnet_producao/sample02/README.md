@@ -117,6 +117,7 @@ partir do sample 4 com **só os problemas deste tema** plantados.
 
 - `Eximia.Integration.BackgroundAgent/Infrastructure/ServicesExtensions.cs`
 - `Eximia.Integration.BackgroundAgent/Program.cs`
+- `Eximia.Integration.BackgroundAgent/Workers/PlatformEventsConsumer.cs`
 - `Eximia.Integration.BackgroundAgent/Workers/ReprocessStuckEventsWorker.cs`
 - `Eximia.Integrations.EventDispatcher/Infrastructure/EximiaProblemDetailsFactory.cs  (só neste sample)`
 - `Eximia.Integrations.EventDispatcher/Infrastructure/IntegrationRequestHttpAdapter.cs  (só neste sample)`
