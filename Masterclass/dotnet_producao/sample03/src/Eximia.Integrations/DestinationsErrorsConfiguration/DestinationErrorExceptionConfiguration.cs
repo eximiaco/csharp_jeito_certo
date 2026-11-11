@@ -1,0 +1,5 @@
+﻿using Eximia.Integrations.DestinationsErrorsConfiguration.Strategies;
+
+namespace Eximia.Integrations.DestinationsErrorsConfiguration;
+
+public record DestinationErrorExceptionConfiguration(int StatusCode, IResponseErrorStrategy ResponseErrorStrategy);
