@@ -1,0 +1,15 @@
+{
+  "profiles": {
+    "Eximia.Integrations.EventDispatcher": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:40094"
+    }
+  },
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true
+  }
+}
