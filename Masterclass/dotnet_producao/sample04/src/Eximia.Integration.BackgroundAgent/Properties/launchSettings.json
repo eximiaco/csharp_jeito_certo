@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Eximia.Integration.BackgroundAgent": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

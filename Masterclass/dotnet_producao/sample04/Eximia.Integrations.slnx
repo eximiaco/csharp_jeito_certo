@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Eximia.Integration.BackgroundAgent/Eximia.Integration.BackgroundAgent.csproj" />
+    <Project Path="src/Eximia.Integrations.EventDispatcher/Eximia.Integrations.EventDispatcher.csproj" />
+    <Project Path="src/Eximia.Integrations.HttpApi/Eximia.Integrations.HttpApi.csproj" />
+    <Project Path="src/Eximia.Integrations/Eximia.Integrations.csproj" />
+  </Folder>
+</Solution>
