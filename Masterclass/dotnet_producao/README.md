@@ -55,6 +55,13 @@ Cada sample tem a mesma estrutura: `Eximia.Integrations.slnx`, `src/` e `sql/`.
 > O que é conclusão de leitura de código (e não comportamento observado rodando) está marcado como tal nos READMEs:
 > por exemplo, o efeito do fallback do Polly sobre o cancelamento e o fechamento das conexões do Npgsql no shutdown.
 
+## Nomes dos tópicos Kafka
+
+Os nomes são **fixos**, sem fábrica e sem prefixo de ambiente: vêm do arquivo de configuração de cada host
+(`Kafka:Events:Topic`, `Kafka:Callback:Topic` e `Kafka:Consumer:Inbounds[].Topics`). O tópico de entrega de cada rota
+é o `TopicName` cadastrado na rota ou, na falta dele, `destino-entidade` em minúsculas
+(`JsonSchemaService.CreateFrom`).
+
 ## Fora do escopo
 
 Defeitos de **mensageria** do fluxo principal (consumidor não idempotente, retry sem limite, republicação fora do

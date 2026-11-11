@@ -13,16 +13,13 @@ public class KafkaClientsConfigurator : IBrokerClientsConfigurator
     public const string PlataformEventEndpointName = "plataform-event";
 
     private readonly KafkaConfig _configuration;
-    private readonly TopicNameFactoryPeerEnviroment _topicNameFactoryPeerEnviroment;
     private readonly string _outboxConnectionString;
 
     public KafkaClientsConfigurator(
         KafkaConfig configuration,
-        TopicNameFactoryPeerEnviroment topicNameFactoryPeerEnviroment,
         PostgresConnectionStringFactory connectionStringFactory)
     {
         _configuration = configuration;
-        _topicNameFactoryPeerEnviroment = topicNameFactoryPeerEnviroment;
         _outboxConnectionString = connectionStringFactory.CreateConnectionString().ConnectionString;
     }
 
@@ -38,7 +35,7 @@ public class KafkaClientsConfigurator : IBrokerClientsConfigurator
                     .DisableMessageValidation()
                     .StoreToOutbox(outbox => outbox.UsePostgreSql(_outboxConnectionString)))
                 .Produce<PlataformEvent>(PlataformEventEndpointName, endpoint => endpoint
-                    .ProduceTo((PlataformEvent _) => _topicNameFactoryPeerEnviroment.Create(_configuration.Events.Topic))
+                    .ProduceTo((PlataformEvent _) => _configuration.Events.Topic)
                     .SetKafkaKey(message => message.ControlCode)
                     .SerializeAsJson()
                     .DisableMessageValidation()

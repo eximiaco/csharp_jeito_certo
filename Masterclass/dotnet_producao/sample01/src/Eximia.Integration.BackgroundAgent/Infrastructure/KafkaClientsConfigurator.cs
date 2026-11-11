@@ -8,12 +8,10 @@ namespace Eximia.Integration.BackgroundAgent.Infrastructure;
 public class KafkaClientsConfigurator : IBrokerClientsConfigurator
 {
     private readonly KafkaConfig _configuration;
-    private readonly TopicNameFactoryPeerEnviroment _topicNameFactoryPeerEnviroment;
 
-    public KafkaClientsConfigurator(KafkaConfig configuration, TopicNameFactoryPeerEnviroment topicNameFactoryPeerEnviroment)
+    public KafkaClientsConfigurator(KafkaConfig configuration)
     {
         _configuration = configuration;
-        _topicNameFactoryPeerEnviroment = topicNameFactoryPeerEnviroment;
     }
 
     public void Configure(BrokerClientsConfigurationBuilder builder)
@@ -28,7 +26,7 @@ public class KafkaClientsConfigurator : IBrokerClientsConfigurator
                     .DisableMessageValidation()))
             .AddProducer("plataform-event-producer", producer => producer
                 .Produce<PlataformEvent>("plataform-event", endpoint => endpoint
-                    .ProduceTo((PlataformEvent _) => _topicNameFactoryPeerEnviroment.Create(_configuration.Events.Topic))
+                    .ProduceTo((PlataformEvent _) => _configuration.Events.Topic)
                     .SetKafkaKey(message => message.ControlCode)
                     .SerializeAsJson()
                     .DisableMessageValidation())));

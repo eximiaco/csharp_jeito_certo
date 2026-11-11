@@ -1,5 +1,4 @@
 ﻿using Eximia.Integrations.Shared;
-using Eximia.Integrations.Shared.Kafka;
 using Eximia.Integrations.IntegrationEvents;
 using Eximia.Integrations.IntegrationEvents.Commands;
 using Eximia.Integrations.Routing;
@@ -8,13 +7,6 @@ namespace Eximia.Integrations.DomainServices;
 
 public class JsonSchemaService
 {
-    private readonly TopicNameFactoryPeerEnviroment _topicNameFactory;
-
-    public JsonSchemaService(TopicNameFactoryPeerEnviroment topicNameFactory)
-    {
-        _topicNameFactory = topicNameFactory;
-    }
-
     /// <summary>
     ///     Cria o evento de integração de UMA rota a partir do comando recebido. O destino, a fila, o modo e a
     ///     exigência de callback vêm da rota; o resto vem do próprio comando.
@@ -25,9 +17,11 @@ public class JsonSchemaService
         string payloadFile,
         Guid fileId)
     {
+        // Nome do tópico FIXO: o da rota, quando cadastrado, ou "destino-entidade" em minúsculas. Sem prefixo de
+        // ambiente: cada ambiente tem o seu cluster Kafka.
         var topic = string.IsNullOrEmpty(route.TopicName)
-            ? _topicNameFactory.CreateForDestiny(route.Destination, command.Entity)
-            : _topicNameFactory.Create(route.TopicName);
+            ? $"{route.Destination}-{command.Entity}".ToLowerInvariant()
+            : route.TopicName;
 
         return IntegrationEvent.CreateNewIntegrationEvent(
             command.Entity,

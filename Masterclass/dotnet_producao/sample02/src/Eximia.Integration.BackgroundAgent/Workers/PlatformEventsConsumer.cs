@@ -50,9 +50,8 @@ public sealed class PlatformEventsConsumer(
 
     private void ConsumeLoop(CancellationToken stoppingToken)
     {
-        string topic;
-        using (var scope = scopes.CreateScope())
-            topic = scope.ServiceProvider.GetRequiredService<TopicNameFactoryPeerEnviroment>().Create(config.Events.Topic);
+        // Nome do tópico FIXO, vindo do arquivo de configuração (Kafka:Events:Topic).
+        var topic = config.Events.Topic;
 
         // O consumer nasce, é usado e morre nesta thread: o IConsumer não deve ser compartilhado entre threads.
         using var consumer = new ConsumerBuilder<string, string>(BuildConfig())

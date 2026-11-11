@@ -35,7 +35,6 @@ internal static class ServicesExtensions
         kafkaConfig.Events = kafkaSection.GetSection("Events").Get<KafkaEventConfig>()!;
 
         services.AddSingleton(kafkaConfig);
-        services.AddScoped<TopicNameFactoryPeerEnviroment>();
 
         services
             .AddSilverback()

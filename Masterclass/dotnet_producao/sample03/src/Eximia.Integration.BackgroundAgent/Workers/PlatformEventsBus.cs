@@ -9,7 +9,7 @@ namespace Eximia.Integration.BackgroundAgent.Workers;
 ///     Consome os eventos da plataforma e entrega a quem se inscreveu. É compartilhado por mais de um
 ///     BackgroundService: cada um chama <see cref="Subscribe" /> e <see cref="StartReceive" />.
 /// </summary>
-public sealed class PlatformEventsBus(KafkaConfig config, IServiceScopeFactory scopes)
+public sealed class PlatformEventsBus(KafkaConfig config)
 {
     private readonly ConcurrentQueue<Func<PlatformEventContext, Task>> _handlers = new();
     private IConsumer<string, string>? _consumer;
@@ -20,18 +20,16 @@ public sealed class PlatformEventsBus(KafkaConfig config, IServiceScopeFactory s
     public void StartReceive()
     {
         // Quem chega depois só pega carona no consumer que já está de pé.
-        // PROBLEMA: guarda não atômica (check-then-act). Os dois BackgroundService chamam StartReceive no ExecuteAsync.
+        // PROBLEMA: guarda não atômica (check-then-act). Os dois BackgroundService
+        // chamam StartReceive no ExecuteAsync.
         // No .NET 8 rodavam em sequência e funcionava; no .NET 10 rodam em paralelo e passam juntos por aqui.
         if (_started)
             return;
 
         if (_consumer is not null)
-            throw new InvalidOperationException(
-                "The platform events consumer is already running and needs to be stopped in order to perform this operation.");
+            throw new InvalidOperationException("The platform events consumer is already running and needs to be stopped in order to perform this operation.");
 
-        string topic;
-        using (var scope = scopes.CreateScope())
-            topic = scope.ServiceProvider.GetRequiredService<TopicNameFactoryPeerEnviroment>().Create(config.Events.Topic);
+        var topic = config.Events.Topic;
 
         // PROBLEMA: configuração padrão. O offset é confirmado em segundo plano antes de processar: um crash perde mensagens.
         // Sem EnableAutoOffsetStore=false, sem CooperativeSticky, sem handlers de erro e sem Close() no encerramento.
@@ -45,7 +43,8 @@ public sealed class PlatformEventsBus(KafkaConfig config, IServiceScopeFactory s
         _consumer.Subscribe(topic);
 
         _started = true;
-        // PROBLEMA: o loop bloqueante roda numa thread do pool. Prende uma thread do ThreadPool para sempre; precisaria de uma thread dedicada.
+        // PROBLEMA: o loop bloqueante roda numa thread do pool.
+        // Prende uma thread do ThreadPool para sempre; precisaria de uma thread dedicada.
         Task.Run(ConsumeLoop);
     }
 

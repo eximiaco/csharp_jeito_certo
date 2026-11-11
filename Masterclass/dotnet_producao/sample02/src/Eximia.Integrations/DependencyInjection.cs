@@ -27,7 +27,8 @@ public static class DependencyInjection
     public static IServiceCollection AddIntegrationsShared(this IServiceCollection services)
     {
         services.AddSingleton<PostgresConnectionStringFactory>();
-        // PROBLEMA: singleton que depende de serviço scoped (captive dependency): o IPublisher é scoped e passa a viver o tempo do processo.
+        // PROBLEMA: singleton que depende de serviço scoped (captive dependency):
+        // o IPublisher é scoped e passa a viver o tempo do processo.
         services.AddSingleton<PublishPlataformEventService>();
         services.AddScoped<IntegrationEventsDataAccess>();
         return services;
@@ -69,7 +70,8 @@ public static class DependencyInjection
     public static IServiceCollection AddRegisterIntegrationEvent(this IServiceCollection services)
     {
         // Usado em toda requisição da API: uma instância só.
-        // PROBLEMA: singleton que depende de serviço scoped (captive dependency): todas as requisições compartilham o mesmo DbContext (que não é thread-safe).
+        // PROBLEMA: singleton que depende de serviço scoped (captive dependency):
+        // todas as requisições compartilham o mesmo DbContext (que não é thread-safe).
         services.AddSingleton<RegisterMultipleRoutesIntegrationEventApplication>();
         services.AddScoped<JsonSchemaService>();
 

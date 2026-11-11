@@ -27,8 +27,8 @@ só troca a liberação da thread por um bloqueio.
 | Caminho de erro | `Eximia.Integrations/IntegrationEvents/Application/Routing/HandleRoutingErrorService.cs` | 34-35 | `NeedRetryAsync(...).GetAwaiter().GetResult()` | Consulta o banco. Com o destino fora do ar, **todas** as mensagens caem aqui ao mesmo tempo: o sistema piora justamente quando mais precisa responder |
 | Callback de erro | `Eximia.Integrations/IntegrationEvents/Services/SendIntegrationEventService.cs` | 30 | `GetStringAsync().Result` | Leitura do corpo da resposta ao devolver o erro à origem, também em caminho de falha |
 | Callback de erro | `Eximia.Integrations/IntegrationEvents/Services/SendIntegrationEventService.cs` | 37 | `GetResponseStringAsync().Result` | Idem, no tratamento da exceção HTTP |
-| Registro (API) | `Eximia.Integrations/IntegrationEvents/Application/Register/RegisterMultipleRoutesIntegrationEventApplication.cs` | 35 | `GetRoutesByOriginAndEntityAsync(...).GetAwaiter().GetResult()` | Segura a thread da requisição durante a ida ao banco, em **toda** requisição da API |
-| Registro (API) | `Eximia.Integrations/IntegrationEvents/Application/Register/RegisterMultipleRoutesIntegrationEventApplication.cs` | 62 | `UploadAsync(...).Result` | Segura a thread da requisição durante o upload ao storage, que é lento por natureza. A vazão da API passa a ser limitada pelo pool, e não pela capacidade real |
+| Registro (API) | `Eximia.Integrations/IntegrationEvents/Application/Register/RegisterMultipleRoutesIntegrationEventApplication.cs` | 36 | `GetRoutesByOriginAndEntityAsync(...).GetAwaiter().GetResult()` | Segura a thread da requisição durante a ida ao banco, em **toda** requisição da API |
+| Registro (API) | `Eximia.Integrations/IntegrationEvents/Application/Register/RegisterMultipleRoutesIntegrationEventApplication.cs` | 63 | `UploadAsync(...).Result` | Segura a thread da requisição durante o upload ao storage, que é lento por natureza. A vazão da API passa a ser limitada pelo pool, e não pela capacidade real |
 
 **Cache de token que não funciona** (`Eximia.Integrations/Routing/Authentication/TokenServiceProvider.cs`)
 - Linha 26: `FromMilliseconds(expires_in)`.
@@ -73,7 +73,7 @@ pendurado. Para quem lê o código, "está cancelável". Para o banco e para a r
 
 **Publisher sem o token**
 - `HandleRoutingErrorService.cs`: linha 52 (`PublishAsync(callbackMessage)`).
-- `RegisterMultipleRoutesIntegrationEventApplication.cs`: linha 91 (`PublishAsync(RouteIntegrationEventRequestCommand.Create(...))`).
+- `RegisterMultipleRoutesIntegrationEventApplication.cs`: linha 92 (`PublishAsync(RouteIntegrationEventRequestCommand.Create(...))`).
 - **Por quê:** o `PublishAsync` aceita o token e ele não é passado. O envio não pode ser interrompido.
 
 **Política de resiliência executada sem o token**

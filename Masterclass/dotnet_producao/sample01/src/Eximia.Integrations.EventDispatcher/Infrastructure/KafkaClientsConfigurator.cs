@@ -13,14 +13,11 @@ public class KafkaClientsConfigurator : IBrokerClientsConfigurator
     private const int DefaultMaxDegreeOfParallelism = 10;
 
     private readonly KafkaConfig _configuration;
-    private readonly TopicNameFactoryPeerEnviroment _topicNameFactoryPeerEnviroment;
 
     public KafkaClientsConfigurator(
-        KafkaConfig configuration,
-        TopicNameFactoryPeerEnviroment topicNameFactoryPeerEnviroment)
+        KafkaConfig configuration)
     {
         _configuration = configuration;
-        _topicNameFactoryPeerEnviroment = topicNameFactoryPeerEnviroment;
     }
 
     public void Configure(BrokerClientsConfigurationBuilder builder)
@@ -34,7 +31,7 @@ public class KafkaClientsConfigurator : IBrokerClientsConfigurator
             {
                 var topics = inbound.Topics!
                     .Split(",")
-                    .Select(c => _topicNameFactoryPeerEnviroment.Create(c))
+                    .Select(c => c)
                     .ToArray();
 
                 var name = $"route-integration-event-{inboundIndex++}";
@@ -58,11 +55,11 @@ public class KafkaClientsConfigurator : IBrokerClientsConfigurator
                 .LimitBackpressure(DefaultBackpressureLimit)
                 .LimitParallelism(DefaultMaxDegreeOfParallelism)
                 .Consume<ProcessIntegrationEventCallbackCommand>("process-integration-event-callback", endpoint => endpoint
-                    .ConsumeFrom(_topicNameFactoryPeerEnviroment.Create(_configuration.Callback.Topic))));
+                    .ConsumeFrom(_configuration.Callback.Topic)));
 
             clients.AddProducer("callback-producer", producer => producer
                 .Produce<ProcessIntegrationEventCallbackCommand>("callback", endpoint => endpoint
-                    .ProduceTo((ProcessIntegrationEventCallbackCommand _) => _topicNameFactoryPeerEnviroment.Create(_configuration.Callback.Topic))
+                    .ProduceTo((ProcessIntegrationEventCallbackCommand _) => _configuration.Callback.Topic)
                     .SetKafkaKey(message => message.Key)
                     .SerializeAsJson()
                     .DisableMessageValidation()));
@@ -72,7 +69,7 @@ public class KafkaClientsConfigurator : IBrokerClientsConfigurator
                 .DisableDeliveryReports()
                 .IgnoreIfNotAcknowledged()
                 .Produce<PlataformEvent>("plataform-event", endpoint => endpoint
-                    .ProduceTo((PlataformEvent _) => _topicNameFactoryPeerEnviroment.Create(_configuration.Events.Topic))
+                    .ProduceTo((PlataformEvent _) => _configuration.Events.Topic)
                     .SetKafkaKey(message => message.ControlCode)
                     .SerializeAsJson()
                     .DisableMessageValidation()));

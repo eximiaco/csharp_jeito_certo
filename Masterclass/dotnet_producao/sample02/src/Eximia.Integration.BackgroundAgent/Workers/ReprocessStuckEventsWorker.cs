@@ -13,7 +13,8 @@ namespace Eximia.Integration.BackgroundAgent.Workers;
 ///     Devolve para a fila os eventos que ficaram parados em Processing por mais de 30 minutos.
 /// </summary>
 public class ReprocessStuckEventsWorker(
-    // PROBLEMA: DbContext no construtor de um singleton. Vive o tempo do processo: leak do change tracker, dados velhos, sem thread-safety.
+    // PROBLEMA: DbContext no construtor de um singleton. Vive o tempo do processo: leak do change tracker,
+    // dados velhos, sem thread-safety.
     EximiaIntegrationDbContext dbContext,
     RoutingDataAccess routingDataAccess,
     IPublisher publisher,

@@ -31,7 +31,8 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
         try
         {
             // 1. Buscar TODAS as rotas para origem + entidade
-            // PROBLEMA: bloqueia uma thread do pool esperando o banco. O método já é async: deveria usar await. Roda em toda requisição.
+            // PROBLEMA: bloqueia uma thread do pool esperando o banco. O método já é async:
+            // deveria usar await. Roda em toda requisição.
             var allRoutes = routingDataAccess.GetRoutesByOriginAndEntityAsync(
                 command.Origin,
                 command.Entity,

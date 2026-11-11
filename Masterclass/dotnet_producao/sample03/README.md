@@ -29,7 +29,7 @@ Para compilar: `dotnet build Eximia.Integrations.slnx`. Nada aqui precisa ser ex
   são usados por várias tasks ao mesmo tempo, sem ser thread-safe.
 
 **No consumer Confluent (ver o bloco de threads abaixo):** uma `Task.Run` solta por mensagem
-(`Workers/PlatformEventsBus.cs`, linha 62), sem limite, sem observar a exceção e com o offset já confirmado.
+(`Workers/PlatformEventsBus.cs`, linha 61), sem limite, sem observar a exceção e com o offset já confirmado.
 
 ## Problema 4 · BackgroundService e host
 
@@ -73,9 +73,9 @@ O consumer fica em `Workers/PlatformEventsBus.cs`, compartilhado por dois `Backg
 
 | Problema | Onde | Por que é um problema |
 |---|---|---|
-| Loop bloqueante numa thread do pool | `PlatformEventsBus.cs`, `Task.Run(ConsumeLoop)` (linha 49) e `Consume()` (linha 57) | `Consume()` bloqueia. O `while (true)` **prende uma thread do ThreadPool para sempre**, sem token. É uma thread a menos para todo o processo |
-| Uma `Task.Run` solta por mensagem | linha 62 | Sem limite: numa rajada, milhares de work items entram na fila do pool. Exceções se perdem. A ordem dentro da partição deixa de existir |
-| Sync-over-async dentro de cada work item | `PlatformEventsBus.cs` (linha 76) e `IntegrationTimelineWorker.cs` (linha 30) | Cada work item **bloqueia** uma thread do pool esperando o banco |
+| Loop bloqueante numa thread do pool | `PlatformEventsBus.cs`, `Task.Run(ConsumeLoop)` (linha 48) e `Consume()` (linha 56) | `Consume()` bloqueia. O `while (true)` **prende uma thread do ThreadPool para sempre**, sem token. É uma thread a menos para todo o processo |
+| Uma `Task.Run` solta por mensagem | linha 61 | Sem limite: numa rajada, milhares de work items entram na fila do pool. Exceções se perdem. A ordem dentro da partição deixa de existir |
+| Sync-over-async dentro de cada work item | `PlatformEventsBus.cs` (linha 75) e `IntegrationTimelineWorker.cs` (linha 30) | Cada work item **bloqueia** uma thread do pool esperando o banco |
 | `Thread.Sleep` no retry | `IntegrationTimelineWorker.cs`, linha 38 | Bloqueia a thread do pool por até 2·n segundos, por mensagem |
 | Commit antes de processar | `PlatformEventsBus.cs`, `ConsumerConfig` sem `EnableAutoOffsetStore = false` | O offset é confirmado em segundo plano enquanto a `Task.Run` ainda nem rodou: um crash ou deploy **perde mensagens** |
 | Sem `Close()` e sem handlers de erro | `PlatformEventsBus.cs` | O rebalance espera o `session.timeout`, e os erros do client somem |
@@ -104,7 +104,7 @@ mesmo starvation nasce de **tarefas soltas mais um `BackgroundService` mal escri
 
 **Onde isso morde aqui.** `IntegrationTimelineWorker` e `IntegrationErrorAlertWorker` fazem a mesma coisa na parte
 síncrona do `ExecuteAsync`: `bus.Subscribe(...)` e `bus.StartReceive()`
-(`IntegrationTimelineWorker.cs`, linha 16; `IntegrationErrorAlertWorker.cs`, linha 14).
+(`IntegrationTimelineWorker.cs`, linha 16; `IntegrationErrorAlertWorker.cs`, linha 15).
 
 O `StartReceive` (linha 20) tem uma guarda que **não é atômica**: `if (_started) return;` e, mais abaixo,
 `_started = true`, com a criação do consumer no meio. No .NET 8 isso funcionava por acaso, porque as chamadas eram

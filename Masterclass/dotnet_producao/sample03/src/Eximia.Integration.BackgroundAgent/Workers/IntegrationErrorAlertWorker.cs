@@ -10,7 +10,8 @@ public sealed class IntegrationErrorAlertWorker(PlatformEventsBus bus, ILogger l
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         bus.Subscribe(AlertAsync);
-        // PROBLEMA: parte síncrona do ExecuteAsync mexendo em estado compartilhado. No .NET 10 roda em paralelo com o outro serviço.
+        // PROBLEMA: parte síncrona do ExecuteAsync mexendo em estado compartilhado.
+        // No .NET 10 roda em paralelo com o outro serviço.
         bus.StartReceive();
         return Task.CompletedTask;
     }

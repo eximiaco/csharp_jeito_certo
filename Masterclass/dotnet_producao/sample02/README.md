@@ -14,8 +14,8 @@ O container é o padrão do .NET (sem Autofac), e as dependências são registra
 `Eximia.Integrations/DependencyInjection.cs`.
 
 **Captive dependency: singleton que recebe serviço scoped** (`Eximia.Integrations/DependencyInjection.cs`)
-- Linha 73: `AddSingleton<RegisterMultipleRoutesIntegrationEventApplication>()`, o handler da API.
-- Linha 31: `AddSingleton<PublishPlataformEventService>()`.
+- Linha 75: `AddSingleton<RegisterMultipleRoutesIntegrationEventApplication>()`, o handler da API.
+- Linha 32: `AddSingleton<PublishPlataformEventService>()`.
 - **Por quê:** o handler depende de serviços **scoped**: o `EximiaIntegrationDbContext`, o `IPublisher` do Silverback
   e o `JsonSchemaService`. O container resolve as dependências de um singleton a partir do escopo raiz, então elas
   passam a viver o tempo do processo, e **todas as requisições da API compartilham o mesmo `DbContext`**. Efeitos
@@ -27,7 +27,7 @@ O container é o padrão do .NET (sem Autofac), e as dependências são registra
   `IPublisher`, que é scoped: mesma regra. Nada disso quebra um teste com uma requisição por vez.
 
 **Singleton desnecessário** (`Eximia.Integrations/DependencyInjection.cs`)
-- Linha 97: `AddSingleton<SendIntegrationEventService>()`, com o comentário "uma instância basta para todo o processo".
+- Linha 99: `AddSingleton<SendIntegrationEventService>()`, com o comentário "uma instância basta para todo o processo".
 - **Por quê:** singleton é a decisão de compartilhar uma instância, e aqui não há o que compartilhar. O serviço só
   recebe o `IConfiguration` (singleton), lê a URL da API no construtor e faz um POST: não guarda estado por operação,
   não é caro de criar e não é dono de nenhum recurso. **Nada quebra hoje**, e é isso que o torna traiçoeiro:
@@ -38,10 +38,10 @@ O container é o padrão do .NET (sem Autofac), e as dependências são registra
   - **Configuração congelada.** A URL é lida uma vez e vale até reiniciar o processo; com o serviço scoped, é relida
     a cada mensagem.
 - **Contraste com um singleton correto:** `PostgresConnectionStringFactory` (linha 29) lê a configuração uma vez e é
-  imutável, então compartilhar a instância faz sentido. O `TokenCache` (linha 49) também: os semáforos dele precisam sobreviver entre mensagens.
+  imutável, então compartilhar a instância faz sentido. O `TokenCache` (linha 50) também: os semáforos dele precisam sobreviver entre mensagens.
 
 **`DbContext` preso em serviço persistente**
-- `Eximia.Integration.BackgroundAgent/Workers/ReprocessStuckEventsWorker.cs`: linha 17. O `BackgroundService` (singleton) recebe o
+- `Eximia.Integration.BackgroundAgent/Workers/ReprocessStuckEventsWorker.cs`: linha 18. O `BackgroundService` (singleton) recebe o
   `EximiaIntegrationDbContext` no construtor.
 - **Por quê:** o `DbContext` foi feito para uma unidade de trabalho curta. Preso ao singleton, ele vive o tempo do
   processo:
@@ -61,7 +61,7 @@ O container é o padrão do .NET (sem Autofac), e as dependências são registra
   e o agent acusa o worker.
 
 **Health check do outbox sem `IOutboxReader`**
-- `Eximia.Integrations.HttpApi/Infrastructure/ServicesExtensions.cs`, método `AddHealth` (linha 135).
+- `Eximia.Integrations.HttpApi/Infrastructure/ServicesExtensions.cs`, método `AddHealth` (linha 134).
 - **Por quê:** o health check do Silverback (`OutboxHealthCheckService`) exige um `IOutboxReader` que nada registra.
   Com a validação ligada, a API não sobe por causa disso, o que indica que o `/health-check` falharia na primeira
   chamada de verdade. Sem validação, ninguém vê.
