@@ -25,6 +25,7 @@ public class RoutingDataAccess(
                 cacheEntry.SlidingExpiration = TimeSpan.FromSeconds(3);
                 cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(20);
                 cacheEntry.Size = 500;
+                // PROBLEMA: new NpgsqlConnection cria um pool global sem dono. Ninguém o descarta no shutdown.
                 await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
                 var dto = await connection.QueryFirstOrDefaultAsync<RouteDto>(new CommandDefinition(
                         @"SELECT id,
@@ -90,6 +91,7 @@ public class RoutingDataAccess(
                 cacheEntry.SlidingExpiration = TimeSpan.FromSeconds(3);
                 cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(20);
                 cacheEntry.Size = 500;
+                // PROBLEMA: new NpgsqlConnection cria um pool global sem dono. Ninguém o descarta no shutdown.
                 await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
                 var dto = await connection.QueryFirstOrDefaultAsync<RouteDto>(new CommandDefinition(
                         @"SELECT id,
@@ -154,6 +156,7 @@ public class RoutingDataAccess(
                 cacheEntry.SlidingExpiration = TimeSpan.FromSeconds(3);
                 cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(20);
                 cacheEntry.Size = 500;
+                // PROBLEMA: new NpgsqlConnection cria um pool global sem dono. Ninguém o descarta no shutdown.
                 await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
                 var dto = await connection.QueryFirstOrDefaultAsync<RouteWithoutRulesDto>(new CommandDefinition(
                         @"SELECT id,
@@ -217,6 +220,7 @@ public class RoutingDataAccess(
                 cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(20);
                 cacheEntry.Size = 500;
 
+                // PROBLEMA: new NpgsqlConnection cria um pool global sem dono. Ninguém o descarta no shutdown.
                 await using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
 
                 var results = await connection.QueryAsync<RouteDto>(new CommandDefinition(

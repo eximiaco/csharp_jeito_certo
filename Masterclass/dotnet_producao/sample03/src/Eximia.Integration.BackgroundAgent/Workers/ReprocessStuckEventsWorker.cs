@@ -17,6 +17,7 @@ public class ReprocessStuckEventsWorker(IServiceScopeFactory scopes, ILogger log
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        // PROBLEMA: while(true) que ignora o token. O StopAsync espera até 5 minutos: o deploy estoura o ShutdownTimeout.
         while (true)
         {
             try
@@ -24,11 +25,13 @@ public class ReprocessStuckEventsWorker(IServiceScopeFactory scopes, ILogger log
                 await using var scope = scopes.CreateAsyncScope();
                 await scope.ServiceProvider.GetRequiredService<ReprocessStuckEvents>().RunAsync();
             }
+            // PROBLEMA: engole também OperationCanceledException: mesmo com token, o serviço seguiria vivo.
             catch (Exception ex)
             {
                 logger.Error(ex, "Error reprocessing stuck integration events.");
             }
 
+            // PROBLEMA: espera sem token, e sem exclusão entre réplicas (duas instâncias reprocessam os mesmos eventos).
             await Task.Delay(TimeSpan.FromMinutes(5));
         }
     }
@@ -50,6 +53,7 @@ public class ReprocessStuckEvents(
                         && (e.Control.StartedAt ?? e.Control.CreatedAt) < limit)
             .OrderBy(e => e.Id)
             .Take(100)
+            // PROBLEMA: query sem token. O EF não pode ser interrompido no shutdown.
             .ToListAsync();
 
         foreach (var integrationEvent in stuckEvents)
@@ -71,6 +75,7 @@ public class ReprocessStuckEvents(
                     route.Value.Id));
         }
 
+        // PROBLEMA: gravação sem token. O EF não pode ser interrompido no shutdown.
         await dbContext.SaveChangesAsync();
         logger.Information("{Count} integration events reprocessed.", stuckEvents.Count);
     }

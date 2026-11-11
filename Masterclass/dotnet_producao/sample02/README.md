@@ -14,8 +14,8 @@ O container é o padrão do .NET (sem Autofac), e as dependências são registra
 `Eximia.Integrations/DependencyInjection.cs`.
 
 **Captive dependency: singleton que recebe serviço scoped** (`Eximia.Integrations/DependencyInjection.cs`)
-- Linha 71: `AddSingleton<RegisterMultipleRoutesIntegrationEventApplication>()`, o handler da API.
-- Linha 30: `AddSingleton<PublishPlataformEventService>()`.
+- Linha 73: `AddSingleton<RegisterMultipleRoutesIntegrationEventApplication>()`, o handler da API.
+- Linha 31: `AddSingleton<PublishPlataformEventService>()`.
 - **Por quê:** o handler depende de serviços **scoped**: o `EximiaIntegrationDbContext`, o `IPublisher` do Silverback
   e o `JsonSchemaService`. O container resolve as dependências de um singleton a partir do escopo raiz, então elas
   passam a viver o tempo do processo, e **todas as requisições da API compartilham o mesmo `DbContext`**. Efeitos
@@ -27,7 +27,7 @@ O container é o padrão do .NET (sem Autofac), e as dependências são registra
   `IPublisher`, que é scoped: mesma regra. Nada disso quebra um teste com uma requisição por vez.
 
 **Singleton desnecessário** (`Eximia.Integrations/DependencyInjection.cs`)
-- Linha 93: `AddSingleton<SendIntegrationEventService>()`, com o comentário "uma instância basta para todo o processo".
+- Linha 97: `AddSingleton<SendIntegrationEventService>()`, com o comentário "uma instância basta para todo o processo".
 - **Por quê:** singleton é a decisão de compartilhar uma instância, e aqui não há o que compartilhar. O serviço só
   recebe o `IConfiguration` (singleton), lê a URL da API no construtor e faz um POST: não guarda estado por operação,
   não é caro de criar e não é dono de nenhum recurso. **Nada quebra hoje**, e é isso que o torna traiçoeiro:
@@ -38,10 +38,10 @@ O container é o padrão do .NET (sem Autofac), e as dependências são registra
   - **Configuração congelada.** A URL é lida uma vez e vale até reiniciar o processo; com o serviço scoped, é relida
     a cada mensagem.
 - **Contraste com um singleton correto:** `PostgresConnectionStringFactory` (linha 29) lê a configuração uma vez e é
-  imutável, então compartilhar a instância faz sentido. O `TokenCache` (linha 48) também: os semáforos dele precisam sobreviver entre mensagens.
+  imutável, então compartilhar a instância faz sentido. O `TokenCache` (linha 49) também: os semáforos dele precisam sobreviver entre mensagens.
 
 **`DbContext` preso em serviço persistente**
-- `Eximia.Integration.BackgroundAgent/Workers/ReprocessStuckEventsWorker.cs`: linha 16. O `BackgroundService` (singleton) recebe o
+- `Eximia.Integration.BackgroundAgent/Workers/ReprocessStuckEventsWorker.cs`: linha 17. O `BackgroundService` (singleton) recebe o
   `EximiaIntegrationDbContext` no construtor.
 - **Por quê:** o `DbContext` foi feito para uma unidade de trabalho curta. Preso ao singleton, ele vive o tempo do
   processo:
@@ -51,9 +51,9 @@ O container é o padrão do .NET (sem Autofac), e as dependências são registra
   - **Concorrência:** o `DbContext` não é thread-safe, e um único objeto serve a todas as iterações.
 
 **Validação do container desligada** (`ValidateScopes = false` e `ValidateOnBuild = false`)
-- `Eximia.Integrations.HttpApi/Program.cs`: linha 50.
-- `Eximia.Integrations.EventDispatcher/Program.cs`: linha 46.
-- `Eximia.Integration.BackgroundAgent/Program.cs`: linha 39.
+- `Eximia.Integrations.HttpApi/Program.cs`: linha 51.
+- `Eximia.Integrations.EventDispatcher/Program.cs`: linha 50.
+- `Eximia.Integration.BackgroundAgent/Program.cs`: linha 40.
 - **Por quê:** por padrão, o container do .NET só valida em Development: `ValidateScopes` acusa um singleton que
   consome um serviço scoped, e `ValidateOnBuild` acusa uma dependência não registrada, ambos na subida. Desligar nos
   três hosts deixa os problemas acima passarem em silêncio em **todos** os ambientes. Religando a validação, a API
@@ -67,15 +67,15 @@ O container é o padrão do .NET (sem Autofac), e as dependências são registra
   chamada de verdade. Sem validação, ninguém vê.
 
 **Sobras de Web API no host sem HTTP** (`HttpContextAccessor`, `IntegrationRequestHttpAdapter`/`IIntegrationRequest` e `EximiaProblemDetailsFactory`)
-- `Eximia.Integrations.EventDispatcher/Program.cs`: linhas 34, 35 e 36.
+- `Eximia.Integrations.EventDispatcher/Program.cs`: linhas 35, 37 e 39.
 - **Por quê:** um consumer não tem `HttpContext`. Registrar o que ninguém usa engana quem lê (cada linha sugere que
   algo depende dela) e carrega dependências sem necessidade.
 
 ## Problema 6 · Encerramento sem cuidado
 
 **Cancelamento tratado como falha de entrega**
-- `Eximia.Integrations/Routing/Dispatchers/PolicyFactory.cs`: linha 62, `Handle<Exception>()` no fallback do Polly.
-- `Eximia.Integrations/IntegrationEvents/Application/Routing/RouteIntegrationEventApplication.cs`: linha 81, `catch (Exception ex)`.
+- `Eximia.Integrations/Routing/Dispatchers/PolicyFactory.cs`: linha 63, `Handle<Exception>()` no fallback do Polly.
+- `Eximia.Integrations/IntegrationEvents/Application/Routing/RouteIntegrationEventApplication.cs`: linha 82, `catch (Exception ex)`.
 - **Por quê (hipótese lida no código, não observada rodando):** se o cancelamento chegar à política, o fallback o
   converte em `DispatcherResult.Failure`. Daí o `HandleRoutingErrorService` (linha 25) grava o evento como `Error`,
   publica o evento de erro e **envia um callback de erro à origem**, avisando de uma falha que nunca aconteceu.
@@ -94,8 +94,8 @@ O container é o padrão do .NET (sem Autofac), e as dependências são registra
 - `Eximia.Integrations/IntegrationEvents/IntegrationEventsDataAccess.cs`: 8.
 - `Eximia.Integrations/Routing/RoutingDataAccess.cs`: 4.
 - `Eximia.Integrations/DestinationsErrorsConfiguration/DataAccess/DestinationErrorConfigurationDataAccess.cs`: 1.
-- `Eximia.Integrations/Shared/Postgres/PostgresAdvisoryLock.cs`: 1 (linha 17). Aqui a conexão **precisa** ficar aberta enquanto o lock vale.
-- `Eximia.Integrations/PlatformEvents/PlatformEventTimelineDataAccess.cs`: 1 (linha 25).
+- `Eximia.Integrations/Shared/Postgres/PostgresAdvisoryLock.cs`: 1 (linha 18). Aqui a conexão **precisa** ficar aberta enquanto o lock vale.
+- `Eximia.Integrations/PlatformEvents/PlatformEventTimelineDataAccess.cs`: 1 (linha 26).
 - **Por quê:** abrir uma conexão curta por operação é o padrão certo. O problema é **de quem é o pool**: com
   `new NpgsqlConnection(connectionString)` ele é global e indexado pela *connection string*, e ninguém o descarta.
   No encerramento, as conexões TCP com o Postgres não são fechadas pelo protocolo, morrem com o processo, e o
@@ -115,7 +115,6 @@ diff -rq sample02/src sample04/src -x bin -x obj
 Os arquivos abaixo são os que diferem do sample 4. Tudo que não está na lista é idêntico: o sample foi montado a
 partir do sample 4 com **só os problemas deste tema** plantados.
 
-- `Eximia.Integration.BackgroundAgent/Infrastructure/HangfireFilters  (só neste sample)`
 - `Eximia.Integration.BackgroundAgent/Infrastructure/ServicesExtensions.cs`
 - `Eximia.Integration.BackgroundAgent/Program.cs`
 - `Eximia.Integration.BackgroundAgent/Workers/ReprocessStuckEventsWorker.cs`

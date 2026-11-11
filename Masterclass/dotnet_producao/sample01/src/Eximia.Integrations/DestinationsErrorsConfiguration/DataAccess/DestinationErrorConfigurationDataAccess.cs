@@ -30,6 +30,7 @@ public class DestinationErrorConfigurationDataAccess : IDestinationErrorConfigur
         param.Add("id", id, DbType.AnsiStringFixedLength, ParameterDirection.Input, 100);
 
         await using var connection = _dataSource.CreateConnection();
+        // PROBLEMA: o método recebe o token e não o repassa ao driver. A query não é cancelada e segue no Postgres.
         var result = await connection.QueryAsync<DestinationErrorConfigurationDto>(sql, param).ConfigureAwait(false);
         if (!result.Any())
             return Maybe.None;

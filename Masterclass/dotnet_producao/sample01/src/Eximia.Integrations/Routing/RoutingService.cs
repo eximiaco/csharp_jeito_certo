@@ -16,6 +16,7 @@ public class RoutingService(
         Route route,
         CancellationToken cancellationToken)
     {
+        // PROBLEMA: bloqueia uma thread do pool esperando o storage. O método já é async: deveria usar await.
         var payload = payloadService.DownloadAsync(integrationEvent, route.SendPayloadAsLink, cancellationToken).Result;
         if (payload.IsFailure)
             return DispatcherResult.Failure(payload.Error);

@@ -30,6 +30,7 @@ try
         .AddCustomCors()
         .AddHealth(builder.Configuration)
         .AddCustomOptions(builder.Configuration)
+        // PROBLEMA: o agent não recebe HTTP e carrega Hangfire, Kestrel, MVC e dashboard. Dois jobs simples não precisam disso.
         .AddHangfireJobs(builder.Configuration)
         .AddOptions()
         .AddKafka(builder.Configuration)
@@ -43,6 +44,7 @@ try
         .AddSingleton<PlatformEventsBus>()
         .AddHostedService<IntegrationTimelineWorker>()
         .AddHostedService<IntegrationErrorAlertWorker>()
+        // PROBLEMA: MVC sem nenhum controller.
         .AddControllers();
 
     builder.Host.UseSerilog();
@@ -61,6 +63,7 @@ try
     var app = builder.Build();
     app.UseHealthChecks("/health-ready");
     app.UseHealthChecks("/health-check");
+    // PROBLEMA: dashboard exposto num serviço que deveria ser só um Worker.
     app.UseHangfireDashboard("/hangfire", new DashboardOptions
     {
         Authorization = [new AllowAllDashboardAuthorizationFilter()],

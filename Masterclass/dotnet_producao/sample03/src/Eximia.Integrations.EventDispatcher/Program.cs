@@ -5,6 +5,7 @@ using Eximia.Integrations;
 using Eximia.Integrations.Shared.Kafka;
 using Eximia.Integrations.EventDispatcher.Infrastructure;
 
+// PROBLEMA: o dispatcher só consome mensagens, mas é uma Web API completa. O único HTTP necessário são os probes de saúde.
 var builder = WebApplication.CreateBuilder(args);
 var assemblyName = Assembly.GetExecutingAssembly().GetName();
 var serviceName = assemblyName.Name;
@@ -24,7 +25,9 @@ try
     builder.Services
         .AddKafka(builder.Configuration)
         .AddEndpointsApiExplorer()
+        // PROBLEMA: Swagger num host sem controllers.
         .AddSwaggerDoc()
+        // PROBLEMA: CORS num host que ninguém chama pelo navegador.
         .AddCustomCors()
         .AddHealth(builder.Configuration)
         .AddHttpClients()
@@ -39,6 +42,7 @@ try
         .AddIntegrationsAuth()
         .AddRouteIntegrationEvent()
         .AddProcessIntegrationEventCallback()
+        // PROBLEMA: MVC sem nenhum controller.
         .AddControllers();
 
     builder.Host.UseSerilog();
@@ -65,6 +69,7 @@ try
         Predicate = (check) => check.Tags.Contains("kafka-healthy")
     });
 
+    // PROBLEMA: endpoint que expõe configuração.
     app.MapGet("/Topics", (KafkaConfig config) =>Results.Ok(new
     {
         config.Connection.GroupId,

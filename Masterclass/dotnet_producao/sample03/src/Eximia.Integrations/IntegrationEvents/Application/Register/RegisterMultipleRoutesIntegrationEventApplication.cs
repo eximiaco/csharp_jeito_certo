@@ -95,6 +95,8 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
                     cancellationToken);
 
                 // Evento da plataforma: roda em paralelo para não atrasar a resposta à origem.
+                // PROBLEMA: task solta. Não é aguardada nem observada: a exceção some, o trabalho se perde se o app parar,
+                // e o IPublisher (scoped) pode já estar descartado quando ela rodar.
                 _ = Task.Run(() =>
                     publishPlataformEventService.PublishIntegrationEventReceivedAsync(integrationEvent.Value));
             }
@@ -103,6 +105,8 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
             await outboxTransaction.CommitAsync(cancellationToken);
 
             // Executar ações pós-registro para cada evento
+            // PROBLEMA: lambda async num Parallel.ForEach vira async void. Não espera o trabalho, uma exceção derruba o processo
+            // e o DbContext é usado por várias tasks ao mesmo tempo.
             Parallel.ForEach(processedEvents,
                 async integrationEvent =>
                 {

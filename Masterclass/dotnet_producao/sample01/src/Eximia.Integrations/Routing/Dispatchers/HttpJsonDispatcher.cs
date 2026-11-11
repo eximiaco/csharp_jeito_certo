@@ -25,6 +25,7 @@ public class HttpJsonDispatcher
             .CreateFallbackPolicy()
             .WrapAsync(PolicyFactory.CreateRetryPolicy(route.MaxRetry, destinationErrorConfiguration));
         
+        // PROBLEMA: a política roda sem o token. Retry e esperas entre tentativas não podem ser cancelados.
         var result = await policy.ExecuteAsync(
             action: async context =>
             {
@@ -32,6 +33,7 @@ public class HttpJsonDispatcher
                     .WithHeader("Content-Type", route.ContentType)
                     .WithHeader("x-eximia-correlation-id", integrationEvent.ControlCode)
                     .WithTimeout(TimeSpan.FromSeconds(route.TimeOut))
+                    // PROBLEMA: a chamada HTTP não recebe o token: só termina pelo timeout da rota.
                     .PostStringAsync(payload);
                 return integrationEvent.Control.IsSync
                     ? DispatcherResult.Success(response.StatusCode, await response.GetStringAsync())

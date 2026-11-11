@@ -20,6 +20,8 @@ public sealed class PlatformEventsBus(KafkaConfig config, IServiceScopeFactory s
     public void StartReceive()
     {
         // Quem chega depois só pega carona no consumer que já está de pé.
+        // PROBLEMA: guarda não atômica (check-then-act). Os dois BackgroundService chamam StartReceive no ExecuteAsync.
+        // No .NET 8 rodavam em sequência e funcionava; no .NET 10 rodam em paralelo e passam juntos por aqui.
         if (_started)
             return;
 
@@ -31,6 +33,8 @@ public sealed class PlatformEventsBus(KafkaConfig config, IServiceScopeFactory s
         using (var scope = scopes.CreateScope())
             topic = scope.ServiceProvider.GetRequiredService<TopicNameFactoryPeerEnviroment>().Create(config.Events.Topic);
 
+        // PROBLEMA: configuração padrão. O offset é confirmado em segundo plano antes de processar: um crash perde mensagens.
+        // Sem EnableAutoOffsetStore=false, sem CooperativeSticky, sem handlers de erro e sem Close() no encerramento.
         _consumer = new ConsumerBuilder<string, string>(new ConsumerConfig
         {
             BootstrapServers = config.Connection.BootstrapServers,
@@ -41,6 +45,7 @@ public sealed class PlatformEventsBus(KafkaConfig config, IServiceScopeFactory s
         _consumer.Subscribe(topic);
 
         _started = true;
+        // PROBLEMA: o loop bloqueante roda numa thread do pool. Prende uma thread do ThreadPool para sempre; precisaria de uma thread dedicada.
         Task.Run(ConsumeLoop);
     }
 
@@ -48,9 +53,12 @@ public sealed class PlatformEventsBus(KafkaConfig config, IServiceScopeFactory s
     {
         while (true)
         {
+            // PROBLEMA: Consume() bloqueante, sem token: nunca encerra.
             var result = _consumer!.Consume();
 
             // Para "não segurar o consumer", cada mensagem vira uma tarefa solta.
+            // PROBLEMA: uma task solta por mensagem. Sem limite (a rajada enche a fila do pool), a exceção some e a ordem
+            // dentro da partição se perde.
             _ = Task.Run(() => Process(result));
         }
     }
@@ -64,6 +72,7 @@ public sealed class PlatformEventsBus(KafkaConfig config, IServiceScopeFactory s
             result.Offset.Value);
 
         foreach (var handler in _handlers)
+            // PROBLEMA: bloqueia a thread do pool esperando o handler.
             handler(context).GetAwaiter().GetResult();
     }
 }

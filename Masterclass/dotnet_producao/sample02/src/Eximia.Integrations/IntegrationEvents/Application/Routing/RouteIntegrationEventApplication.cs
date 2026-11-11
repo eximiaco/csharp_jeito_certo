@@ -78,6 +78,7 @@ public class RouteIntegrationEventApplication(
                 integrationEvent.Value.Control.IsCallback,
                 eventDate);
         }
+        // PROBLEMA: trata o cancelamento (shutdown) como falha de entrega. Falta relançar OperationCanceledException.
         catch (Exception ex)
         {
             logger.Error(ex, "Integration event {IntegrationEventId} failed. | Error: {Error}", command.Id, ex.Message);

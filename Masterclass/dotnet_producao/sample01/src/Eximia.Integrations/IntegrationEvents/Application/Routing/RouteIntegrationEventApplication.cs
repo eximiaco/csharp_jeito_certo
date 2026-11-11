@@ -33,12 +33,14 @@ public class RouteIntegrationEventApplication(
             // O offset/partição passam a ser gravados no consumo (o OutboxWorker padrão do Silverback não expõe o ack do produtor).
             if (kafkaMessage is not null)
             {
+                // PROBLEMA: o token está disponível no método e não é repassado.
                 await integrationEventsDataAccess.UpdateKafkaOffsetAsync(
                     integrationEvent.Value.UniqueId,
                     kafkaMessage.Offset.Value,
                     kafkaMessage.TopicPartition.Partition.Value);
             }
 
+            // PROBLEMA: o token está disponível no método e não é repassado.
             var route = await routingDataAccess.GetRouteWithoutRules(command.RouteId);
             if (route.HasNoValue)
             {
@@ -57,6 +59,7 @@ public class RouteIntegrationEventApplication(
             if (dispatcherResult.IsRetry)
             {
                 integrationEvent.Value.RegisterRetry(dispatcherResult.Message);
+                // PROBLEMA: o token está disponível no método e não é repassado.
                 await integrationEventsDataAccess.UpdateIntegrationProcess(integrationEvent.Value);
                 logger.Warning("Integration event {IntegrationEventId} needs retry. | Error: {Error}", command.Id, dispatcherResult.Message);
                 throw new RetryDispatcherException(
@@ -67,6 +70,8 @@ public class RouteIntegrationEventApplication(
 
             integrationEvent.Value.RegisterSuccessOnDispatching();
 
+            // PROBLEMA: o destino JÁ recebeu o evento e o resultado é gravado sem prazo. Passar o token do consumer também seria
+            // errado (um shutdown aqui geraria reentrega e duplicidade): o certo é um token próprio e curto.
             await integrationEventsDataAccess.UpdateIntegrationProcess(integrationEvent.Value);
             await publishPlataformEventService.PublishIntegrationEventSentAsync(
                 integrationEvent.Value.ControlCode,

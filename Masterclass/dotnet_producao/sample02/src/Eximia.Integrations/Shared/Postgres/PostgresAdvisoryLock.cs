@@ -14,6 +14,7 @@ public sealed class PostgresAdvisoryLock(PostgresConnectionStringFactory connect
     public async Task<IAsyncDisposable?> TryAcquireAsync(string name, CancellationToken cancellationToken)
     {
         // O lock vale para a SESSÃO: a conexão precisa ficar aberta enquanto o trabalho roda.
+        // PROBLEMA: new NpgsqlConnection cria um pool global sem dono. Ninguém o descarta no shutdown.
         var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
         try
         {

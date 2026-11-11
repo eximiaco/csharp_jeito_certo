@@ -47,6 +47,7 @@ try
     builder.Host.UseSerilog();
     builder.Host.UseDefaultServiceProvider(options =>
     {
+        // PROBLEMA: validação do container desligada. Captive dependency e dependência não registrada passam em silêncio.
         options.ValidateScopes = false;
         options.ValidateOnBuild = false;
     });
@@ -69,6 +70,7 @@ try
     app.UseAuthentication();
     app.UseAuthorization();
     app.MapControllers();
+    // PROBLEMA: sem HostOptions.ShutdownTimeout explícito. Os retries do destino podem passar do padrão (30 s) e levar SIGKILL.
     app.Run();
     return 0;
 }

@@ -29,6 +29,7 @@ public class HandleRoutingErrorService(
             "Error dispatching integration event {IntegrationEventId} to {Destiny}. | StatusCode: {StatusCode}. Body: {Body}",
             integrationEvent.Id, integrationEvent.Entity.Destiny.Name, dispatcherResult.StatusCode, dispatcherResult.Body);
 
+        // PROBLEMA: GetResult() bloqueia a thread esperando o banco. Com o destino fora do ar, todas as mensagens caem aqui juntas.
         var needRetry = checkIfErrorStatusCodeIsAllowedService
             .NeedRetryAsync(command.Destiny, dispatcherResult.Body, dispatcherResult.StatusCode, cancellationToken)
             .GetAwaiter().GetResult();
@@ -47,6 +48,7 @@ public class HandleRoutingErrorService(
             return;
 
         ProcessIntegrationEventCallbackCommand callbackMessage = new(integrationEvent.Id, dispatcherResult.StatusCode, command.Key);
+        // PROBLEMA: PublishAsync aceita o token e ele não é passado. O envio não pode ser interrompido.
         await publisher.PublishAsync(callbackMessage);
     }
 }

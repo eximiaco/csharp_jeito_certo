@@ -27,6 +27,7 @@ public static class DependencyInjection
     public static IServiceCollection AddIntegrationsShared(this IServiceCollection services)
     {
         services.AddSingleton<PostgresConnectionStringFactory>();
+        // PROBLEMA: singleton que depende de serviço scoped (captive dependency): o IPublisher é scoped e passa a viver o tempo do processo.
         services.AddSingleton<PublishPlataformEventService>();
         services.AddScoped<IntegrationEventsDataAccess>();
         return services;
@@ -68,6 +69,7 @@ public static class DependencyInjection
     public static IServiceCollection AddRegisterIntegrationEvent(this IServiceCollection services)
     {
         // Usado em toda requisição da API: uma instância só.
+        // PROBLEMA: singleton que depende de serviço scoped (captive dependency): todas as requisições compartilham o mesmo DbContext (que não é thread-safe).
         services.AddSingleton<RegisterMultipleRoutesIntegrationEventApplication>();
         services.AddScoped<JsonSchemaService>();
 
@@ -90,6 +92,8 @@ public static class DependencyInjection
     public static IServiceCollection AddProcessIntegrationEventCallback(this IServiceCollection services)
     {
         // Só lê uma configuração e faz um POST: uma instância basta para todo o processo.
+        // PROBLEMA: singleton desnecessário. Nada é compartilhado: é uma leitura de configuração e um POST.
+        // Não quebra hoje; a próxima dependência scoped injetada aqui vira captive dependency sem aviso.
         services.AddSingleton<SendIntegrationEventService>();
         // O handler (subscriber do Silverback) é registrado no host, com AddScopedSubscriber.
         return services;

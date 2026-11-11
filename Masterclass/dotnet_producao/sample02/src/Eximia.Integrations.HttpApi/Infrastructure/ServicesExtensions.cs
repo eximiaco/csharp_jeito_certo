@@ -134,6 +134,7 @@ internal static class ServicesExtensions
 
     public static IServiceCollection AddHealth(this IServiceCollection services, IConfiguration configuration)
     {
+        // PROBLEMA: o health check do outbox exige um IOutboxReader que ninguém registra. Só falharia na primeira chamada real.
         var hcBuilder = services.AddHealthChecks();
         var connectionStringFactory = new PostgresConnectionStringFactory(configuration);
 

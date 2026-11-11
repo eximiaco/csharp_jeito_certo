@@ -100,6 +100,7 @@ public sealed class IntegrationEventsDataAccess(NpgsqlDataSource dataSource)
         param.Add("@StatusCode", integrationEvent.StatusCode, DbType.Int32, ParameterDirection.Input);
 
         await using var connection = dataSource.CreateConnection();
+        // PROBLEMA: o método recebe o token e não o repassa ao driver. A query não é cancelada e segue no Postgres.
         var result = await connection.ExecuteScalarAsync<int>(sql, param);
         integrationEvent.SetDatabaseId(result);
     }
@@ -146,6 +147,7 @@ public sealed class IntegrationEventsDataAccess(NpgsqlDataSource dataSource)
         // Um único comando: marca o evento como Processing e devolve a linha já atualizada.
         await using var connection = dataSource.CreateConnection();
         var dto = await connection
+            // PROBLEMA: o método recebe o token e não o repassa ao driver. A query não é cancelada e segue no Postgres.
             .QueryFirstOrDefaultAsync<EventDto>(
                 $@"UPDATE public.integration_events
                       SET
@@ -196,6 +198,7 @@ public sealed class IntegrationEventsDataAccess(NpgsqlDataSource dataSource)
             dto.SapQueryAction,
             dto.StatusCode);
 
+    // PROBLEMA: nem recebe o token. Não há como cancelar, por mais que o chamador tenha um.
     public async Task UpdateIntegrationProcess(IntegrationEvent integrationEvent)
     {
         const string sql = @"UPDATE public.integration_events SET
@@ -214,6 +217,7 @@ public sealed class IntegrationEventsDataAccess(NpgsqlDataSource dataSource)
         param.Add("@LastError", integrationEvent.Retry.LastError, DbType.AnsiString, ParameterDirection.Input);
 
         await using var connection = dataSource.CreateConnection();
+        // PROBLEMA: query sem token (o método nem o recebe).
         await connection.ExecuteScalarAsync<int>(sql, param);
     }
 
@@ -226,6 +230,7 @@ public sealed class IntegrationEventsDataAccess(NpgsqlDataSource dataSource)
         param.Add("@Status", EIntegrationStatus.WaitingCallback, DbType.Int16, ParameterDirection.Input);
         param.Add("@ControlCode", integrationEvent.ControlCode, DbType.AnsiString, ParameterDirection.Input);
         await using var connection = dataSource.CreateConnection();
+        // PROBLEMA: o método recebe o token e não o repassa ao driver. A query não é cancelada e segue no Postgres.
         await connection.ExecuteAsync(sql, param);
     }
 
@@ -233,6 +238,7 @@ public sealed class IntegrationEventsDataAccess(NpgsqlDataSource dataSource)
     {
         await using var connection = dataSource.CreateConnection();
         var dto = await connection
+            // PROBLEMA: o método recebe o token e não o repassa ao driver. A query não é cancelada e segue no Postgres.
             .QueryFirstOrDefaultAsync<EventDto>(
                 $@"SELECT {_eventColumns}
                     FROM public.integration_events
@@ -245,6 +251,7 @@ public sealed class IntegrationEventsDataAccess(NpgsqlDataSource dataSource)
         return ToIntegrationEvent(dto);
     }
 
+    // PROBLEMA: nem recebe o token. Não há como cancelar, por mais que o chamador tenha um.
     public async Task UpdateKafkaOffsetAsync(Guid uniqueId, long queueOffset, int queuePartition)
     {
         var sql = @"UPDATE integration_events SET queue_offset = @queueOffset, queue_partition = @queuePartition
@@ -256,6 +263,7 @@ public sealed class IntegrationEventsDataAccess(NpgsqlDataSource dataSource)
         param.Add("queuePartition", queuePartition, DbType.Int32, ParameterDirection.Input);
 
         await using var connection = dataSource.CreateConnection();
+        // PROBLEMA: query sem token (o método nem o recebe).
         await connection.ExecuteAsync(sql, param).ConfigureAwait(false);
     }
 
@@ -279,6 +287,7 @@ public sealed class IntegrationEventsDataAccess(NpgsqlDataSource dataSource)
         param.Add("payloadFileId", payloadFileId, DbType.Guid);
 
         await using var connection = dataSource.CreateConnection();
+        // PROBLEMA: o método recebe o token e não o repassa ao driver. A query não é cancelada e segue no Postgres.
         await connection.ExecuteAsync(sql, param);
     }
 
@@ -292,6 +301,7 @@ public sealed class IntegrationEventsDataAccess(NpgsqlDataSource dataSource)
         param.Add("id", id, DbType.Int32);
         
         await using var connection = dataSource.CreateConnection();
+        // PROBLEMA: o método recebe o token e não o repassa ao driver. A query não é cancelada e segue no Postgres.
         var destiny = await connection.QueryFirstOrDefaultAsync<string>(sql, param);
         
         return string.IsNullOrEmpty(destiny) ? Maybe.None : destiny;

@@ -22,6 +22,7 @@ public sealed class PlatformEventTimelineDataAccess(PostgresConnectionStringFact
     /// </remarks>
     public void Record(PlatformEventContext context)
     {
+        // PROBLEMA: new NpgsqlConnection cria um pool global sem dono. Ninguém o descarta no shutdown.
         using var connection = new NpgsqlConnection(connectionStringFactory.CreateConnectionString().ConnectionString);
         connection.Execute(
             Sql,

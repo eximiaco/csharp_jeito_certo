@@ -31,8 +31,11 @@ try
         .AddCaching()
         .AddCustomOptions(builder.Configuration)
         .AddGoogleStorageAuth(builder.Configuration)
+        // PROBLEMA: sobra de Web API. Um consumer não tem HttpContext; o registro engana quem lê.
         .AddHttpContextAccessor()
+        // PROBLEMA: sobra de Web API. Um consumer não tem HttpContext; o registro engana quem lê.
         .AddSingleton<EximiaProblemDetailsFactory>()
+        // PROBLEMA: sobra de Web API. Um consumer não tem HttpContext; o registro engana quem lê.
         .AddScoped<IIntegrationRequest, IntegrationRequestHttpAdapter>()
         .AddIntegrationsShared()
         .AddIntegrationsRouting()
@@ -43,6 +46,7 @@ try
     builder.Host.UseSerilog();
     builder.Host.UseDefaultServiceProvider(options =>
     {
+        // PROBLEMA: validação do container desligada. Captive dependency e dependência não registrada passam em silêncio.
         options.ValidateScopes = false;
         options.ValidateOnBuild = false;
     });
@@ -58,6 +62,7 @@ try
         Predicate = (check) => check.Tags.Contains("kafka-healthy")
     });
 
+    // PROBLEMA: sem HostOptions.ShutdownTimeout explícito. Os retries do destino podem passar do padrão (30 s) e levar SIGKILL.
     app.Run();
     return 0;
 }

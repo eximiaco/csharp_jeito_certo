@@ -109,7 +109,7 @@ As práticas recomendadas pela Confluent aplicadas:
 | **At-least-once** | `EnableAutoCommit = true` e `EnableAutoOffsetStore = false` (linha 167): o offset só é marcado com `StoreOffset` (linha 97) **depois** de processar. O commit roda em segundo plano |
 | **Idempotência** | A reentrega é normal. A gravação usa `INSERT ... ON CONFLICT DO NOTHING`, com a chave natural da mensagem (`topic`, `partition`, `offset`) |
 | **Encerramento limpo** | `Close()` num `finally` (linha 107): confirma os offsets guardados e sai do grupo na hora, sem esperar o `session.timeout` |
-| **Rebalance cooperativo** | `PartitionAssignmentStrategy.CooperativeSticky` (linha 30): só as partições que mudam de dono são pausadas |
+| **Rebalance cooperativo** | `PartitionAssignmentStrategy.CooperativeSticky` (linha 169): só as partições que mudam de dono são pausadas |
 | **Erros do client** | `SetErrorHandler` e `SetLogHandler` (para o Serilog). `ConsumeException` não fatal é logada e o loop segue; erro **fatal** derruba o serviço |
 | **Mensagem venenosa** | Que não desserializa: logada e **pulada** (o offset é guardado), para não travar a partição |
 | **Falha do banco** | Retentada com backoff curto e cancelável (`MaxAttempts`, linha 41). Persistindo, o serviço cai **sem guardar o offset**, e a mensagem é reentregue após o restart. Pular a falha em silêncio perderia dados |

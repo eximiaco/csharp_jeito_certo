@@ -36,8 +36,10 @@ try
     builder.Services.AddSerilog();
 
     builder.ConfigureContainer(new DefaultServiceProviderFactory(
+        // PROBLEMA: validação do container desligada. Captive dependency e dependência não registrada passam em silêncio.
         new ServiceProviderOptions { ValidateScopes = false, ValidateOnBuild = false }));
 
+    // PROBLEMA: sem HostOptions.ShutdownTimeout explícito. Os retries do destino podem passar do padrão (30 s) e levar SIGKILL.
     await builder.Build().RunAsync();
     return 0;
 }

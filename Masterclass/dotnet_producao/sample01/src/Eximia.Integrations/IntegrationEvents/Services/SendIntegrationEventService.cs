@@ -26,12 +26,14 @@ public class SendIntegrationEventService(IConfiguration configuration)
                     .WithOAuthBearerToken(token)
                     .PostJsonAsync(request, cancellationToken: context);
 
+                // PROBLEMA: .Result bloqueia a thread lendo o corpo da resposta (caminho de falha).
                 return DispatcherResult.Success(response.StatusCode, response.GetStringAsync().Result);
             },
             cancellationToken: cancellationToken);
 
         if (result.Outcome != OutcomeType.Failure) return result.Result;
         if (result.FinalException is FlurlHttpException ex)
+            // PROBLEMA: .Result bloqueia a thread lendo o corpo da resposta de erro.
             return DispatcherResult.Failure(string.Empty, ex.StatusCode ?? 0, ex.GetResponseStringAsync().Result);
         return DispatcherResult.Failure(string.Empty, 999, result.FinalException.ToString());
     }

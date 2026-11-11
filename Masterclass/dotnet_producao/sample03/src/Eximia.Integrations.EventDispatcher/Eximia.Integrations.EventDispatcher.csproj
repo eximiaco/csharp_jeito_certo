@@ -1,3 +1,4 @@
+<!-- PROBLEMA: SDK Web completo para um host que só precisa dos probes de saúde (CreateSlimBuilder). -->
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>

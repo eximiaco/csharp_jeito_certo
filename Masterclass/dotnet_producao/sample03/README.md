@@ -13,7 +13,7 @@ Para compilar: `dotnet build Eximia.Integrations.slnx`. Nada aqui precisa ser ex
 ## Problema 3 · Tarefas disparadas e esquecidas
 
 **`Task.Run` solto no registro do evento** (`Eximia.Integrations/IntegrationEvents/Application/Register/RegisterMultipleRoutesIntegrationEventApplication.cs`)
-- Linha 98: `_ = Task.Run(() => publishPlataformEventService.PublishIntegrationEventReceivedAsync(...))`.
+- Linha 100: `_ = Task.Run(() => publishPlataformEventService.PublishIntegrationEventReceivedAsync(...))`.
 - **Por quê:** o comentário diz "roda em paralelo para não atrasar a resposta", mas a task não é aguardada nem
   observada. (1) Se ela falhar, a exceção some: ninguém a vê, e o evento da plataforma se perde sem rastro.
   (2) Se o app parar, o trabalho some junto. (3) Ela usa o `IPublisher`, que é scoped e vive no escopo da requisição:
@@ -21,7 +21,7 @@ Para compilar: `dotnet build Eximia.Integrations.slnx`. Nada aqui precisa ser ex
   sob carga, cada requisição joga mais uma task no pool.
 
 **`Parallel.ForEach` com lambda `async`** (mesmo arquivo)
-- Linha 106: `Parallel.ForEach(processedEvents, async integrationEvent => await ...Execute(...))`.
+- Linha 110: `Parallel.ForEach(processedEvents, async integrationEvent => await ...Execute(...))`.
 - **Por quê:** `Parallel.ForEach` recebe um `Action`, então o lambda `async` vira **`async void`**. O
   `Parallel.ForEach` termina assim que cada lambda atinge o primeiro `await`, **sem esperar o trabalho**. A resposta
   `Success` volta antes das ações pós-registro terminarem; se uma delas lançar, a exceção de um `async void` vai para
@@ -29,19 +29,19 @@ Para compilar: `dotnet build Eximia.Integrations.slnx`. Nada aqui precisa ser ex
   são usados por várias tasks ao mesmo tempo, sem ser thread-safe.
 
 **No consumer Confluent (ver o bloco de threads abaixo):** uma `Task.Run` solta por mensagem
-(`Workers/PlatformEventsBus.cs`, linha 54), sem limite, sem observar a exceção e com o offset já confirmado.
+(`Workers/PlatformEventsBus.cs`, linha 62), sem limite, sem observar a exceção e com o offset já confirmado.
 
 ## Problema 4 · BackgroundService e host
 
 **Worker escrito como `while(true)`** (`Eximia.Integration.BackgroundAgent/Workers/ReprocessStuckEventsWorker.cs`)
-- Linha 20: `while (true)` que ignora o token.
-- Linhas 53 e 74: `ToListAsync()` e `SaveChangesAsync()` sem o token.
-- Linha 32: `Task.Delay` sem token.
+- Linha 21: `while (true)` que ignora o token.
+- Linhas 57 e 79: `ToListAsync()` e `SaveChangesAsync()` sem o token.
+- Linha 35: `Task.Delay` sem token.
 - Sem exclusão entre réplicas.
 - **Por quê:**
   - O `StopAsync` espera o `ExecuteAsync` terminar, e esse loop só termina quando o intervalo de 5 minutos vence. Um
     deploy espera até 5 minutos, estoura o `ShutdownTimeout` e o processo leva `SIGKILL` no meio de uma iteração.
-  - O `catch (Exception)` do loop (linha 27) engole também a `OperationCanceledException`, então mesmo com token o serviço
+  - O `catch (Exception)` do loop (linha 29) engole também a `OperationCanceledException`, então mesmo com token o serviço
     seguiria vivo.
   - Sem token, o EF não pode ser interrompido.
   - Com duas réplicas do agent, as duas reprocessam os mesmos eventos. O Hangfire dava essa exclusão com lock no
@@ -49,14 +49,14 @@ Para compilar: `dotnet build Eximia.Integrations.slnx`. Nada aqui precisa ser ex
 
 **Agent como casca de Hangfire**
 - `Eximia.Integration.BackgroundAgent/Eximia.Integration.BackgroundAgent.csproj`: linha 1 (SDK `Microsoft.NET.Sdk.Web`).
-- `Eximia.Integration.BackgroundAgent/Program.cs`: linha 33 (`AddHangfireJobs`) e linha 64 (`UseHangfireDashboard`).
-- `Eximia.Integration.BackgroundAgent/Infrastructure/JobsConfiguration.cs`: linha 6, um `BackgroundService` que não faz nada.
+- `Eximia.Integration.BackgroundAgent/Program.cs`: linha 34 (`AddHangfireJobs`) e linha 67 (`UseHangfireDashboard`).
+- `Eximia.Integration.BackgroundAgent/Infrastructure/JobsConfiguration.cs`: linha 7, um `BackgroundService` que não faz nada.
 - **Por quê:** o serviço não recebe HTTP, mas carrega Kestrel, MVC, Hangfire e um dashboard. A superfície de ataque e o
   custo de manter crescem sem ganho: os dois jobs reais viram dois `BackgroundService` simples.
 
 **Dispatcher como Web API completa** (`Eximia.Integrations.EventDispatcher`)
 - `Eximia.Integrations.EventDispatcher/Eximia.Integrations.EventDispatcher.csproj`: linha 1 (SDK Web).
-- `Eximia.Integrations.EventDispatcher/Program.cs`: `CreateBuilder` (linha 8), `AddSwaggerDoc` (linha 27), `AddControllers` (linha 42) e `MapGet("/Topics")` (linha 68).
+- `Eximia.Integrations.EventDispatcher/Program.cs`: `CreateBuilder` (linha 9), `AddSwaggerDoc` (linha 29), `AddControllers` (linha 46) e `MapGet("/Topics")` (linha 73).
 - **Por quê:** o dispatcher só **consome** mensagens. Swagger, CORS e MVC sem nenhum controller são superfície inútil,
   e o `/Topics` expõe configuração. O único HTTP de que ele precisa são os probes de saúde do Kubernetes.
 
@@ -73,10 +73,10 @@ O consumer fica em `Workers/PlatformEventsBus.cs`, compartilhado por dois `Backg
 
 | Problema | Onde | Por que é um problema |
 |---|---|---|
-| Loop bloqueante numa thread do pool | `PlatformEventsBus.cs`, `Task.Run(ConsumeLoop)` (linha 44) e `Consume()` (linha 51) | `Consume()` bloqueia. O `while (true)` **prende uma thread do ThreadPool para sempre**, sem token. É uma thread a menos para todo o processo |
-| Uma `Task.Run` solta por mensagem | linha 54 | Sem limite: numa rajada, milhares de work items entram na fila do pool. Exceções se perdem. A ordem dentro da partição deixa de existir |
-| Sync-over-async dentro de cada work item | `PlatformEventsBus.cs` (linha 67) e `IntegrationTimelineWorker.cs` (linha 28) | Cada work item **bloqueia** uma thread do pool esperando o banco |
-| `Thread.Sleep` no retry | `IntegrationTimelineWorker.cs`, linha 35 | Bloqueia a thread do pool por até 2·n segundos, por mensagem |
+| Loop bloqueante numa thread do pool | `PlatformEventsBus.cs`, `Task.Run(ConsumeLoop)` (linha 49) e `Consume()` (linha 57) | `Consume()` bloqueia. O `while (true)` **prende uma thread do ThreadPool para sempre**, sem token. É uma thread a menos para todo o processo |
+| Uma `Task.Run` solta por mensagem | linha 62 | Sem limite: numa rajada, milhares de work items entram na fila do pool. Exceções se perdem. A ordem dentro da partição deixa de existir |
+| Sync-over-async dentro de cada work item | `PlatformEventsBus.cs` (linha 76) e `IntegrationTimelineWorker.cs` (linha 30) | Cada work item **bloqueia** uma thread do pool esperando o banco |
+| `Thread.Sleep` no retry | `IntegrationTimelineWorker.cs`, linha 38 | Bloqueia a thread do pool por até 2·n segundos, por mensagem |
 | Commit antes de processar | `PlatformEventsBus.cs`, `ConsumerConfig` sem `EnableAutoOffsetStore = false` | O offset é confirmado em segundo plano enquanto a `Task.Run` ainda nem rodou: um crash ou deploy **perde mensagens** |
 | Sem `Close()` e sem handlers de erro | `PlatformEventsBus.cs` | O rebalance espera o `session.timeout`, e os erros do client somem |
 
@@ -104,13 +104,13 @@ mesmo starvation nasce de **tarefas soltas mais um `BackgroundService` mal escri
 
 **Onde isso morde aqui.** `IntegrationTimelineWorker` e `IntegrationErrorAlertWorker` fazem a mesma coisa na parte
 síncrona do `ExecuteAsync`: `bus.Subscribe(...)` e `bus.StartReceive()`
-(`IntegrationTimelineWorker.cs`, linha 15; `IntegrationErrorAlertWorker.cs`, linha 13).
+(`IntegrationTimelineWorker.cs`, linha 16; `IntegrationErrorAlertWorker.cs`, linha 14).
 
 O `StartReceive` (linha 20) tem uma guarda que **não é atômica**: `if (_started) return;` e, mais abaixo,
 `_started = true`, com a criação do consumer no meio. No .NET 8 isso funcionava por acaso, porque as chamadas eram
 sequenciais: o segundo serviço via o bus já ligado e só pegava carona. No .NET 10 as duas chamadas correm juntas:
 
-- as duas passam pelo `if`, e o resultado é **intermitente**: a exceção "already running" na subida (linha 28), ou
+- as duas passam pelo `if`, e o resultado é **intermitente**: a exceção "already running" na subida (linha 30), ou
   **dois consumers** no mesmo grupo e o primeiro vazado;
 - o erro aparece só no start, dependendo do timing, então um serviço pode ter o problema sem nunca ter falhado antes.
 

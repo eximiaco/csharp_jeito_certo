@@ -19,9 +19,11 @@ public static class PolicyFactory
                 {
                     var error = result.Exception.Message;
                     if (result.Exception is FlurlHttpException flurlException)
+                        // PROBLEMA: callback síncrono lendo a resposta com .Result. No 401, todas as entregas bloqueiam threads juntas.
                         error = flurlException.GetResponseStringAsync().Result;
 
                     Log.Warning("Destination {Destination} returned 401, renewing the token. | Error: {Error}", route.Destination, error);
+                    // PROBLEMA: bloqueia uma thread do pool esperando o provedor de identidade (renovação do token). O método já é async: deveria usar await.
                     provider.GetTokenAsync(route, correlationId).GetAwaiter().GetResult();
                 });
 

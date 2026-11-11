@@ -27,6 +27,7 @@ public class RoutingDataAccess(
                 cacheEntry.Size = 500;
                 await using var connection = dataSource.CreateConnection();
                 var dto = await connection
+                    // PROBLEMA: consulta sem token. Não é cancelada no shutdown nem no timeout.
                     .QueryFirstOrDefaultAsync<RouteDto>(
                         @"SELECT id,
                                     origin,
@@ -92,6 +93,7 @@ public class RoutingDataAccess(
                 cacheEntry.Size = 500;
                 await using var connection = dataSource.CreateConnection();
                 var dto = await connection
+                    // PROBLEMA: consulta sem token. Não é cancelada no shutdown nem no timeout.
                     .QueryFirstOrDefaultAsync<RouteDto>(
                         @"SELECT id,
                                     origin,
@@ -156,6 +158,7 @@ public class RoutingDataAccess(
                 cacheEntry.Size = 500;
                 await using var connection = dataSource.CreateConnection();
                 var dto = await connection
+                    // PROBLEMA: consulta sem token. Não é cancelada no shutdown nem no timeout.
                     .QueryFirstOrDefaultAsync<RouteWithoutRulesDto>(
                         @"SELECT id,
                                     origin,
@@ -219,6 +222,7 @@ public class RoutingDataAccess(
 
                 await using var connection = dataSource.CreateConnection();
 
+                // PROBLEMA: consulta sem token. Não é cancelada no shutdown nem no timeout.
                 var results = await connection.QueryAsync<RouteDto>(
                     @"SELECT r.id, r.origin, r.destination, r.entity, r.topic_name AS TopicName,
                          r.callback_required AS CallbackRequired, r.uri, r.content_type AS ContentType,

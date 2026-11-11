@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<!-- PROBLEMA: SDK Web num serviço sem HTTP. Deveria ser Microsoft.NET.Sdk.Worker. -->
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>

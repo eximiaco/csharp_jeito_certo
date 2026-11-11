@@ -29,6 +29,7 @@ public class DestinationErrorConfigurationDataAccess : IDestinationErrorConfigur
         DynamicParameters param = new();
         param.Add("id", id, DbType.AnsiStringFixedLength, ParameterDirection.Input, 100);
 
+        // PROBLEMA: new NpgsqlConnection cria um pool global sem dono. Ninguém o descarta no shutdown.
         await using var connection = new NpgsqlConnection(_connectionStringFactory.CreateConnectionString().ConnectionString);
         var result = await connection.QueryAsync<DestinationErrorConfigurationDto>(
             new CommandDefinition(sql, param, cancellationToken: cancellationToken)).ConfigureAwait(false);

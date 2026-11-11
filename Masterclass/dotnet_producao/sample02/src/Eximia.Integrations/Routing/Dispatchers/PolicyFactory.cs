@@ -59,6 +59,7 @@ public static class PolicyFactory
 
     public static IAsyncPolicy<DispatcherResult> CreateFallbackPolicy() =>
         Policy<DispatcherResult>
+            // PROBLEMA: captura também OperationCanceledException. O shutdown vira DispatcherResult.Failure (erro falso e callback de erro).
             .Handle<Exception>()
             .FallbackAsync(
                  fallbackAction: async (result, context, token) =>

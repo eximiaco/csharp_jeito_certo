@@ -29,10 +29,12 @@ public class HttpJsonWithJwtDispatcher(ClientCredentialsProvider clientCredentia
 
         var uri = integrationEvent.Control.IsCallbackError ? route.CallbackErrorUri : route.Uri;
 
+        // PROBLEMA: a política roda sem o token. Retry e esperas entre tentativas não podem ser cancelados.
         var result = await policy.ExecuteAsync(
             action: async context =>
             {
                 var tokenJwt = string.Empty;
+                // PROBLEMA: bloqueia uma thread do pool esperando o provedor de identidade. O método já é async: deveria usar await.
                 var authToken = clientCredentialsProvider.GetTokenAsync(route).GetAwaiter().GetResult();
 
                 if (authToken != null)
@@ -43,6 +45,7 @@ public class HttpJsonWithJwtDispatcher(ClientCredentialsProvider clientCredentia
                     .WithHeader("x-eximia-correlation-id", integrationEvent.ControlCode)
                     .WithHeader("Authorization", tokenJwt)
                     .WithTimeout(TimeSpan.FromSeconds(route.TimeOut))
+                    // PROBLEMA: a chamada HTTP não recebe o token: só termina pelo timeout da rota.
                     .PostStringAsync(payload);
 
                 return integrationEvent.Control.IsSync

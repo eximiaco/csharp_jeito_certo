@@ -31,6 +31,7 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
         try
         {
             // 1. Buscar TODAS as rotas para origem + entidade
+            // PROBLEMA: bloqueia uma thread do pool esperando o banco. O método já é async: deveria usar await. Roda em toda requisição.
             var allRoutes = routingDataAccess.GetRoutesByOriginAndEntityAsync(
                 command.Origin,
                 command.Entity,
@@ -57,6 +58,7 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
             var payload = command.Payload.ToStringJson();
             var payloadFileId = Guid.NewGuid();
 
+            // PROBLEMA: bloqueia uma thread do pool esperando o upload ao storage. O método já é async: deveria usar await. Roda em toda requisição.
             var uploadResult = uploadIntegrationEventPayloadService.UploadAsync(
                 payload,
                 payloadFileId,
@@ -85,6 +87,7 @@ public class RegisterMultipleRoutesIntegrationEventApplication(
                 processedEvents.Add(integrationEvent.Value);
 
                 // Publicar no Kafka
+                // PROBLEMA: PublishAsync aceita o token e ele não é passado. O envio não pode ser interrompido.
                 await publisher.PublishAsync(
                     RouteIntegrationEventRequestCommand.Create(
                         integrationEvent.Value,
